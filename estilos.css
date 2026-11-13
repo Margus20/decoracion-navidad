@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(180deg, #0a1f44 0%, #1a3a6e 50%, #0a1f44 100%);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+header {
+    text-align: center;
+    padding: 40px 20px 20px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2em;
+    color: #fff;
+}
+
+.menu-principal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding: 40px 20px;
+}
+
+.menu-principal button {
+    width: 90%;
+    max-width: 400px;
+    padding: 25px 20px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #fff;
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#boton-arbolito {
+    background: linear-gradient(135deg, #b22222, #8b0000);
+}
+
+#boton-belen {
+    background: linear-gradient(135deg, #228b22, #006400);
+}
+
+.menu-principal button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(255, 215, 0, 0.5);
+}
+
+/* Efecto de nieve cayendo */
+.nieve {
+    position: fixed;
+    top: -10px;
+    color: #fff;
+    font-size: 1.5em;
+    pointer-events: none;
+    animation: caer 10s linear infinite;
+    z-index: 1;
+}
+
+@keyframes caer {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) translateX(50px);
+        opacity: 0.3;
+    }
+}
