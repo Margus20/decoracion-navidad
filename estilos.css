@@ -14,6 +14,76 @@ body {
     overflow-x: hidden;
 }
 
+/* ============ PORTADA ============ */
+.portada {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-image: url('img/belen/portada-vertical.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+    .portada {
+        background-image: url('img/belen/portada-horizontal.jpg');
+    }
+}
+
+.botones-portada {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.btn-portada {
+    position: absolute;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Botón "decorar árbol" - lado izquierdo, parte inferior */
+.btn-arbol {
+    top: 60%;
+    left: 5%;
+    width: 42%;
+    height: 25%;
+}
+
+/* Botón "armar Belén" - lado derecho, parte inferior */
+.btn-belen {
+    top: 60%;
+    left: 53%;
+    width: 42%;
+    height: 25%;
+}
+
+/* Ajuste para pantallas grandes (horizontal) */
+@media (min-width: 768px) {
+    .btn-arbol {
+        top: 55%;
+        left: 20%;
+        width: 25%;
+        height: 30%;
+    }
+    .btn-belen {
+        top: 55%;
+        left: 55%;
+        width: 25%;
+        height: 30%;
+    }
+}
+
+/* Efecto al tocar los botones */
+.btn-portada:active {
+    opacity: 0.7;
+}
+
+/* ============ ESTILOS GENERALES PARA LAS ESCENAS ============ */
 header {
     text-align: center;
     padding: 15px;
@@ -50,17 +120,11 @@ header h1 {
 }
 
 .escena {
-    display: none;
     position: relative;
     min-height: calc(100vh - 120px);
 }
 
-.escena.activa {
-    display: flex;
-    flex-direction: column;
-}
-
-/* SALA */
+/* ============ SALA ============ */
 .sala {
     position: relative;
     width: 100%;
@@ -160,7 +224,7 @@ header h1 {
     font-size: 2em;
 }
 
-/* ARBOLITO */
+/* ============ ARBOLITO ============ */
 .arbol-base {
     position: absolute;
     bottom: 5%;
@@ -222,7 +286,7 @@ header h1 {
     pointer-events: none;
 }
 
-/* PANEL DE ADORNOS */
+/* ============ PANEL DE ADORNOS ============ */
 .panel-adornos {
     background: #2c1810;
     border-top: 3px solid #ffd700;
@@ -264,7 +328,7 @@ header h1 {
     pointer-events: auto;
 }
 
-/* BELÉN */
+/* ============ BELÉN ============ */
 .terreno-belen {
     position: relative;
     width: 100%;
@@ -344,3 +408,46 @@ header h1 {
 
 .arbolito-belen { bottom: 25%; left: 15%; }
 .belen-2 { bottom: 30%; right: 10%; }
+
+/* ============ NIEVE ============ */
+.nieve {
+    position: fixed;
+    top: -10px;
+    color: #fff;
+    font-size: 1.5em;
+    pointer-events: none;
+    animation: caer 10s linear infinite;
+    z-index: 1;
+}
+
+@keyframes caer {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) translateX(50px);
+        opacity: 0.3;
+    }
+}
+
+/* ============ BOTÓN VOLVER ============ */
+.btn-volver {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 10px 15px;
+    background: #8b0000;
+    color: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    text-decoration: none;
+}
+
+.btn-volver:active {
+    transform: scale(0.95);
+}
