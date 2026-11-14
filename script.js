@@ -23,7 +23,7 @@ function iniciarArrastre(e, elemento) {
     adornoActivo = elemento.cloneNode(true);
     adornoActivo.classList.add('colocado');
     adornoActivo.style.position = 'absolute';
-    adornoActivo.style.zIndex = '1000';
+    adornoActivo.style.zIndex = '9999'; // Asegura que quede por encima de la nieve y todo lo demás
     document.body.appendChild(adornoActivo);
     
     const rect = elemento.getBoundingClientRect();
