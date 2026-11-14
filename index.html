@@ -3,105 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Navidad Mágica - Decora tu Sala o Belén</title>
+    <title>Navidad Mágica</title>
     <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
-    <header>
-        <h1>🎄 Navidad Mágica 🎄</h1>
-        <div class="menu-botones">
-            <button id="btn-sala">🏠 Decorar la Sala</button>
-            <button id="btn-belen">⭐ Armar el Belén</button>
+    <div class="portada">
+        <!-- Capa invisible con los botones funcionales encima de la imagen -->
+        <div class="botones-portada">
+            <a href="arbol.html" class="btn-portada btn-arbol"></a>
+            <a href="belen.html" class="btn-portada btn-belen"></a>
         </div>
-    </header>
+    </div>
 
-    <!-- ESCENA DE LA SALA -->
-    <section id="escena-sala" class="escena activa">
-        <div class="sala">
-            <!-- Pared y piso -->
-            <div class="pared"></div>
-            <div class="piso"></div>
-            
-            <!-- Ventanas con luces -->
-            <div class="ventana ventana-izq">
-                <div class="luz-larga"></div>
-                <div class="luz-larga"></div>
-                <div class="luz-larga"></div>
-            </div>
-            <div class="ventana ventana-der">
-                <div class="luz-larga"></div>
-                <div class="luz-larga"></div>
-                <div class="luz-larga"></div>
-            </div>
-            
-            <!-- Cuadro en la pared -->
-            <div class="cuadro"></div>
-            
-            <!-- Mesa con mantel -->
-            <div class="mesa"></div>
-            
-            <!-- Sofá -->
-            <div class="sofa"></div>
-            
-            <!-- Mascota (gatito) -->
-            <div class="mascota">🐱</div>
-            
-            <!-- Arbolito (base para armar) -->
-            <div class="arbol-base">
-                <div class="tronco"></div>
-                <div class="rama rama-1"></div>
-                <div class="rama rama-2"></div>
-                <div class="rama rama-3"></div>
-            </div>
-            
-            <!-- Zona para soltar adornos -->
-            <div class="zona-soltar" id="zona-arbol"></div>
-        </div>
-        
-        <!-- Panel de adornos -->
-        <aside class="panel-adornos">
-            <h3>🎁 Adornos</h3>
-            <div class="adorno" data-tipo="esfera-roja">🔴</div>
-            <div class="adorno" data-tipo="esfera-azul">🔵</div>
-            <div class="adorno" data-tipo="esfera-dorada">🟡</div>
-            <div class="adorno" data-tipo="estrella">⭐</div>
-            <div class="adorno" data-tipo="luz">💡</div>
-            <div class="adorno" data-tipo="regalo">🎁</div>
-            <div class="adorno" data-tipo="moño">🎀</div>
-            <div class="adorno" data-tipo="caramelo">🍬</div>
-        </aside>
-    </section>
-
-    <!-- ESCENA DEL BELÉN -->
-    <section id="escena-belen" class="escena">
-        <div class="terreno-belen">
-            <div class="cielo"></div>
-            <div class="estrella-guia">⭐</div>
-            <div class="pesebre"></div>
-            <div class="roca roca-1"></div>
-            <div class="roca roca-2"></div>
-            <div class="arbolito-belen">🌴</div>
-            <div class="arbolito-belen belen-2">🌵</div>
-            <div class="zona-soltar" id="zona-belen"></div>
-        </div>
-        
-        <aside class="panel-adornos">
-            <h3>👼 Personajes</h3>
-            <div class="adorno" data-tipo="maria">👩</div>
-            <div class="adorno" data-tipo="jose">👨</div>
-            <div class="adorno" data-tipo="nino">👶</div>
-            <div class="adorno" data-tipo="rey1">🤴</div>
-            <div class="adorno" data-tipo="rey2">👑</div>
-            <div class="adorno" data-tipo="rey3">🧙</div>
-            <div class="adorno" data-tipo="angel">👼</div>
-            <div class="adorno" data-tipo="pastor">🧑‍🌾</div>
-            <div class="adorno" data-tipo="oveja">🐑</div>
-            <div class="adorno" data-tipo="burro">🫏</div>
-            <div class="adorno" data-tipo="buey">🐂</div>
-        </aside>
-    </section>
-
-    <script src="script.js"></script>
 </body>
 </html>
