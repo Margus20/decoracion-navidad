@@ -9,12 +9,18 @@
 <body>
 
     <div class="portada">
+        <!-- Imagen que se adapta automáticamente a vertical u horizontal -->
+        <picture>
+            <source media="(min-width: 768px)" srcset="img/belen/portada-horizontal.jpg">
+            <img src="img/belen/portada-vertical.jpg" alt="Navidad Mágica - elige decorar el árbol o armar el Belén">
+        </picture>
         <!-- Capa invisible con los botones funcionales encima de la imagen -->
         <div class="botones-portada">
-            <a href="arbol.html" class="btn-portada btn-arbol"></a>
-            <a href="belen.html" class="btn-portada btn-belen"></a>
+            <a href="arbol.html" class="btn-portada btn-arbol" aria-label="Decorar árbol"></a>
+            <a href="belen.html" class="btn-portada btn-belen" aria-label="Armar Belén"></a>
         </div>
     </div>
 
+    <script src="script.js"></script>
 </body>
 </html>
