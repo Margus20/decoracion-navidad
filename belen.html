@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belén Navideño</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .stage-image {
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Volver</a>
+    
+    <div class="container">
+        <img id="stageImage" class="stage-image" src="" alt="Belén Navideño">
+    </div>
+
+    <script>
+        function updateImage() {
+            const stageImage = document.getElementById('stageImage');
+            
+            if (window.innerHeight > window.innerWidth) {
+                // Pantalla vertical
+                stageImage.src = 'img/belen/vertical_stage.jpg';
+            } else {
+                // Pantalla horizontal
+                stageImage.src = 'img/belen/horizontal_stage.jpg';
+            }
+        }
+
+        // Ejecutar al cargar la página
+        updateImage();
+
+        // Ejecutar cuando cambie la orientación
+        window.addEventListener('resize', updateImage);
+        window.addEventListener('orientationchange', updateImage);
+    </script>
+</body>
+</html>
