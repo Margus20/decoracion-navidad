@@ -29,8 +29,15 @@ html, body {
     object-fit: cover;
     object-position: center;
     display: block;
-    /* NUEVO: Escenario en blanco y negro para que las piezas a color resalten */
+    /* Escenario en blanco y negro para que las piezas a color resalten */
     filter: grayscale(100%) brightness(0.9);
+    /* NUEVO: Transición suave para cuando recupere el color */
+    transition: filter 1.5s ease;
+}
+
+/* NUEVO: Cuando se completa el Belén, se quita el blanco y negro */
+.celebracion-activa .stage-image {
+    filter: grayscale(0%) brightness(1) !important;
 }
 
 .escena-overlay {
@@ -46,6 +53,57 @@ html, body {
     pointer-events: none;
 }
 
+/* ============ BARRAS DE PROGRESO (NUEVO) ============ */
+.panel-progreso {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 800;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.barra-contenedor {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+}
+
+.label-progreso {
+    display: block;
+    font-size: 0.75rem;
+    color: #fff;
+    margin-bottom: 4px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+    background-color: #ff4444; /* Rojo por defecto */
+}
+
+.barra-relleno.nivel-bajo { background-color: #ff4444; }
+.barra-relleno.nivel-medio { background-color: #ffcc00; }
+.barra-relleno.nivel-alto { background-color: #44ff44; box-shadow: 0 0 10px #44ff44; }
+
 /* ============ FIGURAS COLOCADAS ============ */
 .figura-activa {
     position: absolute;
@@ -56,7 +114,7 @@ html, body {
     z-index: 100;
     filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
     touch-action: none;
-    /* NUEVO: Preparación para la selección con borde dorado */
+    /* Preparación para la selección con borde dorado */
     transition: outline 0.15s ease, filter 0.15s ease;
     outline: 3px solid transparent;
     outline-offset: 4px;
@@ -69,7 +127,7 @@ html, body {
     filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
 }
 
-/* NUEVO: Estilo cuando la pieza está seleccionada y activa */
+/* Estilo cuando la pieza está seleccionada y activa */
 .figura-activa.seleccionada {
     outline: 3px solid #ffd700;
     filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.85)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
@@ -180,25 +238,23 @@ html, body {
     background: #5a3a20;
 }
 
-/* ========================================================= */
-/* ============ NUEVO: PANEL DE CONTROLES DE PIEZA ========= */
-/* ========================================================= */
+/* ============ PANEL DE CONTROLES DE PIEZA ============ */
 .panel-controles {
     position: fixed;
     bottom: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100vw - 100px);
+    width: calc(100vw - 40px); /* Ajustado para dar más espacio */
     max-width: 640px;
     background: rgba(20, 20, 40, 0.9);
     border: 2px solid #ffd700;
     border-radius: 16px;
-    padding: 12px 14px;
+    padding: 12px 10px; /* Padding reducido un poco */
     z-index: 700;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    display: none; /* Se muestra con la clase .visible desde JS */
+    display: none;
 }
 
 .panel-controles.visible {
@@ -208,7 +264,7 @@ html, body {
 .fila-bloques {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 14px;
+    gap: 8px 12px;
     margin-bottom: 10px;
 }
 
@@ -219,7 +275,7 @@ html, body {
 }
 
 .bloque-control label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #ffd700;
     font-weight: bold;
     letter-spacing: 0.5px;
@@ -230,7 +286,7 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 26px;
+    height: 24px;
     background: transparent;
     cursor: pointer;
 }
@@ -245,12 +301,12 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #fff6c8, #ffd700 60%, #b8860b);
     border: 2px solid #ffffff;
-    margin-top: -9px;
+    margin-top: -8px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
@@ -272,21 +328,21 @@ input[type="range"]::-moz-range-thumb {
 
 .fila-botones {
     display: flex;
-    gap: 10px;
+    gap: 8px; /* Gap reducido para que quepan 4 botones */
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .ctrl-btn {
     flex: 1;
-    min-width: 90px;
-    padding: 10px 8px;
-    font-size: 0.95rem;
+    min-width: 65px; /* REDUCIDO: Para que quepan Voltear, Duplicar, Capas y Quitar */
+    padding: 10px 4px;
+    font-size: 0.85rem;
     font-weight: bold;
     color: #fff;
     background: linear-gradient(180deg, #2e7d32, #1b5e20);
     border: 2px solid #ffd700;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     transition: transform 0.15s ease;
 }
@@ -297,6 +353,79 @@ input[type="range"]::-moz-range-thumb {
 
 .ctrl-quitar {
     background: linear-gradient(180deg, #c62828, #8e1a1a);
+}
+
+/* ============ MODAL DE CAPAS (NUEVO) ============ */
+.modal-capas {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-capas.visible {
+    display: flex;
+}
+
+.modal-contenido {
+    background: #1a1a2e;
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-contenido h3 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.item-capa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.btn-capa {
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.btn-capa:active {
+    transform: scale(0.9);
+}
+
+/* ============ EFECTO DE CHISPAS (NUEVO) ============ */
+.chispa {
+    position: fixed;
+    pointer-events: none;
+    z-index: 950;
+    font-size: 1.5rem;
+    animation: caerChispa 3s linear forwards;
+}
+
+@keyframes caerChispa {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
 /* ============ MODO HORIZONTAL ============ */
@@ -323,7 +452,7 @@ input[type="range"]::-moz-range-thumb {
         width: 120px;
     }
 
-    /* NUEVO: En horizontal, el panel de controles sube para no chocar con los avatares */
+    /* En horizontal, el panel de controles sube para no chocar con los avatares */
     .panel-controles {
         bottom: auto;
         top: 14px;
