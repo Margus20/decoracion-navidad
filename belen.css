@@ -29,13 +29,10 @@ html, body {
     object-fit: cover;
     object-position: center;
     display: block;
-    /* Escenario en blanco y negro para que las piezas a color resalten */
     filter: grayscale(100%) brightness(0.9);
-    /* NUEVO: Transición suave para cuando recupere el color */
     transition: filter 1.5s ease;
 }
 
-/* NUEVO: Cuando se completa el Belén, se quita el blanco y negro */
 .celebracion-activa .stage-image {
     filter: grayscale(0%) brightness(1) !important;
 }
@@ -53,14 +50,13 @@ html, body {
     pointer-events: none;
 }
 
-/* ============ BARRAS DE PROGRESO (NUEVO) ============ */
+/* ============ BARRAS DE PROGRESO ============ */
 .panel-progreso {
     position: fixed;
-    top: 15px;
+    top: 85px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
+    width: min(90vw, 500px);
     z-index: 800;
     display: flex;
     flex-direction: column;
@@ -97,7 +93,7 @@ html, body {
     width: 0%;
     border-radius: 6px;
     transition: width 0.4s ease, background-color 0.4s ease;
-    background-color: #ff4444; /* Rojo por defecto */
+    background-color: #ff4444;
 }
 
 .barra-relleno.nivel-bajo { background-color: #ff4444; }
@@ -114,7 +110,6 @@ html, body {
     z-index: 100;
     filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
     touch-action: none;
-    /* Preparación para la selección con borde dorado */
     transition: outline 0.15s ease, filter 0.15s ease;
     outline: 3px solid transparent;
     outline-offset: 4px;
@@ -127,14 +122,13 @@ html, body {
     filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
 }
 
-/* Estilo cuando la pieza está seleccionada y activa */
 .figura-activa.seleccionada {
     outline: 3px solid #ffd700;
     filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.85)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
     z-index: 250;
 }
 
-/* ============ BOTÓN VOLVER (Polo Norte) ============ */
+/* ============ BOTÓN VOLVER ============ */
 .back-button {
     position: fixed;
     top: 18px;
@@ -231,7 +225,6 @@ html, body {
     transform: scale(0.9);
 }
 
-/* Estado cuando la figura YA está colocada en la escena */
 .avatar-btn.activo {
     border-color: #ffffff;
     box-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 22px rgba(255, 215, 0, 0.6);
@@ -244,12 +237,12 @@ html, body {
     bottom: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100vw - 40px); /* Ajustado para dar más espacio */
+    width: calc(100vw - 40px);
     max-width: 640px;
     background: rgba(20, 20, 40, 0.9);
     border: 2px solid #ffd700;
     border-radius: 16px;
-    padding: 12px 10px; /* Padding reducido un poco */
+    padding: 12px 10px;
     z-index: 700;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -281,7 +274,6 @@ html, body {
     letter-spacing: 0.5px;
 }
 
-/* Estilo de las barras deslizantes (sliders) */
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -328,14 +320,14 @@ input[type="range"]::-moz-range-thumb {
 
 .fila-botones {
     display: flex;
-    gap: 8px; /* Gap reducido para que quepan 4 botones */
+    gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .ctrl-btn {
     flex: 1;
-    min-width: 65px; /* REDUCIDO: Para que quepan Voltear, Duplicar, Capas y Quitar */
+    min-width: 65px;
     padding: 10px 4px;
     font-size: 0.85rem;
     font-weight: bold;
@@ -355,7 +347,7 @@ input[type="range"]::-moz-range-thumb {
     background: linear-gradient(180deg, #c62828, #8e1a1a);
 }
 
-/* ============ MODAL DE CAPAS (NUEVO) ============ */
+/* ============ MODAL DE CAPAS ============ */
 .modal-capas {
     position: fixed;
     inset: 0;
@@ -414,7 +406,7 @@ input[type="range"]::-moz-range-thumb {
     transform: scale(0.9);
 }
 
-/* ============ EFECTO DE CHISPAS (NUEVO) ============ */
+/* ============ EFECTO DE CHISPAS ============ */
 .chispa {
     position: fixed;
     pointer-events: none;
@@ -452,7 +444,6 @@ input[type="range"]::-moz-range-thumb {
         width: 120px;
     }
 
-    /* En horizontal, el panel de controles sube para no chocar con los avatares */
     .panel-controles {
         bottom: auto;
         top: 14px;
@@ -463,6 +454,11 @@ input[type="range"]::-moz-range-thumb {
     }
 
     .fila-bloques {
-        grid-template-columns: repeat(4, 1fr); /* Las 4 barras en una sola fila en pantallas grandes */
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .panel-progreso {
+        top: auto;
+        bottom: 130px;
     }
 }
