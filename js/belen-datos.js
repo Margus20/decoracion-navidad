@@ -36,7 +36,8 @@ const btnCerrarCapas = document.getElementById('btnCerrarCapas');
 let piezaActiva = null;
 let contadorCopias = 1;
 let celebracionActivada = false;
-const UMBRAL_CELEBRACION = 85;
+// Umbral ajustado a 99 para que las chispas sean exclusivas del puntaje perfecto/casi perfecto
+const UMBRAL_CELEBRACION = 99;
 
 // ============ RELOJ DE MEMORIA TEMPORAL (1 hora) ============
 const TIEMPO_LIMITE_MS = 60 * 60 * 1000;
