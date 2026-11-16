@@ -1,0 +1,192 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a2e;
+    overflow: hidden;
+}
+
+/* ============ ESCENARIO ============ */
+.container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+}
+
+.stage-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.escena-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.zona-figuras {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* ============ FIGURAS COLOCADAS ============ */
+.figura-activa {
+    position: absolute;
+    width: 90px;
+    height: auto;
+    pointer-events: auto;
+    cursor: grab;
+    z-index: 100;
+    filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
+    touch-action: none;
+}
+
+.figura-activa:active {
+    cursor: grabbing;
+    z-index: 200;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
+}
+
+/* ============ BOTÓN VOLVER (Polo Norte) ============ */
+.back-button {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px 10px 14px;
+    background: linear-gradient(180deg, #d32f2f 0%, #a31515 100%);
+    color: #ffffff;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+    border: 4px solid #ffffff;
+    border-radius: 14px;
+    box-shadow:
+        0 0 0 2px #a31515 inset,
+        0 5px 0 rgba(0, 0, 0, 0.25),
+        0 8px 22px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.back-button:hover {
+    transform: translateY(-2px) rotate(-2deg);
+    box-shadow:
+        0 0 0 2px #a31515 inset,
+        0 7px 0 rgba(0, 0, 0, 0.25),
+        0 12px 26px rgba(0, 0, 0, 0.55);
+}
+
+.back-button .arrow {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.back-button::after {
+    content: '❄';
+    position: absolute;
+    top: -12px;
+    right: -10px;
+    font-size: 1.3rem;
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+}
+
+/* ============ PANEL DE AVATARES ============ */
+.panel-avatars {
+    position: fixed;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(26, 26, 46, 0.75);
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    z-index: 600;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+    border: 2px solid #ffd700;
+    background: #2c1810;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    padding: 0;
+}
+
+.avatar-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.avatar-btn:active {
+    transform: scale(0.9);
+}
+
+/* Estado cuando la figura YA está colocada en la escena */
+.avatar-btn.activo {
+    border-color: #ffffff;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 22px rgba(255, 215, 0, 0.6);
+    background: #5a3a20;
+}
+
+/* ============ MODO HORIZONTAL ============ */
+@media (min-width: 768px) {
+    .panel-avatars {
+        top: auto;
+        bottom: 18px;
+        right: 50%;
+        transform: translateX(50%);
+        flex-direction: row;
+        gap: 14px;
+        padding: 12px 18px;
+        max-width: 95vw;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .avatar-btn {
+        width: 68px;
+        height: 68px;
+    }
+
+    .figura-activa {
+        width: 120px;
+    }
+}
