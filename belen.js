@@ -13,6 +13,20 @@ const personajes = [
 const panelAvatars = document.getElementById('panelAvatars');
 const zonaFiguras = document.getElementById('zonaFiguras');
 
+// ============ NUEVO: Referencias al Panel de Controles ============
+const panelControles = document.getElementById('panelControles');
+const sliderX = document.getElementById('sliderX');
+const sliderY = document.getElementById('sliderY');
+const sliderZoom = document.getElementById('sliderZoom');
+const sliderGiro = document.getElementById('sliderGiro');
+const btnVoltear = document.getElementById('btnVoltear');
+const btnDuplicar = document.getElementById('btnDuplicar');
+const btnQuitar = document.getElementById('btnQuitar');
+
+// ============ NUEVO: Estado de selección (solo una pieza a la vez) ============
+let piezaActiva = null;
+let contadorCopias = 1;
+
 // ============ 1. IMAGEN DEL ESCENARIO SEGÚN ORIENTACIÓN ============
 function updateImage() {
     const stageImage = document.getElementById('stageImage');
@@ -27,7 +41,7 @@ updateImage();
 window.addEventListener('resize', updateImage);
 window.addEventListener('orientationchange', updateImage);
 
-// ============ 2. POSICIÓN INICIAL DE LA FIGURA (evita tapar el panel) ============
+// ============ 2. POSICIÓN INICIAL DE LA FIGURA ============
 function esHorizontal() {
     return window.innerWidth >= 768;
 }
@@ -36,11 +50,64 @@ function posicionInicial() {
     const w = window.innerWidth;
     const h = window.innerHeight;
     if (esHorizontal()) {
-        // Panel abajo: la figura aparece en el centro-alto del área visible
-        return { x: w / 2, y: h * 0.35 };
+        return { xPct: 50, yPct: 35 }; // Porcentajes para mantener consistencia con sliders
     } else {
-        // Panel a la derecha: la figura aparece un poco a la izquierda del centro
-        return { x: w * 0.42, y: h * 0.5 };
+        return { xPct: 42, yPct: 50 };
+    }
+}
+
+// ============ NUEVO: Utilidades de estado de la pieza ============
+function leerEstado(el) {
+    return {
+        x: parseFloat(el.dataset.x) || 50,
+        y: parseFloat(el.dataset.y) || 50,
+        zoom: parseFloat(el.dataset.zoom) || 100,
+        giro: parseFloat(el.dataset.giro) || 0,
+        volteada: el.dataset.volteada === 'true'
+    };
+}
+
+function aplicarTransform(el) {
+    const s = leerEstado(el);
+    el.style.left = (s.x / 100 * window.innerWidth) + 'px';
+    el.style.top = (s.y / 100 * window.innerHeight) + 'px';
+    const flip = s.volteada ? ' scaleX(-1)' : '';
+    el.style.transform = 'translate(-50%, -50%) rotate(' + s.giro + 'deg) scale(' + (s.zoom / 100) + ')' + flip;
+}
+
+function refrescarSliders(el) {
+    const s = leerEstado(el);
+    sliderX.value = s.x;
+    sliderY.value = s.y;
+    sliderZoom.value = s.zoom;
+    sliderGiro.value = s.giro;
+}
+
+function seleccionarPieza(el) {
+    if (piezaActiva === el) return;
+    if (piezaActiva) piezaActiva.classList.remove('seleccionada');
+    piezaActiva = el;
+    el.classList.add('seleccionada');
+    panelControles.classList.add('visible');
+    refrescarSliders(el);
+}
+
+function deseleccionar() {
+    if (piezaActiva) {
+        piezaActiva.classList.remove('seleccionada');
+        piezaActiva = null;
+    }
+    panelControles.classList.remove('visible');
+}
+
+function actualizarEstadoAvatar(idPersonaje) {
+    const btn = panelAvatars.querySelector('[data-id="' + idPersonaje + '"]');
+    if (!btn) return;
+    const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]');
+    if (figurasExistentes.length > 0) {
+        btn.classList.add('activo');
+    } else {
+        btn.classList.remove('activo');
     }
 }
 
@@ -60,60 +127,69 @@ personajes.forEach(function (personaje) {
     panelAvatars.appendChild(btn);
 
     btn.addEventListener('click', function () {
-        const figura = document.getElementById('figura-' + personaje.id);
-        if (figura) {
-            // Ya está colocada: pedir confirmación antes de quitar
+        // Buscar si ya existe al menos una figura de este personaje
+        const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
+        
+        if (figurasExistentes.length > 0) {
+            // Ya existe: preguntar si quiere quitar una (prioriza la seleccionada, si no, la última)
+            const figuraAQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) 
+                ? piezaActiva 
+                : figurasExistentes[figurasExistentes.length - 1];
+                
             const seguro = confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?');
             if (seguro) {
-                figura.remove();
-                btn.classList.remove('activo');
+                if (piezaActiva === figuraAQuitar) deseleccionar();
+                figuraAQuitar.remove();
+                actualizarEstadoAvatar(personaje.id);
             }
         } else {
-            // No existe: crearla en el centro y activar el botón
-            crearFigura(personaje, btn);
+            // No existe: crearla
+            crearFigura(personaje);
         }
     });
 });
 
 // ============ 4. CREAR LA FIGURA PNG EN LA ESCENA ============
-function crearFigura(personaje, btn) {
+function crearFigura(personaje) {
+    contadorCopias++;
     const img = document.createElement('img');
     img.src = personaje.png;
-    img.id = 'figura-' + personaje.id;
+    img.id = 'figura-' + personaje.id + '-' + contadorCopias; // ID único para permitir duplicados
     img.alt = personaje.nombre;
     img.classList.add('figura-activa');
     img.draggable = false;
-
+    img.dataset.personaje = personaje.id;
+    
+    // Estado inicial por defecto
     const pos = posicionInicial();
-    img.style.left = pos.x + 'px';
-    img.style.top = pos.y + 'px';
-    img.style.transform = 'translate(-50%, -50%)';
+    img.dataset.x = pos.xPct;
+    img.dataset.y = pos.yPct;
+    img.dataset.zoom = 100;
+    img.dataset.giro = 0;
+    img.dataset.volteada = 'false';
 
+    aplicarTransform(img);
     hacerArrastrable(img);
     zonaFiguras.appendChild(img);
-    btn.classList.add('activo');
+    actualizarEstadoAvatar(personaje.id);
+    seleccionarPieza(img);
 }
 
-// ============ 5. ARRASTRAR CON DEDO O MOUSE ============
+// ============ 5. ARRASTRAR CON DEDO O MOUSE (Actualizado para sincronizar con sliders) ============
 function hacerArrastrable(elemento) {
     let arrastrando = false;
-    let startX = 0, startY = 0, initLeft = 0, initTop = 0;
+    let startX = 0, startY = 0, initX = 0, initY = 0;
 
     function inicio(e) {
+        seleccionarPieza(elemento); // Seleccionar al tocar
         arrastrando = true;
         e.preventDefault();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
         startX = cx;
         startY = cy;
-        const rect = elemento.getBoundingClientRect();
-        initLeft = rect.left;
-        initTop = rect.top;
-        // Cambiar de transform a left/top absolutos para mover con precisión
-        elemento.style.transform = 'none';
-        elemento.style.left = initLeft + 'px';
-        elemento.style.top = initTop + 'px';
-        elemento.style.zIndex = '300';
+        initX = parseFloat(elemento.dataset.x) || 50;
+        initY = parseFloat(elemento.dataset.y) || 50;
     }
 
     function mover(e) {
@@ -121,15 +197,23 @@ function hacerArrastrable(elemento) {
         e.preventDefault();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        elemento.style.left = (initLeft + (cx - startX)) + 'px';
-        elemento.style.top = (initTop + (cy - startY)) + 'px';
+        
+        // Calcular cambio en porcentaje de pantalla
+        const dxPct = (cx - startX) / window.innerWidth * 100;
+        const dyPct = (cy - startY) / window.innerHeight * 100;
+        
+        let nuevoX = Math.max(0, Math.min(100, initX + dxPct));
+        let nuevoY = Math.max(0, Math.min(100, initY + dyPct));
+        
+        elemento.dataset.x = nuevoX;
+        elemento.dataset.y = nuevoY;
+        
+        aplicarTransform(elemento);
+        refrescarSliders(elemento); // Sincronizar barras mientras se arrastra
     }
 
     function fin() {
-        if (arrastrando) {
-            arrastrando = false;
-            elemento.style.zIndex = '100';
-        }
+        arrastrando = false;
     }
 
     elemento.addEventListener('mousedown', inicio);
@@ -141,3 +225,83 @@ function hacerArrastrable(elemento) {
     document.addEventListener('touchend', fin);
     document.addEventListener('touchcancel', fin);
 }
+
+// ============ NUEVO: 6. BARRAS DE CONTROL ============
+sliderX.addEventListener('input', function () {
+    if (piezaActiva) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); }
+});
+sliderY.addEventListener('input', function () {
+    if (piezaActiva) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); }
+});
+sliderZoom.addEventListener('input', function () {
+    if (piezaActiva) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); }
+});
+sliderGiro.addEventListener('input', function () {
+    if (piezaActiva) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); }
+});
+
+btnVoltear.addEventListener('click', function () {
+    if (piezaActiva) {
+        const nuevo = piezaActiva.dataset.volteada === 'true' ? 'false' : 'true';
+        piezaActiva.dataset.volteada = nuevo;
+        aplicarTransform(piezaActiva);
+    }
+});
+
+btnDuplicar.addEventListener('click', function () {
+    if (piezaActiva) {
+        const idP = piezaActiva.dataset.personaje;
+        const personaje = personajes.find(p => p.id === idP);
+        if (personaje) {
+            // Crear copia manualmente para mantener la posición y estado actual, pero desplazada
+            contadorCopias++;
+            const img = document.createElement('img');
+            img.src = personaje.png;
+            img.id = 'figura-' + personaje.id + '-' + contadorCopias;
+            img.alt = personaje.nombre + ' (copia)';
+            img.classList.add('figura-activa');
+            img.draggable = false;
+            img.dataset.personaje = personaje.id;
+            
+            const s = leerEstado(piezaActiva);
+            img.dataset.x = Math.min(95, s.x + 5); // Desplazada un 5% a la derecha
+            img.dataset.y = Math.min(95, s.y + 5); // Desplazada un 5% abajo
+            img.dataset.zoom = s.zoom;
+            img.dataset.giro = s.giro;
+            img.dataset.volteada = s.volteada;
+            
+            aplicarTransform(img);
+            hacerArrastrable(img);
+            zonaFiguras.appendChild(img);
+            seleccionarPieza(img);
+        }
+    }
+});
+
+btnQuitar.addEventListener('click', function () {
+    if (piezaActiva) {
+        const idP = piezaActiva.dataset.personaje;
+        const personaje = personajes.find(p => p.id === idP);
+        const nombre = personaje ? personaje.nombre : 'esta pieza';
+        if (confirm('¿Seguro que quieres quitar ' + nombre + ' de la escena?')) {
+            const el = piezaActiva;
+            piezaActiva = null;
+            el.remove();
+            panelControles.classList.remove('visible');
+            actualizarEstadoAvatar(idP);
+        }
+    }
+});
+
+// ============ NUEVO: 7. TOCAR EL FONDO PARA DESELECCIONAR ============
+document.querySelector('.escena-overlay').addEventListener('click', function (e) {
+    if (e.target === this || e.target === zonaFiguras) {
+        deseleccionar();
+    }
+});
+
+// ============ 8. REAJUSTAR AL CAMBIAR ORIENTACIÓN ============
+window.addEventListener('resize', function () {
+    const figuras = document.querySelectorAll('.figura-activa');
+    figuras.forEach(function (f) { aplicarTransform(f); });
+});
