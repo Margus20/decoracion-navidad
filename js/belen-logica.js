@@ -46,6 +46,15 @@ function distPct(a, b) {
 function cerca(a, b, umbral) { return distPct(a, b) <= umbral; }
 function zindex(el) { return parseInt(el.style.zIndex) || 100; }
 
+// Verifica si el centro de la pieza 'a' cae dentro del área de la pieza 'b' (con margen)
+function dentroDe(a, b) {
+    const ca = centro(a);
+    const rb = b.getBoundingClientRect();
+    const margen = 12;
+    return ca.x >= rb.left - margen && ca.x <= rb.right + margen &&
+           ca.y >= rb.top - margen && ca.y <= rb.bottom + margen;
+}
+
 function obtenerMapa() {
     const m = {};
     idsNecesarios.forEach(id => {
@@ -57,42 +66,44 @@ function obtenerMapa() {
 
 // ============ 4. CRITERIOS DE COHERENCIA ============
 const criterios = [
-    { id: 'completitud', peso: 12, eval: (m) => {
+    { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => {
         const presentes = idsNecesarios.filter(id => m[id]).length;
         return presentes / idsNecesarios.length;
     }},
-    { id: 'jesus_cuna', peso: 12, eval: (m) => {
+    { id: 'jesus_cuna', nombre: 'Niño Jesús en la Cuna', peso: 12, eval: (m) => {
         if (!m.jesus || !m.cuna) return 0;
-        if (cerca(m.jesus, m.cuna, 16)) return 1;
+        if (dentroDe(m.jesus, m.cuna)) return 1;
+        if (cerca(m.jesus, m.cuna, 16)) return 0.8;
         if (cerca(m.jesus, m.cuna, 30)) return 0.5;
         return 0;
     }},
-    { id: 'cuna_pesebre', peso: 12, eval: (m) => {
+    { id: 'cuna_pesebre', nombre: 'Cuna dentro del Pesebre', peso: 12, eval: (m) => {
         if (!m.cuna || !m.pesebre) return 0;
-        if (cerca(m.cuna, m.pesebre, 18)) return 1;
+        if (dentroDe(m.cuna, m.pesebre)) return 1;
+        if (cerca(m.cuna, m.pesebre, 18)) return 0.8;
         if (cerca(m.cuna, m.pesebre, 32)) return 0.5;
         return 0;
     }},
-    { id: 'estrella_arriba', peso: 10, eval: (m) => {
+    { id: 'estrella_arriba', nombre: 'Estrella arriba del Pesebre', peso: 10, eval: (m) => {
         if (!m.estrella || !m.pesebre) return 0;
         const e = centroY(m.estrella), p = centroY(m.pesebre);
         if (e < p) return 1;
         if (e < p + 60) return 0.5;
         return 0;
     }},
-    { id: 'maria_pesebre', peso: 10, eval: (m) => {
+    { id: 'maria_pesebre', nombre: 'María cerca del Pesebre', peso: 10, eval: (m) => {
         if (!m.maria || !m.pesebre) return 0;
         if (cerca(m.maria, m.pesebre, 24)) return 1;
         if (cerca(m.maria, m.pesebre, 38)) return 0.6;
         return 0;
     }},
-    { id: 'jose_pesebre', peso: 10, eval: (m) => {
+    { id: 'jose_pesebre', nombre: 'José cerca del Pesebre', peso: 10, eval: (m) => {
         if (!m.jose || !m.pesebre) return 0;
         if (cerca(m.jose, m.pesebre, 24)) return 1;
         if (cerca(m.jose, m.pesebre, 38)) return 0.6;
         return 0;
     }},
-    { id: 'oveja_suelo', peso: 8, eval: (m) => {
+    { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 8, eval: (m) => {
         if (!m.oveja || !m.pesebre) return 0;
         const enSuelo = centroY(m.oveja) > centroY(m.pesebre);
         const cercaP = distPct(m.oveja, m.pesebre) <= 34;
@@ -100,7 +111,7 @@ const criterios = [
         if (enSuelo) return 0.5;
         return 0;
     }},
-    { id: 'burro_suelo', peso: 8, eval: (m) => {
+    { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 8, eval: (m) => {
         if (!m.burro || !m.pesebre) return 0;
         const enSuelo = centroY(m.burro) > centroY(m.pesebre);
         const cercaP = distPct(m.burro, m.pesebre) <= 34;
@@ -108,11 +119,11 @@ const criterios = [
         if (enSuelo) return 0.5;
         return 0;
     }},
-    { id: 'capas', peso: 16, eval: (m) => {
+    { id: 'capas', nombre: 'Orden visual correcto', peso: 16, eval: (m) => {
         if (!m.jesus || !m.cuna || !m.pesebre) return 0;
         let pts = 0;
-        if (zindex(m.jesus) >= zindex(m.cuna)) pts += 0.5;
-        if (zindex(m.cuna) >= zindex(m.pesebre)) pts += 0.5;
+        if (dentroDe(m.jesus, m.cuna) || cerca(m.jesus, m.cuna, 12)) pts += 0.5;
+        if (dentroDe(m.cuna, m.pesebre) || cerca(m.cuna, m.pesebre, 14)) pts += 0.5;
         return pts;
     }}
 ];
@@ -180,10 +191,19 @@ function actualizarBarraIndividual(el) {
     else barraIndividual.className = 'barra-relleno nivel-alto';
 }
 
-// ============ 6. CELEBRACIÓN Y CHISPAS ============
+// ============ 6. CELEBRACIÓN Y MODAL DE RESULTADO ============
+let resultadoMostrado = false;
+
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
+
+    // Mostrar el puntaje en números para que el usuario sepa qué falta
+    const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
+    if (etiquetaGeneral) {
+        etiquetaGeneral.textContent = 'Progreso del Belén: ' + Math.round(score) + '/100';
+    }
+
     if (score < 25) barraGeneral.className = 'barra-relleno nivel-bajo';
     else if (score < 75) barraGeneral.className = 'barra-relleno nivel-medio';
     else barraGeneral.className = 'barra-relleno nivel-alto';
@@ -191,10 +211,59 @@ function actualizarProgresoGeneral() {
     const figuras = document.querySelectorAll('.figura-activa');
     const hayOchoPiezas = figuras.length === 8;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
-    const listoParaFestejo = score >= UMBRAL_CELEBRACION && hayOchoPiezas && todasUnicas;
 
-    if (listoParaFestejo && !celebracionActivada) activarCelebracion();
-    else if (!listoParaFestejo && celebracionActivada) desactivarCelebracion();
+    if (hayOchoPiezas && todasUnicas && !resultadoMostrado) {
+        mostrarResultadoFinal(score);
+    }
+}
+
+function mostrarResultadoFinal(score) {
+    resultadoMostrado = true;
+    const modal = document.getElementById('modalResultado');
+    const titulo = document.getElementById('resultadoTitulo');
+    const puntaje = document.getElementById('resultadoPuntaje');
+    const mensaje = document.getElementById('resultadoMensaje');
+    const listaDetalles = document.getElementById('listaDetalles');
+
+    puntaje.textContent = Math.round(score) + '/100';
+    puntaje.className = 'modal-resultado-puntaje';
+
+    // Las chispas y el color SOLO para puntaje perfecto (>= 99, según tu belen-datos.js)
+    if (score >= UMBRAL_CELEBRACION) {
+        puntaje.classList.add('perfecto');
+        titulo.textContent = '¡Belén Perfecto!';
+        mensaje.textContent = '¡Felicitaciones! Has armado el Belén con maestría. Todas las piezas están en su lugar correcto.';
+        activarCelebracion();
+    } else if (score >= 80) {
+        puntaje.classList.add('bueno');
+        titulo.textContent = '¡Belén Completado!';
+        mensaje.textContent = 'Muy bien hecho. Tu Belén está casi perfecto, pero hay algunas relaciones que pueden mejorar.';
+        // Sin chispas ni cambio de color
+    } else {
+        puntaje.classList.add('regular');
+        titulo.textContent = 'Belén Armado';
+        mensaje.textContent = 'Has colocado todas las piezas, pero algunas relaciones no son las ideales. Revisa los detalles abajo.';
+        // Sin chispas ni cambio de color
+    }
+
+    listaDetalles.innerHTML = '';
+    const m = obtenerMapa();
+    criterios.forEach(c => {
+        if (c.id === 'completitud') return;
+        const valor = c.eval(m);
+        const item = document.createElement('div');
+        item.className = 'detalle-item';
+        
+        let estado = 'fallo';
+        let texto = '✗';
+        if (valor >= 0.9) { estado = 'ok'; texto = '✓'; }
+        else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
+        
+        item.innerHTML = '<span>' + c.nombre + '</span><span class="detalle-estado ' + estado + '">' + texto + '</span>';
+        listaDetalles.appendChild(item);
+    });
+
+    modal.classList.add('visible');
 }
 
 function activarCelebracion() {
