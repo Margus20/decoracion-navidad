@@ -262,7 +262,7 @@ function actualizarBarraIndividual(el) {
     else barraIndividual.className = 'barra-relleno nivel-alto';
 }
 
-// ============ 6. BARRA GENERAL Y CELEBRACIÓN ============
+// ============ 6. BARRA GENERAL Y CELEBRACIÓN (CON CANDADO DE 8 PIEZAS) ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
@@ -270,8 +270,20 @@ function actualizarProgresoGeneral() {
     else if (score < 75) barraGeneral.className = 'barra-relleno nivel-medio';
     else barraGeneral.className = 'barra-relleno nivel-alto';
 
-    if (score >= UMBRAL_CELEBRACION && !celebracionActivada) activarCelebracion();
-    else if (score < UMBRAL_CELEBRACION && celebracionActivada) desactivarCelebracion();
+    // CANDADO ESTRICTO: Debe haber exactamente 8 piezas y ninguna repetida
+    const figuras = document.querySelectorAll('.figura-activa');
+    const hayOchoPiezas = figuras.length === 8;
+    const todasUnicas = idsNecesarios.every(id => 
+        figuras.filter(f => f.dataset.personaje === id).length === 1
+    );
+    
+    const listoParaFestejo = score >= UMBRAL_CELEBRACION && hayOchoPiezas && todasUnicas;
+
+    if (listoParaFestejo && !celebracionActivada) {
+        activarCelebracion();
+    } else if (!listoParaFestejo && celebracionActivada) {
+        desactivarCelebracion();
+    }
 }
 
 function activarCelebracion() {
@@ -285,22 +297,56 @@ function desactivarCelebracion() {
     document.body.classList.remove('celebracion-activa');
 }
 
+// ============ 7. CHISPAS MULTIDIRECCIONALES ============
 function generarChispas() {
-    const simbolos = ['✨', '🌟', '❄️', '⭐'];
-    for (let i = 0; i < 50; i++) {
+    const simbolos = ['✨', '🌟', '❄️', '⭐', '🎉', '🎊'];
+    const direcciones = ['cae', 'sube', 'derecha', 'izquierda', 'diag1', 'diag2', 'diag3', 'diag4'];
+    const totalChispas = 80;
+
+    for (let i = 0; i < totalChispas; i++) {
         setTimeout(() => {
+            const dir = direcciones[Math.floor(Math.random() * direcciones.length)];
             const chispa = document.createElement('div');
-            chispa.className = 'chispa';
+            chispa.className = 'chispa ' + dir;
             chispa.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
-            chispa.style.left = Math.random() * 100 + 'vw';
-            chispa.style.animationDuration = (Math.random() * 2 + 2) + 's';
+
+            const dur = (Math.random() * 2 + 2.5) + 's';
+            chispa.style.animationDuration = dur;
+
+            // Posición inicial según la dirección elegida
+            if (dir === 'cae') {
+                chispa.style.left = (Math.random() * 100) + 'vw';
+                chispa.style.top = '-8vh';
+            } else if (dir === 'sube') {
+                chispa.style.left = (Math.random() * 100) + 'vw';
+                chispa.style.top = '108vh';
+            } else if (dir === 'derecha') {
+                chispa.style.top = (Math.random() * 100) + 'vh';
+                chispa.style.left = '-8vw';
+            } else if (dir === 'izquierda') {
+                chispa.style.top = (Math.random() * 100) + 'vh';
+                chispa.style.left = '108vw';
+            } else if (dir === 'diag1') { // abajo-izq -> arriba-der
+                chispa.style.left = '-8vw';
+                chispa.style.top = '108vh';
+            } else if (dir === 'diag2') { // abajo-der -> arriba-izq
+                chispa.style.left = '108vw';
+                chispa.style.top = '108vh';
+            } else if (dir === 'diag3') { // arriba-izq -> abajo-der
+                chispa.style.left = '-8vw';
+                chispa.style.top = '-8vh';
+            } else if (dir === 'diag4') { // arriba-der -> abajo-izq
+                chispa.style.left = '108vw';
+                chispa.style.top = '-8vh';
+            }
+
             document.body.appendChild(chispa);
-            setTimeout(() => chispa.remove(), 4000);
-        }, i * 80);
+            setTimeout(() => chispa.remove(), 5000);
+        }, i * 50);
     }
 }
 
-// ============ 7. CREAR FIGURA ============
+// ============ 8. CREAR FIGURA ============
 function crearFigura(personaje) {
     contadorCopias++;
     const img = document.createElement('img');
@@ -331,7 +377,7 @@ function actualizarEstadoAvatar(idPersonaje) {
     btn.classList.toggle('activo', n > 0);
 }
 
-// ============ 8. BOTONES AVATAR ============
+// ============ 9. BOTONES AVATAR ============
 personajes.forEach(function (personaje) {
     const btn = document.createElement('button');
     btn.classList.add('avatar-btn');
@@ -361,7 +407,7 @@ personajes.forEach(function (personaje) {
     });
 });
 
-// ============ 9. ARRASTRAR CON DEDO O MOUSE ============
+// ============ 10. ARRASTRAR CON DEDO O MOUSE ============
 function hacerArrastrable(elemento) {
     let arrastrando = false;
     let startX = 0, startY = 0, initX = 0, initY = 0;
@@ -404,7 +450,7 @@ function hacerArrastrable(elemento) {
     document.addEventListener('touchcancel', fin);
 }
 
-// ============ 10. SLIDERS Y BOTONES DE CONTROL ============
+// ============ 11. SLIDERS Y BOTONES DE CONTROL ============
 sliderX.addEventListener('input', function () {
     if (piezaActiva) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); actualizarBarraIndividual(piezaActiva); actualizarProgresoGeneral(); }
 });
@@ -458,47 +504,4 @@ btnDuplicar.addEventListener('click', function () {
 btnQuitar.addEventListener('click', function () {
     if (piezaActiva) {
         const idP = piezaActiva.dataset.personaje;
-        const personaje = personajes.find(p => p.id === idP);
-        if (confirm('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?')) {
-            const el = piezaActiva;
-            piezaActiva = null;
-            el.remove();
-            panelControles.classList.remove('visible');
-            contenedorBarraInd.style.display = 'none';
-            actualizarEstadoAvatar(idP);
-            actualizarProgresoGeneral();
-        }
-    }
-});
-
-// ============ 11. MODAL DE CAPAS ============
-function renderizarCapas() {
-    listaCapas.innerHTML = '';
-    const figuras = Array.from(document.querySelectorAll('.figura-activa')).sort((a, b) => zindex(b) - zindex(a));
-    figuras.forEach((fig, index) => {
-        const item = document.createElement('div');
-        item.className = 'item-capa';
-        item.innerHTML = '<span>' + (index + 1) + '. ' + fig.alt + '</span><div><button class="btn-capa" onclick="cambiarCapa(\'' + fig.id + '\', 1)">⬆</button><button class="btn-capa" onclick="cambiarCapa(\'' + fig.id + '\', -1)">⬇</button></div>';
-        listaCapas.appendChild(item);
-    });
-}
-
-window.cambiarCapa = function (id, direccion) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.zIndex = zindex(el) + (direccion * 10);
-    renderizarCapas();
-};
-
-btnCapas.addEventListener('click', () => { renderizarCapas(); modalCapas.classList.add('visible'); });
-btnCerrarCapas.addEventListener('click', () => { modalCapas.classList.remove('visible'); });
-modalCapas.addEventListener('click', (e) => { if (e.target === modalCapas) modalCapas.classList.remove('visible'); });
-
-// ============ 12. DESELECCIONAR AL TOCAR FONDO ============
-document.querySelector('.escena-overlay').addEventListener('click', function (e) {
-    if (e.target === this || e.target === zonaFiguras) deseleccionar();
-});
-
-function recalcularTodasLasFiguras() {
-    document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
-}
+        const person
