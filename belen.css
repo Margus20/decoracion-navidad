@@ -406,7 +406,136 @@ input[type="range"]::-moz-range-thumb {
     transform: scale(0.9);
 }
 
-/* ============ EFECTO DE CHISPAS MULTIDIRECCIONAL (ACTUALIZADO) ============ */
+/* ============ MODAL DE RESULTADO FINAL ============ */
+.modal-resultado {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+}
+
+.modal-resultado.visible {
+    display: flex;
+}
+
+.modal-resultado-contenido {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+.modal-resultado-titulo {
+    font-size: 1.8rem;
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.modal-resultado-puntaje {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 20px 0;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.modal-resultado-puntaje.perfecto {
+    color: #44ff44;
+}
+
+.modal-resultado-puntaje.bueno {
+    color: #ffcc00;
+}
+
+.modal-resultado-puntaje.regular {
+    color: #ff8844;
+}
+
+.modal-resultado-mensaje {
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-resultado-detalles {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.modal-resultado-detalles h4 {
+    color: #ffd700;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-estado {
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.detalle-estado.ok {
+    background: #44ff44;
+    color: #000;
+}
+
+.detalle-estado.parcial {
+    background: #ffcc00;
+    color: #000;
+}
+
+.detalle-estado.fallo {
+    background: #ff4444;
+    color: #fff;
+}
+
+.modal-resultado-btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(180deg, #2e7d32, #1b5e20);
+    border: 2px solid #ffd700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.modal-resultado-btn:active {
+    transform: scale(0.95);
+}
+
+/* ============ EFECTO DE CHISPAS MULTIDIRECCIONAL ============ */
 .chispa {
     position: fixed;
     pointer-events: none;
