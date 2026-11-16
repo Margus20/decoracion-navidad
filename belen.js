@@ -10,10 +10,21 @@ const personajes = [
     { id: 'cuna', nombre: 'la Cuna', avatar: 'img/belen/crib_avatar.jpg', png: 'img/belen/crib.png' }
 ];
 
+// ============ ZONAS INVISIBLES (Recalibradas para tu escenario) ============
+const zonas = {
+    estrella: { x: 50, y: 25, radio: 20 },
+    jose: { x: 30, y: 55, radio: 20 },
+    maria: { x: 70, y: 55, radio: 20 },
+    pesebre: { x: 50, y: 65, radio: 20 },
+    cuna: { x: 50, y: 70, radio: 20 },
+    jesus: { x: 50, y: 70, radio: 20 },
+    burro: { x: 25, y: 75, radio: 20 },
+    oveja: { x: 75, y: 75, radio: 20 }
+};
+
+// ============ REFERENCIAS AL DOM ============
 const panelAvatars = document.getElementById('panelAvatars');
 const zonaFiguras = document.getElementById('zonaFiguras');
-
-// ============ NUEVO: Referencias al Panel de Controles ============
 const panelControles = document.getElementById('panelControles');
 const sliderX = document.getElementById('sliderX');
 const sliderY = document.getElementById('sliderY');
@@ -21,42 +32,33 @@ const sliderZoom = document.getElementById('sliderZoom');
 const sliderGiro = document.getElementById('sliderGiro');
 const btnVoltear = document.getElementById('btnVoltear');
 const btnDuplicar = document.getElementById('btnDuplicar');
+const btnCapas = document.getElementById('btnCapas');
 const btnQuitar = document.getElementById('btnQuitar');
+const btnLimpiar = document.getElementById('btnLimpiar'); // Botón nuevo para borrar memoria
 
-// ============ NUEVO: Estado de selección (solo una pieza a la vez) ============
+const barraGeneral = document.getElementById('barraGeneral');
+const contenedorBarraInd = document.getElementById('contenedorBarraIndividual');
+const barraIndividual = document.getElementById('barraIndividual');
+const textoBarraInd = document.getElementById('textoBarraIndividual');
+
+const modalCapas = document.getElementById('modalCapas');
+const listaCapas = document.getElementById('listaCapas');
+const btnCerrarCapas = document.getElementById('btnCerrarCapas');
+
 let piezaActiva = null;
 let contadorCopias = 1;
+let celebracionActivada = false;
 
-// ============ 1. IMAGEN DEL ESCENARIO SEGÚN ORIENTACIÓN ============
+// ============ 1. IMAGEN DEL ESCENARIO ============
 function updateImage() {
     const stageImage = document.getElementById('stageImage');
-    if (window.innerHeight > window.innerWidth) {
-        stageImage.src = 'img/belen/vertical_stage.jpg';
-    } else {
-        stageImage.src = 'img/belen/horizontal_stage.jpg';
-    }
+    stageImage.src = window.innerHeight > window.innerWidth ? 'img/belen/vertical_stage.jpg' : 'img/belen/horizontal_stage.jpg';
 }
-
 updateImage();
-window.addEventListener('resize', updateImage);
+window.addEventListener('resize', () => { updateImage(); recalcularTodasLasFiguras(); });
 window.addEventListener('orientationchange', updateImage);
 
-// ============ 2. POSICIÓN INICIAL DE LA FIGURA ============
-function esHorizontal() {
-    return window.innerWidth >= 768;
-}
-
-function posicionInicial() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    if (esHorizontal()) {
-        return { xPct: 50, yPct: 35 }; // Porcentajes para mantener consistencia con sliders
-    } else {
-        return { xPct: 42, yPct: 50 };
-    }
-}
-
-// ============ NUEVO: Utilidades de estado de la pieza ============
+// ============ 2. UTILIDADES DE ESTADO Y TRANSFORMACIÓN ============
 function leerEstado(el) {
     return {
         x: parseFloat(el.dataset.x) || 50,
@@ -83,13 +85,17 @@ function refrescarSliders(el) {
     sliderGiro.value = s.giro;
 }
 
+// ============ 3. SELECCIÓN Y PROGRESO INDIVIDUAL ============
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
     piezaActiva = el;
     el.classList.add('seleccionada');
     panelControles.classList.add('visible');
+    contenedorBarraInd.style.display = 'flex';
+    textoBarraInd.textContent = 'Ubicación de: ' + el.alt;
     refrescarSliders(el);
+    actualizarBarraIndividual(el);
 }
 
 function deseleccionar() {
@@ -98,72 +104,150 @@ function deseleccionar() {
         piezaActiva = null;
     }
     panelControles.classList.remove('visible');
+    contenedorBarraInd.style.display = 'none';
 }
 
-function actualizarEstadoAvatar(idPersonaje) {
-    const btn = panelAvatars.querySelector('[data-id="' + idPersonaje + '"]');
-    if (!btn) return;
-    const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]');
-    if (figurasExistentes.length > 0) {
-        btn.classList.add('activo');
-    } else {
-        btn.classList.remove('activo');
+function calcularProgresoPieza(el) {
+    const id = el.dataset.personaje;
+    const zona = zonas[id];
+    if (!zona) return 100;
+
+    const rect = el.getBoundingClientRect();
+    const elCx = rect.left + rect.width / 2;
+    const elCy = rect.top + rect.height / 2;
+    const zonaCx = (zona.x / 100) * window.innerWidth;
+    const zonaCy = (zona.y / 100) * window.innerHeight;
+
+    const distPx = Math.sqrt(Math.pow(elCx - zonaCx, 2) + Math.pow(elCy - zonaCy, 2));
+    const maxDistPx = (zona.radio / 100) * Math.min(window.innerWidth, window.innerHeight);
+    
+    let porcentaje = Math.max(0, 100 - (distPx / maxDistPx) * 100);
+    return Math.min(100, porcentaje);
+}
+
+function actualizarBarraIndividual(el) {
+    const pct = calcularProgresoPieza(el);
+    barraIndividual.style.width = pct + '%';
+    if (pct < 30) barraIndividual.className = 'barra-relleno nivel-bajo';
+    else if (pct < 80) barraIndividual.className = 'barra-relleno nivel-medio';
+    else barraIndividual.className = 'barra-relleno nivel-alto';
+}
+
+// ============ 4. PROGRESO GENERAL, CELEBRACIÓN Y MEMORIA ============
+function actualizarProgresoGeneral() {
+    const figuras = document.querySelectorAll('.figura-activa');
+    let correctas = 0;
+    const totalEsperado = 8;
+
+    figuras.forEach(f => {
+        if (calcularProgresoPieza(f) >= 80) correctas++;
+    });
+
+    const pctGeneral = (correctas / totalEsperado) * 100;
+    barraGeneral.style.width = pctGeneral + '%';
+
+    if (pctGeneral < 25) barraGeneral.className = 'barra-relleno nivel-bajo';
+    else if (pctGeneral < 75) barraGeneral.className = 'barra-relleno nivel-medio';
+    else barraGeneral.className = 'barra-relleno nivel-alto';
+
+    if (correctas === totalEsperado && !celebracionActivada) {
+        activarCelebracion();
+    } else if (correctas < totalEsperado && celebracionActivada) {
+        desactivarCelebracion();
+    }
+    
+    guardarEstado(); // Guardar en memoria cada vez que cambia el progreso
+}
+
+function activarCelebracion() {
+    celebracionActivada = true;
+    document.body.classList.add('celebracion-activa');
+    generarChispas();
+}
+
+function desactivarCelebracion() {
+    celebracionActivada = false;
+    document.body.classList.remove('celebracion-activa');
+}
+
+function generarChispas() {
+    const simbolos = ['✨', '🌟', '❄️', '⭐'];
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const chispa = document.createElement('div');
+            chispa.className = 'chispa';
+            chispa.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+            chispa.style.left = Math.random() * 100 + 'vw';
+            chispa.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(chispa);
+            setTimeout(() => chispa.remove(), 4000);
+        }, i * 80);
     }
 }
 
-// ============ 3. CREAR LOS BOTONES AVATAR ============
-personajes.forEach(function (personaje) {
-    const btn = document.createElement('button');
-    btn.classList.add('avatar-btn');
-    btn.setAttribute('data-id', personaje.id);
-    btn.setAttribute('aria-label', personaje.nombre);
+function guardarEstado() {
+    const figuras = document.querySelectorAll('.figura-activa');
+    const estado = Array.from(figuras).map(f => ({
+        personaje: f.dataset.personaje,
+        x: f.dataset.x,
+        y: f.dataset.y,
+        zoom: f.dataset.zoom,
+        giro: f.dataset.giro,
+        volteada: f.dataset.volteada,
+        zIndex: f.style.zIndex || 100
+    }));
+    localStorage.setItem('belenState', JSON.stringify(estado));
+}
 
-    const img = document.createElement('img');
-    img.src = personaje.avatar;
-    img.alt = personaje.nombre;
-    img.draggable = false;
+function cargarEstado() {
+    const guardado = localStorage.getItem('belenState');
+    if (!guardado) return;
+    
+    try {
+        const estado = JSON.parse(guardado);
+        estado.forEach(datos => {
+            const personaje = personajes.find(p => p.id === datos.personaje);
+            if (!personaje) return;
+            
+            contadorCopias++;
+            const img = document.createElement('img');
+            img.src = personaje.png;
+            img.id = 'figura-' + personaje.id + '-' + contadorCopias;
+            img.alt = personaje.nombre;
+            img.classList.add('figura-activa');
+            img.draggable = false;
+            img.dataset.personaje = datos.personaje;
+            img.dataset.x = datos.x;
+            img.dataset.y = datos.y;
+            img.dataset.zoom = datos.zoom;
+            img.dataset.giro = datos.giro;
+            img.dataset.volteada = datos.volteada;
+            img.style.zIndex = datos.zIndex;
+            
+            aplicarTransform(img);
+            hacerArrastrable(img);
+            zonaFiguras.appendChild(img);
+            actualizarEstadoAvatar(personaje.id);
+        });
+        actualizarProgresoGeneral();
+    } catch (e) {
+        console.error("Error al cargar el estado", e);
+    }
+}
 
-    btn.appendChild(img);
-    panelAvatars.appendChild(btn);
-
-    btn.addEventListener('click', function () {
-        // Buscar si ya existe al menos una figura de este personaje
-        const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
-        
-        if (figurasExistentes.length > 0) {
-            // Ya existe: preguntar si quiere quitar una (prioriza la seleccionada, si no, la última)
-            const figuraAQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) 
-                ? piezaActiva 
-                : figurasExistentes[figurasExistentes.length - 1];
-                
-            const seguro = confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?');
-            if (seguro) {
-                if (piezaActiva === figuraAQuitar) deseleccionar();
-                figuraAQuitar.remove();
-                actualizarEstadoAvatar(personaje.id);
-            }
-        } else {
-            // No existe: crearla
-            crearFigura(personaje);
-        }
-    });
-});
-
-// ============ 4. CREAR LA FIGURA PNG EN LA ESCENA ============
+// ============ 5. CREAR FIGURA ============
 function crearFigura(personaje) {
     contadorCopias++;
     const img = document.createElement('img');
     img.src = personaje.png;
-    img.id = 'figura-' + personaje.id + '-' + contadorCopias; // ID único para permitir duplicados
+    img.id = 'figura-' + personaje.id + '-' + contadorCopias;
     img.alt = personaje.nombre;
     img.classList.add('figura-activa');
     img.draggable = false;
     img.dataset.personaje = personaje.id;
     
-    // Estado inicial por defecto
-    const pos = posicionInicial();
-    img.dataset.x = pos.xPct;
-    img.dataset.y = pos.yPct;
+    img.dataset.x = 50;
+    img.dataset.y = 50;
     img.dataset.zoom = 100;
     img.dataset.giro = 0;
     img.dataset.volteada = 'false';
@@ -173,15 +257,53 @@ function crearFigura(personaje) {
     zonaFiguras.appendChild(img);
     actualizarEstadoAvatar(personaje.id);
     seleccionarPieza(img);
+    actualizarProgresoGeneral();
 }
 
-// ============ 5. ARRASTRAR CON DEDO O MOUSE (Actualizado para sincronizar con sliders) ============
+function actualizarEstadoAvatar(idPersonaje) {
+    const btn = panelAvatars.querySelector('[data-id="' + idPersonaje + '"]');
+    if (!btn) return;
+    const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]');
+    btn.classList.toggle('activo', figurasExistentes.length > 0);
+}
+
+// ============ 6. BOTONES AVATAR ============
+personajes.forEach(function (personaje) {
+    const btn = document.createElement('button');
+    btn.classList.add('avatar-btn');
+    btn.setAttribute('data-id', personaje.id);
+    btn.setAttribute('aria-label', personaje.nombre);
+    const img = document.createElement('img');
+    img.src = personaje.avatar;
+    img.alt = personaje.nombre;
+    img.draggable = false;
+    btn.appendChild(img);
+    panelAvatars.appendChild(btn);
+
+    btn.addEventListener('click', function () {
+        const figurasExistentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
+        if (figurasExistentes.length > 0) {
+            const figuraAQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : figurasExistentes[figurasExistentes.length - 1];
+            if (confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?')) {
+                if (piezaActiva === figuraAQuitar) deseleccionar();
+                figuraAQuitar.remove();
+                actualizarEstadoAvatar(personaje.id);
+                actualizarProgresoGeneral();
+            }
+        } else {
+            crearFigura(personaje);
+        }
+        if (modalCapas.classList.contains('visible')) renderizarCapas();
+    });
+});
+
+// ============ 7. ARRASTRAR (Sincronizado con sliders) ============
 function hacerArrastrable(elemento) {
     let arrastrando = false;
     let startX = 0, startY = 0, initX = 0, initY = 0;
 
     function inicio(e) {
-        seleccionarPieza(elemento); // Seleccionar al tocar
+        seleccionarPieza(elemento);
         arrastrando = true;
         e.preventDefault();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -198,53 +320,48 @@ function hacerArrastrable(elemento) {
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
         
-        // Calcular cambio en porcentaje de pantalla
         const dxPct = (cx - startX) / window.innerWidth * 100;
         const dyPct = (cy - startY) / window.innerHeight * 100;
         
-        let nuevoX = Math.max(0, Math.min(100, initX + dxPct));
-        let nuevoY = Math.max(0, Math.min(100, initY + dyPct));
-        
-        elemento.dataset.x = nuevoX;
-        elemento.dataset.y = nuevoY;
+        elemento.dataset.x = Math.max(0, Math.min(100, initX + dxPct));
+        elemento.dataset.y = Math.max(0, Math.min(100, initY + dyPct));
         
         aplicarTransform(elemento);
-        refrescarSliders(elemento); // Sincronizar barras mientras se arrastra
+        refrescarSliders(elemento);
+        actualizarBarraIndividual(elemento);
+        actualizarProgresoGeneral();
     }
 
-    function fin() {
-        arrastrando = false;
-    }
+    function fin() { arrastrando = false; }
 
     elemento.addEventListener('mousedown', inicio);
     document.addEventListener('mousemove', mover);
     document.addEventListener('mouseup', fin);
-
     elemento.addEventListener('touchstart', inicio, { passive: false });
     document.addEventListener('touchmove', mover, { passive: false });
     document.addEventListener('touchend', fin);
     document.addEventListener('touchcancel', fin);
 }
 
-// ============ NUEVO: 6. BARRAS DE CONTROL ============
-sliderX.addEventListener('input', function () {
-    if (piezaActiva) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); }
+// ============ 8. CONTROLES DESLIZANTES Y BOTONES ============
+sliderX.addEventListener('input', function () { 
+    if (piezaActiva) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); actualizarBarraIndividual(piezaActiva); actualizarProgresoGeneral(); } 
 });
-sliderY.addEventListener('input', function () {
-    if (piezaActiva) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); }
+sliderY.addEventListener('input', function () { 
+    if (piezaActiva) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); actualizarBarraIndividual(piezaActiva); actualizarProgresoGeneral(); } 
 });
-sliderZoom.addEventListener('input', function () {
-    if (piezaActiva) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); }
+sliderZoom.addEventListener('input', function () { 
+    if (piezaActiva) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); guardarEstado(); } 
 });
-sliderGiro.addEventListener('input', function () {
-    if (piezaActiva) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); }
+sliderGiro.addEventListener('input', function () { 
+    if (piezaActiva) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); guardarEstado(); } 
 });
 
 btnVoltear.addEventListener('click', function () {
     if (piezaActiva) {
-        const nuevo = piezaActiva.dataset.volteada === 'true' ? 'false' : 'true';
-        piezaActiva.dataset.volteada = nuevo;
+        piezaActiva.dataset.volteada = piezaActiva.dataset.volteada === 'true' ? 'false' : 'true';
         aplicarTransform(piezaActiva);
+        guardarEstado();
     }
 });
 
@@ -253,7 +370,6 @@ btnDuplicar.addEventListener('click', function () {
         const idP = piezaActiva.dataset.personaje;
         const personaje = personajes.find(p => p.id === idP);
         if (personaje) {
-            // Crear copia manualmente para mantener la posición y estado actual, pero desplazada
             contadorCopias++;
             const img = document.createElement('img');
             img.src = personaje.png;
@@ -264,16 +380,19 @@ btnDuplicar.addEventListener('click', function () {
             img.dataset.personaje = personaje.id;
             
             const s = leerEstado(piezaActiva);
-            img.dataset.x = Math.min(95, s.x + 5); // Desplazada un 5% a la derecha
-            img.dataset.y = Math.min(95, s.y + 5); // Desplazada un 5% abajo
+            img.dataset.x = Math.min(95, s.x + 5);
+            img.dataset.y = Math.min(95, s.y + 5);
             img.dataset.zoom = s.zoom;
             img.dataset.giro = s.giro;
             img.dataset.volteada = s.volteada;
+            img.style.zIndex = parseInt(s.zIndex || 100) + 10;
             
             aplicarTransform(img);
             hacerArrastrable(img);
             zonaFiguras.appendChild(img);
+            actualizarEstadoAvatar(personaje.id);
             seleccionarPieza(img);
+            actualizarProgresoGeneral();
         }
     }
 });
@@ -282,26 +401,74 @@ btnQuitar.addEventListener('click', function () {
     if (piezaActiva) {
         const idP = piezaActiva.dataset.personaje;
         const personaje = personajes.find(p => p.id === idP);
-        const nombre = personaje ? personaje.nombre : 'esta pieza';
-        if (confirm('¿Seguro que quieres quitar ' + nombre + ' de la escena?')) {
+        if (confirm('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?')) {
             const el = piezaActiva;
             piezaActiva = null;
             el.remove();
             panelControles.classList.remove('visible');
+            contenedorBarraInd.style.display = 'none';
             actualizarEstadoAvatar(idP);
+            actualizarProgresoGeneral();
         }
     }
 });
 
-// ============ NUEVO: 7. TOCAR EL FONDO PARA DESELECCIONAR ============
+if (btnLimpiar) {
+    btnLimpiar.addEventListener('click', function () {
+        if (confirm('¿Seguro que quieres limpiar toda la escena y empezar de cero?')) {
+            zonaFiguras.innerHTML = '';
+            localStorage.removeItem('belenState');
+            document.querySelectorAll('.avatar-btn').forEach(btn => btn.classList.remove('activo'));
+            deseleccionar();
+            actualizarProgresoGeneral();
+        }
+    });
+}
+
+// ============ 9. MODAL DE CAPAS ============
+function renderizarCapas() {
+    listaCapas.innerHTML = '';
+    const figuras = Array.from(document.querySelectorAll('.figura-activa')).sort((a, b) => {
+        return parseInt(b.style.zIndex || 100) - parseInt(a.style.zIndex || 100);
+    });
+
+    figuras.forEach((fig, index) => {
+        const item = document.createElement('div');
+        item.className = 'item-capa';
+        item.innerHTML = `
+            <span>${index + 1}. ${fig.alt}</span>
+            <div>
+                <button class="btn-capa" onclick="cambiarCapa('${fig.id}', 1)">⬆</button>
+                <button class="btn-capa" onclick="cambiarCapa('${fig.id}', -1)">⬇</button>
+            </div>
+        `;
+        listaCapas.appendChild(item);
+    });
+}
+
+window.cambiarCapa = function(id, direccion) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let z = parseInt(el.style.zIndex || 100);
+    el.style.zIndex = z + (direccion * 10);
+    renderizarCapas();
+    guardarEstado();
+};
+
+btnCapas.addEventListener('click', () => { renderizarCapas(); modalCapas.classList.add('visible'); });
+btnCerrarCapas.addEventListener('click', () => { modalCapas.classList.remove('visible'); });
+modalCapas.addEventListener('click', (e) => { if (e.target === modalCapas) modalCapas.classList.remove('visible'); });
+
+// ============ 10. DESELECCIONAR AL TOCAR FONDO ============
 document.querySelector('.escena-overlay').addEventListener('click', function (e) {
-    if (e.target === this || e.target === zonaFiguras) {
-        deseleccionar();
-    }
+    if (e.target === this || e.target === zonaFiguras) deseleccionar();
 });
 
-// ============ 8. REAJUSTAR AL CAMBIAR ORIENTACIÓN ============
-window.addEventListener('resize', function () {
-    const figuras = document.querySelectorAll('.figura-activa');
-    figuras.forEach(function (f) { aplicarTransform(f); });
+function recalcularTodasLasFiguras() {
+    document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
+}
+
+// ============ 11. INICIALIZACIÓN ============
+document.addEventListener('DOMContentLoaded', function() {
+    cargarEstado();
 });
