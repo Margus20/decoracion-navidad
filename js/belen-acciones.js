@@ -201,6 +201,14 @@ function recalcularTodasLasFiguras() {
     document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
 }
 
+// ============ 6.5. CERRAR MODAL DE RESULTADO ============
+const btnCerrarResultado = document.getElementById('btnCerrarResultado');
+if (btnCerrarResultado) {
+    btnCerrarResultado.addEventListener('click', function() {
+        document.getElementById('modalResultado').classList.remove('visible');
+    });
+}
+
 // ============ 7. INICIALIZACIÓN ============
 iniciarRelojLimpieza();
 updateImage();
