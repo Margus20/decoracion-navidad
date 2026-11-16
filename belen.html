@@ -28,6 +28,33 @@
 
     <aside class="panel-avatars" id="panelAvatars"></aside>
 
+    <!-- Panel de controles de la pieza activa (Agregado conservando tu estructura) -->
+    <div class="panel-controles" id="panelControles">
+        <div class="fila-bloques">
+            <div class="bloque-control">
+                <label for="sliderX">↔ Horizontal</label>
+                <input type="range" id="sliderX" min="0" max="100" value="50" step="0.5">
+            </div>
+            <div class="bloque-control">
+                <label for="sliderY">↕ Vertical</label>
+                <input type="range" id="sliderY" min="0" max="100" value="50" step="0.5">
+            </div>
+            <div class="bloque-control">
+                <label for="sliderZoom">🔍 Tamaño</label>
+                <input type="range" id="sliderZoom" min="40" max="300" value="100" step="1">
+            </div>
+            <div class="bloque-control">
+                <label for="sliderGiro">🔄 Girar</label>
+                <input type="range" id="sliderGiro" min="-180" max="180" value="0" step="1">
+            </div>
+        </div>
+        <div class="fila-botones">
+            <button id="btnVoltear" class="ctrl-btn">🪞 Voltear</button>
+            <button id="btnDuplicar" class="ctrl-btn">📋 Duplicar</button>
+            <button id="btnQuitar" class="ctrl-btn ctrl-quitar">✕ Quitar</button>
+        </div>
+    </div>
+
     <script src="belen.js"></script>
 </body>
 </html>
