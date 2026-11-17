@@ -52,7 +52,7 @@ function verificarInicioRelojFinal() {
     }
 }
 
-// Función central de cierre: la llaman tanto la victoria (logica) como el tiempo (relojes)
+// Función central de cierre: la llaman el monitor (victoria) o el reloj (tiempo)
 function finalizarJuego(motivo) {
     if (juegoTerminado) return;
     juegoTerminado = true;
@@ -67,7 +67,7 @@ function finalizarJuego(motivo) {
     
     deseleccionar();
     
-    // Llamar a la función de evaluación que está en belen-logica.js, pasándole el motivo
+    // Llamar a la función de evaluación que está en belen-logica.js
     if (typeof mostrarResultadoFinal === 'function') {
         mostrarResultadoFinal(calcularScoreGeneral(), motivo);
     }
@@ -79,7 +79,7 @@ function guardarEnTablaHonor(nombre, puntaje) {
     const fecha = new Date().toLocaleDateString('es-VE');
     tabla.push({ nombre: nombre || 'Anónimo', puntaje: Math.round(puntaje), fecha });
     tabla.sort((a, b) => b.puntaje - a.puntaje);
-    tabla = tabla.slice(0, 10); // Guardar solo el Top 10
+    tabla = tabla.slice(0, 10);
     localStorage.setItem('belenTablaHonor', JSON.stringify(tabla));
 }
 
@@ -147,7 +147,7 @@ personajes.forEach(function (personaje) {
     panelAvatars.appendChild(btn);
 
     btn.addEventListener('click', function () {
-        if (juegoTerminado) return; // No permitir cambios si el juego terminó
+        if (juegoTerminado) return;
         
         const existentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
         if (existentes.length > 0) {
@@ -228,7 +228,6 @@ sliderGiro.addEventListener('input', function () {
     if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); }
 });
 
-// Al soltar cualquier barra, re-evaluamos por si acaso
 sliderX.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
 sliderY.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
 sliderZoom.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
@@ -323,7 +322,13 @@ function recalcularTodasLasFiguras() {
     document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
 }
 
-// ============ 9. GESTIÓN DEL MODAL DE RESULTADO, X, GUARDAR Y REINICIO ============
+// ============ 9. GESTIÓN DEL MODAL DE RESULTADO Y REINICIO ============
+
+// Función clave: muestra el botón de reiniciar SOLO cuando el modal se cierra
+function mostrarBotonReinicio() {
+    document.body.classList.add('mostrar-reinicio');
+}
+
 const btnGuardarNombre = document.getElementById('btnGuardarNombre');
 if (btnGuardarNombre) {
     btnGuardarNombre.addEventListener('click', function() {
@@ -331,18 +336,17 @@ if (btnGuardarNombre) {
         const nombre = inputNombre.value.trim() || 'Anónimo';
         guardarEnTablaHonor(nombre, calcularScoreGeneral());
         
-        // Ocultar modal de resultado y mostrar tabla de honor
         document.getElementById('modalResultado').classList.remove('visible');
+        mostrarBotonReinicio(); // Activa el botón de reiniciar
         mostrarTablaHonor();
     });
 }
 
-// Manejo de la X para salir sin guardar
 const btnCerrarXResultado = document.getElementById('btnCerrarXResultado');
 if (btnCerrarXResultado) {
     btnCerrarXResultado.addEventListener('click', function() {
         document.getElementById('modalResultado').classList.remove('visible');
-        // El juego sigue congelado y el botón de reiniciar sigue visible
+        mostrarBotonReinicio(); // Activa el botón de reiniciar
     });
 }
 
@@ -364,7 +368,6 @@ document.getElementById('modalHonor').addEventListener('click', (e) => {
     if (e.target.id === 'modalHonor') document.getElementById('modalHonor').classList.remove('visible'); 
 });
 
-// Botón grande de reinicio en el centro
 const btnReiniciar = document.getElementById('btnReiniciar');
 if (btnReiniciar) {
     btnReiniciar.addEventListener('click', function() {
@@ -374,7 +377,7 @@ if (btnReiniciar) {
 
 // ============ 10. INICIALIZACIÓN ============
 iniciarRelojGlobal();
-iniciarRelojLimpieza(); // El reloj de 1 hora de limpieza de memoria que ya teníamos
+iniciarRelojLimpieza();
 updateImage();
 window.addEventListener('resize', () => { updateImage(); recalcularTodasLasFiguras(); });
 window.addEventListener('orientationchange', updateImage);
