@@ -1,6 +1,6 @@
 // ============ VARIABLES DE TIEMPO Y ESTADO ============
-let tiempoGlobalRestante = 8 * 60; // 8 minutos en segundos
-let tiempoFinalRestante = 45; // 45 segundos
+let tiempoGlobalRestante = 8 * 60;
+let tiempoFinalRestante = 45;
 let intervaloGlobal = null;
 let intervaloFinal = null;
 let juegoTerminado = false;
@@ -52,14 +52,12 @@ function verificarInicioRelojFinal() {
     }
 }
 
-// Función central de cierre: la llaman el monitor (victoria) o el reloj (tiempo)
 function finalizarJuego(motivo) {
     if (juegoTerminado) return;
     juegoTerminado = true;
     clearInterval(intervaloGlobal);
     clearInterval(intervaloFinal);
     
-    // Congelar visualmente la escena
     document.body.classList.add('juego-congelado');
     document.getElementById('relojGlobal').classList.add('agotado');
     const rf = document.getElementById('relojFinal');
@@ -67,13 +65,15 @@ function finalizarJuego(motivo) {
     
     deseleccionar();
     
-    // Llamar a la función de evaluación que está en belen-logica.js
+    // Repintar la barra general con el valor definitivo antes de mostrar el modal
+    actualizarProgresoGeneral();
+    
     if (typeof mostrarResultadoFinal === 'function') {
         mostrarResultadoFinal(calcularScoreGeneral(), motivo);
     }
 }
 
-// ============ RED DE SEGURIDAD: Chequeo instantáneo al interactuar ============
+// ============ RED DE SEGURIDAD: Chequeo instantáneo ============
 function chequearVictoria() {
     if (juegoTerminado) return;
     const figuras = document.querySelectorAll('.figura-activa');
@@ -137,7 +137,7 @@ function crearFigura(personaje) {
     seleccionarPieza(img);
     actualizarProgresoGeneral();
     verificarInicioRelojFinal();
-    chequearVictoria(); // Red de seguridad
+    chequearVictoria();
 }
 
 function actualizarEstadoAvatar(idPersonaje) {
@@ -208,15 +208,17 @@ function hacerArrastrable(elemento) {
         elemento.dataset.y = Math.max(0, Math.min(100, initY + dyPct));
         aplicarTransform(elemento);
         refrescarSliders(elemento);
-        actualizarBarraIndividual(elemento);
+        // Solo actualizamos la barra general durante el movimiento
         actualizarProgresoGeneral();
     }
 
     function fin() {
         if (arrastrando) {
             arrastrando = false;
+            // CORRECCIÓN CLAVE: Repintar la barra con el valor definitivo al soltar
+            actualizarProgresoGeneral();
             verificarInicioRelojFinal();
-            chequearVictoria(); // Red de seguridad al soltar la pieza
+            chequearVictoria();
         }
     }
 
@@ -231,23 +233,23 @@ function hacerArrastrable(elemento) {
 
 // ============ 6. SLIDERS Y BOTONES DE CONTROL ============
 sliderX.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); actualizarBarraIndividual(piezaActiva); actualizarProgresoGeneral(); }
+    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
 });
 sliderY.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); actualizarBarraIndividual(piezaActiva); actualizarProgresoGeneral(); }
+    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
 });
 sliderZoom.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); }
+    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
 });
 sliderGiro.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); }
+    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
 });
 
-// Red de seguridad en los sliders al soltar
-sliderX.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
-sliderY.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
-sliderZoom.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
-sliderGiro.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
+// CORRECCIÓN CLAVE: al soltar cualquier slider, repintar la barra con el valor definitivo
+sliderX.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
+sliderY.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
+sliderZoom.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
+sliderGiro.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
 
 btnVoltear.addEventListener('click', function () {
     if (piezaActiva && !juegoTerminado) {
@@ -283,7 +285,7 @@ btnDuplicar.addEventListener('click', function () {
             seleccionarPieza(img);
             actualizarProgresoGeneral();
             verificarInicioRelojFinal();
-            chequearVictoria(); // Red de seguridad
+            chequearVictoria();
         }
     }
 });
@@ -297,7 +299,6 @@ btnQuitar.addEventListener('click', function () {
             piezaActiva = null;
             el.remove();
             panelControles.classList.remove('visible');
-            contenedorBarraInd.style.display = 'none';
             actualizarEstadoAvatar(idP);
             actualizarProgresoGeneral();
             verificarInicioRelojFinal();
