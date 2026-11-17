@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché actualizado a v=6 -->
-    <link rel="stylesheet" href="css/belen-base.css?v=6">
-    <link rel="stylesheet" href="css/belen-relojes.css?v=6">
-    <link rel="stylesheet" href="css/belen-ui.css?v=6">
-    <link rel="stylesheet" href="css/belen-botones.css?v=6">
-    <link rel="stylesheet" href="css/belen-modales.css?v=6">
-    <link rel="stylesheet" href="css/belen-efectos.css?v=6">
-    <link rel="stylesheet" href="css/belen-responsive.css?v=6">
+    <!-- Estilos fragmentados con anti-caché actualizado a v=7 -->
+    <link rel="stylesheet" href="css/belen-base.css?v=7">
+    <link rel="stylesheet" href="css/belen-relojes.css?v=7">
+    <link rel="stylesheet" href="css/belen-ui.css?v=7">
+    <link rel="stylesheet" href="css/belen-botones.css?v=7">
+    <link rel="stylesheet" href="css/belen-modales.css?v=7">
+    <link rel="stylesheet" href="css/belen-efectos.css?v=7">
+    <link rel="stylesheet" href="css/belen-responsive.css?v=7">
 </head>
 <body>
     <!-- Botón Volver -->
@@ -65,24 +65,36 @@
     <!-- Panel de Avatares -->
     <aside class="panel-avatars" id="panelAvatars"></aside>
 
-    <!-- Panel de Controles -->
+    <!-- Panel de Controles (CON CAMPOS NUMÉRICOS) -->
     <div class="panel-controles" id="panelControles">
         <div class="fila-bloques">
             <div class="bloque-control">
                 <label for="sliderX">↔ Horizontal</label>
-                <input type="range" id="sliderX" min="0" max="100" value="50" step="0.5">
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderX" min="0" max="100" value="50" step="0.5">
+                    <input type="number" id="inputX" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor horizontal">
+                </div>
             </div>
             <div class="bloque-control">
                 <label for="sliderY">↕ Vertical</label>
-                <input type="range" id="sliderY" min="0" max="100" value="50" step="0.5">
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderY" min="0" max="100" value="50" step="0.5">
+                    <input type="number" id="inputY" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor vertical">
+                </div>
             </div>
             <div class="bloque-control">
                 <label for="sliderZoom">🔍 Tamaño</label>
-                <input type="range" id="sliderZoom" min="40" max="300" value="100" step="1">
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderZoom" min="40" max="300" value="100" step="1">
+                    <input type="number" id="inputZoom" min="40" max="300" step="1" value="100" class="input-numerico" aria-label="Valor tamaño">
+                </div>
             </div>
             <div class="bloque-control">
                 <label for="sliderGiro">🔄 Girar</label>
-                <input type="range" id="sliderGiro" min="-180" max="180" value="0" step="1">
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderGiro" min="-180" max="180" value="0" step="1">
+                    <input type="number" id="inputGiro" min="-180" max="180" step="1" value="0" class="input-numerico" aria-label="Valor giro">
+                </div>
             </div>
         </div>
         <div class="fila-botones">
@@ -153,10 +165,10 @@
         });
     </script>
 
-    <!-- Scripts con anti-caché actualizado a v=6 y orden obligatorio -->
-    <script src="js/belen-datos.js?v=6"></script>
-    <script src="js/belen-logica.js?v=6"></script>
-    <script src="js/belen-acciones.js?v=6"></script>
-    <script src="js/belen-monitor.js?v=6"></script>
+    <!-- Scripts con anti-caché actualizado a v=7 y orden obligatorio -->
+    <script src="js/belen-datos.js?v=7"></script>
+    <script src="js/belen-logica.js?v=7"></script>
+    <script src="js/belen-acciones.js?v=7"></script>
+    <script src="js/belen-monitor.js?v=7"></script>
 </body>
 </html>
