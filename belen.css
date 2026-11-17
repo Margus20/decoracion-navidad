@@ -50,15 +50,16 @@ html, body {
     pointer-events: none;
 }
 
-/* ============ RELOJES DEL JUEGO (NUEVO) ============ */
+/* ============ RELOJES DEL JUEGO (AJUSTADO A LA DERECHA) ============ */
 .zona-relojes {
     position: fixed;
-    top: 85px;
-    left: 18px;
+    top: 18px;
+    right: 18px;
     z-index: 900;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    align-items: flex-end;
 }
 
 .reloj {
@@ -116,7 +117,18 @@ html, body {
     50% { opacity: 0.4; }
 }
 
-/* ============ BOTÓN TABLA DE HONOR (NUEVO) ============ */
+.reloj.agotado {
+    border-color: #666;
+    background: rgba(40, 40, 40, 0.8);
+    animation: none;
+}
+
+.reloj.agotado .reloj-numero {
+    color: #999;
+    animation: none;
+}
+
+/* ============ BOTÓN TABLA DE HONOR ============ */
 .btn-honor {
     position: fixed;
     top: 18px;
@@ -596,7 +608,7 @@ input[type="range"]::-moz-range-thumb {
 .detalle-estado.parcial { background: #ffcc00; color: #000; }
 .detalle-estado.fallo { background: #ff4444; color: #fff; }
 
-/* NUEVO: Campo de nombre en el modal */
+/* Campo de nombre en el modal */
 .campo-nombre {
     margin-top: 20px;
     padding-top: 20px;
@@ -649,7 +661,7 @@ input[type="range"]::-moz-range-thumb {
     transform: scale(0.95);
 }
 
-/* ============ MODAL DE TABLA DE HONOR (NUEVO) ============ */
+/* ============ MODAL DE TABLA DE HONOR ============ */
 .modal-honor {
     position: fixed;
     inset: 0;
@@ -821,13 +833,10 @@ input[type="range"]::-moz-range-thumb {
         bottom: 130px;
     }
     
-    /* En horizontal, los relojes se mueven un poco para no estorbar */
+    /* En horizontal, los relojes van a la esquina inferior derecha para no estorbar */
     .zona-relojes {
-        top: 14px;
-    }
-    
-    .btn-honor {
-        top: 14px;
-        left: 160px;
+        top: auto;
+        bottom: 18px;
+        right: 12px;
     }
 }
