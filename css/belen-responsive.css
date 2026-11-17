@@ -1,0 +1,48 @@
+/* ============ MODO HORIZONTAL ============ */
+@media (min-width: 768px) {
+    .panel-avatars {
+        top: auto;
+        bottom: 18px;
+        right: 50%;
+        transform: translateX(50%);
+        flex-direction: row;
+        gap: 14px;
+        padding: 12px 18px;
+        max-width: 95vw;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .avatar-btn {
+        width: 68px;
+        height: 68px;
+    }
+
+    .figura-activa {
+        width: 120px;
+    }
+
+    .panel-controles {
+        bottom: auto;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 40px);
+        max-width: 760px;
+    }
+
+    .fila-bloques {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .panel-progreso {
+        top: auto;
+        bottom: 130px;
+    }
+
+    .zona-relojes {
+        top: auto;
+        bottom: 18px;
+        right: 12px;
+    }
+}
