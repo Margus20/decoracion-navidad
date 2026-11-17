@@ -191,9 +191,12 @@ function actualizarBarraIndividual(el) {
 }
 
 // ============ 6. CELEBRACIÓN Y MODAL DE RESULTADO ============
-let resultadoMostrado = false;
+var victoriaLanzada = false;
 
 function actualizarProgresoGeneral() {
+    // Si el juego ya terminó por tiempo o victoria, no seguimos evaluando cambios
+    if (typeof juegoTerminado !== 'undefined' && juegoTerminado) return;
+
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
 
@@ -210,24 +213,29 @@ function actualizarProgresoGeneral() {
     const hayOchoPiezas = figuras.length === 8;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
 
-    if (hayOchoPiezas && todasUnicas && !resultadoMostrado) {
-        mostrarResultadoFinal(score);
+    // CONDICIÓN 1 DE VICTORIA: 8 únicas + 100 puntos -> se termina YA con celebración
+    if (hayOchoPiezas && todasUnicas && Math.round(score) >= 100 && !victoriaLanzada) {
+        victoriaLanzada = true;
+        if (typeof finalizarJuego === 'function') {
+            finalizarJuego('victoria');
+        } else {
+            mostrarResultadoFinal(score, 'victoria');
+        }
     }
 }
 
-function mostrarResultadoFinal(score) {
-    resultadoMostrado = true;
+function mostrarResultadoFinal(score, motivo) {
     const modal = document.getElementById('modalResultado');
     const titulo = document.getElementById('resultadoTitulo');
     const puntaje = document.getElementById('resultadoPuntaje');
     const mensaje = document.getElementById('resultadoMensaje');
     const listaDetalles = document.getElementById('listaDetalles');
+    const campoNombre = document.getElementById('campoNombre');
 
     const puntajeRedondeado = Math.round(score);
     puntaje.textContent = puntajeRedondeado + '/100';
     puntaje.className = 'modal-resultado-puntaje';
 
-    // Analizar cuántas están bien, parciales o mal para el mensaje
     const m = obtenerMapa();
     let parciales = 0, fallidas = 0;
     criterios.forEach(c => {
@@ -236,7 +244,9 @@ function mostrarResultadoFinal(score) {
         else if (v < 0.5) fallidas++;
     });
 
-    if (puntajeRedondeado >= 100) {
+    const esPerfecto = puntajeRedondeado >= 100;
+
+    if (esPerfecto) {
         puntaje.classList.add('perfecto');
         titulo.textContent = '¡Belén Perfecto!';
         mensaje.textContent = '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.';
@@ -245,7 +255,7 @@ function mostrarResultadoFinal(score) {
         puntaje.classList.add('bueno');
         titulo.textContent = '¡Belén Completado!';
         const faltan = 100 - puntajeRedondeado;
-        let detalle = 'Te faltan ' + faltan + ' puntos para la perfección. ';
+        let detalle = (motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '') + 'Te faltan ' + faltan + ' puntos para la perfección. ';
         if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
         if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) casi correctas que puedes afinar.';
         detalle += 'Revisa abajo las marcadas con ~ o ✗.';
@@ -254,7 +264,7 @@ function mostrarResultadoFinal(score) {
         puntaje.classList.add('regular');
         titulo.textContent = 'Belén Armado';
         const faltan = 100 - puntajeRedondeado;
-        let detalle = 'Te faltan ' + faltan + ' puntos. ';
+        let detalle = (motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '') + 'Te faltan ' + faltan + ' puntos. ';
         if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
         if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) que pueden mejorar.';
         detalle += 'Revisa abajo las marcadas con ~ o ✗.';
@@ -278,6 +288,11 @@ function mostrarResultadoFinal(score) {
         listaDetalles.appendChild(item);
     });
 
+    // Asegurar que el campo para escribir el nombre sea visible
+    if (campoNombre) {
+        campoNombre.style.display = 'block';
+    }
+    
     modal.classList.add('visible');
 }
 
@@ -318,4 +333,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-        }
+                      }
