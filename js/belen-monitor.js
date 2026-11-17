@@ -1,32 +1,27 @@
-// ============ MONITOR DE VICTORIA (belen-monitor.js) ============
-// Vigila el puntaje y dispara la celebración al instante al llegar a 100 
-// con las 8 piezas únicas, sin depender de eventos de movimiento o arrastre.
+// ============ MONITOR DE VICTORIA INSTANTÁNEA ============
 (function () {
-    const INTERVALO_MS = 400; // Revisa cada 400 milisegundos
+    const INTERVALO_MS = 400;
     let intervaloMonitor = null;
 
     function revisarVictoria() {
-        // Si el juego ya terminó (por victoria o por tiempo), detener el vigilante
         if (typeof juegoTerminado !== 'undefined' && juegoTerminado) {
             detenerMonitor();
             return;
         }
 
         const figuras = document.querySelectorAll('.figura-activa');
-        
-        // Deben haber exactamente 8 piezas en el escenario
         if (figuras.length !== 8) return;
 
-        // Y deben ser todas únicas (una de cada tipo necesario)
         const todasUnicas = idsNecesarios.every(id => 
             figuras.filter(f => f.dataset.personaje === id).length === 1
         );
         
         if (!todasUnicas) return;
 
-        // Verificar si el puntaje alcanzó o superó 100
         const score = calcularScoreGeneral();
-        if (Math.round(score) >= 100) {
+        
+        // Disparar si el puntaje redondeado es 100 (o 99.5+ por seguridad de decimales)
+        if (score >= 99.5) {
             detenerMonitor();
             finalizarJuego('victoria');
         }
@@ -44,7 +39,6 @@
         intervaloMonitor = setInterval(revisarVictoria, INTERVALO_MS);
     }
 
-    // Iniciar el monitor tan pronto como el HTML esté cargado
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', iniciarMonitor);
     } else {
