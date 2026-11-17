@@ -145,22 +145,7 @@ function calcularScoreGeneral() {
     return criterios.reduce((total, c) => total + (c.peso * c.eval(m)), 0);
 }
 
-function calcularScoreIndividual(el) {
-    const m = obtenerMapa();
-    const idP = el.dataset.personaje;
-    const ids = criteriosPorPieza[idP] || ['completitud'];
-    let obtenido = 0, maximo = 0;
-    
-    criterios.forEach(c => {
-        if (ids.includes(c.id)) {
-            obtenido += c.peso * c.eval(m);
-            maximo += c.peso;
-        }
-    });
-    return maximo === 0 ? 0 : (obtenido / maximo) * 100;
-}
-
-// ============ 5. SELECCIÓN Y BARRAS ============
+// ============ 5. SELECCIÓN ============
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
@@ -168,11 +153,8 @@ function seleccionarPieza(el) {
     piezaActiva = el;
     el.classList.add('seleccionada');
     panelControles.classList.add('visible');
-    contenedorBarraInd.style.display = 'flex';
-    textoBarraInd.textContent = 'Ubicación de: ' + el.alt;
     
     refrescarSliders(el);
-    actualizarBarraIndividual(el);
 }
 
 function deseleccionar() {
@@ -181,18 +163,9 @@ function deseleccionar() {
         piezaActiva = null;
     }
     panelControles.classList.remove('visible');
-    contenedorBarraInd.style.display = 'none';
 }
 
-function actualizarBarraIndividual(el) {
-    const pct = calcularScoreIndividual(el);
-    barraIndividual.style.width = pct + '%';
-    barraIndividual.className = 'barra-relleno ' + (pct < 40 ? 'nivel-bajo' : pct < 80 ? 'nivel-medio' : 'nivel-alto');
-}
-
-// ============ 6. BARRA GENERAL Y MODAL DE RESULTADO ============
-// NOTA: La detección de VICTORIA la hace exclusivamente belen-monitor.js.
-// Esta función solo actualiza la interfaz visual de la barra.
+// ============ 6. BARRA GENERAL Y DISPARO DE VICTORIA ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
@@ -203,6 +176,17 @@ function actualizarProgresoGeneral() {
     }
 
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
+
+    // DISPARO DE VICTORIA BLINDADO: Si la barra llega a 100 con las 8 únicas, se dispara aquí mismo.
+    if (typeof juegoTerminado !== 'undefined' && !juegoTerminado && Math.round(score) >= 100) {
+        const figuras = document.querySelectorAll('.figura-activa');
+        const hayOcho = figuras.length === 8;
+        const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
+        
+        if (hayOcho && todasUnicas && typeof finalizarJuego === 'function') {
+            finalizarJuego('victoria');
+        }
+    }
 }
 
 function mostrarResultadoFinal(score, motivo) {
@@ -210,7 +194,6 @@ function mostrarResultadoFinal(score, motivo) {
     const puntajeRedondeado = Math.round(score);
     const m = obtenerMapa();
     
-    // Contar estados para el mensaje
     let parciales = 0, fallidas = 0;
     criterios.forEach(c => {
         const v = c.eval(m);
@@ -218,7 +201,6 @@ function mostrarResultadoFinal(score, motivo) {
         else if (v < 0.5) fallidas++;
     });
 
-    // Actualizar UI del modal
     document.getElementById('resultadoPuntaje').textContent = `${puntajeRedondeado}/100`;
     document.getElementById('resultadoPuntaje').className = 'modal-resultado-puntaje ' + (puntajeRedondeado >= 100 ? 'perfecto' : puntajeRedondeado >= 80 ? 'bueno' : 'regular');
     
@@ -245,7 +227,6 @@ function mostrarResultadoFinal(score, motivo) {
     }
     document.getElementById('resultadoMensaje').textContent = mensajeTexto;
 
-    // Generar lista de detalles
     const listaDetalles = document.getElementById('listaDetalles');
     listaDetalles.innerHTML = '';
     criterios.forEach(c => {
@@ -262,7 +243,6 @@ function mostrarResultadoFinal(score, motivo) {
         listaDetalles.appendChild(item);
     });
 
-    // Asegurar que el campo de nombre sea visible
     const campoNombre = document.getElementById('campoNombre');
     if (campoNombre) campoNombre.style.display = 'block';
     
