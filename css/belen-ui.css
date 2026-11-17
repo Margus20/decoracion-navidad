@@ -1,0 +1,286 @@
+/* ============ BOTÓN TABLA DE HONOR ============ */
+.btn-honor {
+    position: fixed;
+    top: 18px;
+    left: 160px;
+    z-index: 900;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #b8860b 0%, #8b6508 100%);
+    color: #fff;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    border: 3px solid #ffffff;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.5);
+    transition: transform 0.15s ease;
+}
+
+.btn-honor:active {
+    transform: scale(0.93);
+}
+
+/* ============ BARRAS DE PROGRESO ============ */
+.panel-progreso {
+    position: fixed;
+    top: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(80vw, 500px);
+    z-index: 800;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.barra-contenedor {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+}
+
+.label-progreso {
+    display: block;
+    font-size: 0.75rem;
+    color: #fff;
+    margin-bottom: 4px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    height: 100%;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+    background-color: #ff4444;
+}
+
+.barra-relleno.nivel-bajo { background-color: #ff4444; }
+.barra-relleno.nivel-medio { background-color: #ffcc00; }
+.barra-relleno.nivel-alto { background-color: #44ff44; box-shadow: 0 0 10px #44ff44; }
+
+/* ============ FIGURAS COLOCADAS ============ */
+.figura-activa {
+    position: absolute;
+    width: 90px;
+    height: auto;
+    pointer-events: auto;
+    cursor: grab;
+    z-index: 100;
+    filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
+    touch-action: none;
+    transition: outline 0.15s ease, filter 0.15s ease;
+    outline: 3px solid transparent;
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.figura-activa:active {
+    cursor: grabbing;
+    z-index: 200;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
+}
+
+.figura-activa.seleccionada {
+    outline: 3px solid #ffd700;
+    filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.85)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
+    z-index: 250;
+}
+
+.juego-congelado .figura-activa,
+.juego-congelado .panel-avatars,
+.juego-congelado .panel-controles {
+    pointer-events: none;
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+body.celebracion-activa .figura-activa {
+    opacity: 1 !important;
+    filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6)) !important;
+}
+
+body.celebracion-activa .panel-avatars,
+body.celebracion-activa .panel-controles {
+    opacity: 0.7 !important;
+    filter: none !important;
+}
+
+/* ============ PANEL DE AVATARES ============ */
+.panel-avatars {
+    position: fixed;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(26, 26, 46, 0.75);
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    z-index: 600;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+    border: 2px solid #ffd700;
+    background: #2c1810;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    padding: 0;
+}
+
+.avatar-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.avatar-btn:active {
+    transform: scale(0.9);
+}
+
+.avatar-btn.activo {
+    border-color: #ffffff;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 22px rgba(255, 215, 0, 0.6);
+    background: #5a3a20;
+}
+
+/* ============ PANEL DE CONTROLES ============ */
+.panel-controles {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 40px);
+    max-width: 640px;
+    background: rgba(20, 20, 40, 0.9);
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    padding: 12px 10px;
+    z-index: 700;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    display: none;
+}
+
+.panel-controles.visible {
+    display: block;
+}
+
+.fila-bloques {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.bloque-control {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bloque-control label {
+    font-size: 0.75rem;
+    color: #ffd700;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 24px;
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: linear-gradient(90deg, #3a3a5e, #5a5a8e);
+    border-radius: 6px;
+    border: 1px solid #ffd700;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff6c8, #ffd700 60%, #b8860b);
+    border: 2px solid #ffffff;
+    margin-top: -8px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: linear-gradient(90deg, #3a3a5e, #5a5a8e);
+    border-radius: 6px;
+    border: 1px solid #ffd700;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff6c8, #ffd700 60%, #b8860b);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.fila-botones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ctrl-btn {
+    flex: 1;
+    min-width: 65px;
+    padding: 10px 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(180deg, #2e7d32, #1b5e20);
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.ctrl-btn:active {
+    transform: scale(0.93);
+}
+
+.ctrl-quitar {
+    background: linear-gradient(180deg, #c62828, #8e1a1a);
+}
