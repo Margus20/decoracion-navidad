@@ -10,16 +10,15 @@
     <link rel="stylesheet" href="belen.css">
 </head>
 <body>
+    <!-- Botón Volver -->
     <a href="index.html" class="back-button">
         <svg class="arrow" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20"
-                  stroke="#ffffff" stroke-width="5"
-                  stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
         VOLVER
     </a>
 
-    <!-- Relojes + botón donar (a la izquierda del reloj) -->
+    <!-- Relojes y Botón de Donar -->
     <div class="zona-relojes">
         <div class="fila-donate-reloj">
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
@@ -34,21 +33,26 @@
         </div>
     </div>
 
-    <!-- Botón tabla de honor -->
+    <!-- Botón Tabla de Honor -->
     <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
 
     <!-- Barras de Progreso -->
     <div class="panel-progreso">
         <div class="barra-contenedor">
             <span class="label-progreso">Progreso del Belén</span>
-            <div class="barra-fondo"><div id="barraGeneral" class="barra-relleno" style="width: 0%;"></div></div>
+            <div class="barra-fondo">
+                <div id="barraGeneral" class="barra-relleno" style="width: 0%;"></div>
+            </div>
         </div>
         <div class="barra-contenedor" id="contenedorBarraIndividual" style="display: none;">
             <span class="label-progreso" id="textoBarraIndividual">Ubicación de la pieza</span>
-            <div class="barra-fondo"><div id="barraIndividual" class="barra-relleno" style="width: 0%;"></div></div>
+            <div class="barra-fondo">
+                <div id="barraIndividual" class="barra-relleno" style="width: 0%;"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Escenario -->
     <div class="container">
         <img id="stageImage" class="stage-image" src="" alt="Belén Navideño">
         <div class="escena-overlay">
@@ -56,9 +60,10 @@
         </div>
     </div>
 
+    <!-- Panel de Avatares -->
     <aside class="panel-avatars" id="panelAvatars"></aside>
 
-    <!-- Panel de controles de la pieza activa -->
+    <!-- Panel de Controles -->
     <div class="panel-controles" id="panelControles">
         <div class="fila-bloques">
             <div class="bloque-control">
@@ -98,18 +103,16 @@
     <!-- Modal de Resultado Final -->
     <div class="modal-resultado" id="modalResultado">
         <div class="modal-resultado-contenido">
-            <!-- NUEVO: Botón X para salir sin guardar -->
             <button class="modal-cerrar-x" id="btnCerrarXResultado" title="Salir sin guardar">✕</button>
-            
             <h2 class="modal-resultado-titulo" id="resultadoTitulo">Veredicto</h2>
             <div class="modal-resultado-puntaje" id="resultadoPuntaje">0/100</div>
             <p class="modal-resultado-mensaje" id="resultadoMensaje"></p>
+            
             <div class="modal-resultado-detalles">
                 <h4>Detalle de relaciones:</h4>
                 <div id="listaDetalles"></div>
             </div>
             
-            <!-- Campo para escribir el nombre -->
             <div class="campo-nombre" id="campoNombre">
                 <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
                 <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
@@ -127,12 +130,13 @@
         </div>
     </div>
 
-    <!-- NUEVO: Botón grande de reinicio (aparece al terminar el juego) -->
+    <!-- Botón de Reinicio -->
     <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR BELÉN</button>
 
-    <!-- Scripts divididos en la carpeta js/ para mejor organización -->
+    <!-- Scripts (El orden es importante) -->
     <script src="js/belen-datos.js"></script>
     <script src="js/belen-logica.js"></script>
     <script src="js/belen-acciones.js"></script>
+    <script src="js/belen-monitor.js"></script>
 </body>
 </html>
