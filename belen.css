@@ -50,7 +50,7 @@ html, body {
     pointer-events: none;
 }
 
-/* ============ RELOJES DEL JUEGO Y BOTÓN DONAR ============ */
+/* ============ RELOJES Y BOTÓN DONAR ============ */
 .zona-relojes {
     position: fixed;
     top: 18px;
@@ -62,7 +62,6 @@ html, body {
     align-items: flex-end;
 }
 
-/* NUEVO: Contenedor para alinear el botón donar con el reloj */
 .fila-donate-reloj {
     display: flex;
     align-items: center;
@@ -70,7 +69,6 @@ html, body {
     justify-content: flex-end;
 }
 
-/* NUEVO: Estilo del botón de donar (verde navideño con letras amarillas) */
 .btn-donate {
     padding: 6px 12px;
     background: linear-gradient(180deg, #2e7d32, #1b5e20);
@@ -119,7 +117,6 @@ html, body {
     transition: color 0.3s ease;
 }
 
-/* Estado de urgencia: cuando quedan menos de 20 segundos */
 .reloj.urgente {
     border-color: #ff3333;
     background: rgba(80, 0, 0, 0.85);
@@ -257,7 +254,6 @@ html, body {
     z-index: 250;
 }
 
-/* Estado cuando el juego termina y se congela */
 .juego-congelado .figura-activa,
 .juego-congelado .panel-avatars,
 .juego-congelado .panel-controles {
@@ -266,7 +262,7 @@ html, body {
     filter: grayscale(50%);
 }
 
-/* ============ BOTÓN REINICIAR (NUEVO) ============ */
+/* ============ BOTÓN REINICIAR ============ */
 .btn-reiniciar {
     position: fixed;
     top: 50%;
@@ -292,8 +288,8 @@ html, body {
     transform: translate(-50%, -50%) scale(0.95);
 }
 
-/* Hace visible el botón de reiniciar cuando el juego termina */
-.juego-congelado .btn-reiniciar {
+/* Muestra el botón de reiniciar SOLO cuando se cierra el modal */
+body.mostrar-reinicio .btn-reiniciar {
     display: block;
 }
 
@@ -400,7 +396,7 @@ html, body {
     background: #5a3a20;
 }
 
-/* ============ PANEL DE CONTROLES DE PIEZA ============ */
+/* ============ PANEL DE CONTROLES ============ */
 .panel-controles {
     position: fixed;
     bottom: 14px;
@@ -592,7 +588,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .modal-resultado-contenido {
-    position: relative; /* Necesario para posicionar la X */
+    position: relative;
     background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%);
     border: 3px solid #ffd700;
     border-radius: 20px;
@@ -605,7 +601,6 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
 }
 
-/* NUEVO: Botón X para cerrar el modal sin guardar */
 .modal-cerrar-x {
     position: absolute;
     top: 10px;
@@ -687,7 +682,6 @@ input[type="range"]::-moz-range-thumb {
 .detalle-estado.parcial { background: #ffcc00; color: #000; }
 .detalle-estado.fallo { background: #ff4444; color: #fff; }
 
-/* Campo de nombre en el modal */
 .campo-nombre {
     margin-top: 20px;
     padding-top: 20px;
@@ -745,7 +739,7 @@ input[type="range"]::-moz-range-thumb {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.85);
-    z-index: 1100; /* Ligeramente por encima del modal de resultado */
+    z-index: 1100;
     display: none;
     align-items: center;
     justify-content: center;
@@ -876,4 +870,27 @@ input[type="range"]::-moz-range-thumb {
         top: auto;
         bottom: 18px;
         right: 50%;
-        transform: 
+        transform: translateX(50%);
+        flex-direction: row;
+        gap: 14px;
+        padding: 12px 18px;
+        max-width: 95vw;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .avatar-btn {
+        width: 68px;
+        height: 68px;
+    }
+
+    .figura-activa {
+        width: 120px;
+    }
+
+    .panel-controles {
+        bottom: auto;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 4
