@@ -19,6 +19,21 @@
         VOLVER
     </a>
 
+    <!-- NUEVO: Relojes del juego (debajo del botón VOLVER) -->
+    <div class="zona-relojes">
+        <div class="reloj" id="relojGlobal">
+            <span class="reloj-etiqueta">⏱ Global</span>
+            <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
+        </div>
+        <div class="reloj" id="relojFinal" style="display: none;">
+            <span class="reloj-etiqueta">🔥 Final</span>
+            <span class="reloj-numero" id="relojFinalNumero">00:45</span>
+        </div>
+    </div>
+
+    <!-- NUEVO: Botón para ver la tabla de honor -->
+    <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
+
     <!-- Barras de Progreso -->
     <div class="panel-progreso">
         <div class="barra-contenedor">
@@ -77,17 +92,34 @@
         </div>
     </div>
 
-    <!-- Modal de Resultado Final -->
+    <!-- Modal de Resultado Final (AJUSTADO con campo de nombre) -->
     <div class="modal-resultado" id="modalResultado">
         <div class="modal-resultado-contenido">
-            <h2 class="modal-resultado-titulo" id="resultadoTitulo">¡Belén Completado!</h2>
+            <h2 class="modal-resultado-titulo" id="resultadoTitulo">Veredicto</h2>
             <div class="modal-resultado-puntaje" id="resultadoPuntaje">0/100</div>
             <p class="modal-resultado-mensaje" id="resultadoMensaje"></p>
-            <div class="modal-resultado-detalles" id="resultadoDetalles">
+            <div class="modal-resultado-detalles">
                 <h4>Detalle de relaciones:</h4>
                 <div id="listaDetalles"></div>
             </div>
-            <button class="modal-resultado-btn" id="btnCerrarResultado">Cerrar</button>
+            
+            <!-- NUEVO: Campo para escribir el nombre -->
+            <div class="campo-nombre" id="campoNombre">
+                <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
+                <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
+                <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
+            </div>
+            
+            <button class="modal-resultado-btn" id="btnCerrarResultado" style="display: none;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- NUEVO: Modal de Tabla de Honor -->
+    <div class="modal-honor" id="modalHonor">
+        <div class="modal-honor-contenido">
+            <h3>🏆 Tabla de Honor Local</h3>
+            <div id="listaHonor" class="lista-honor"></div>
+            <button class="modal-resultado-btn" id="btnCerrarHonor">Cerrar</button>
         </div>
     </div>
 
