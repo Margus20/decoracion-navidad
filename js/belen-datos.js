@@ -36,10 +36,13 @@ const btnCerrarCapas = document.getElementById('btnCerrarCapas');
 let piezaActiva = null;
 let contadorCopias = 1;
 let celebracionActivada = false;
-// Umbral ajustado a 99 para que las chispas sean exclusivas del puntaje perfecto/casi perfecto
-const UMBRAL_CELEBRACION = 99;
 
-// ============ RELOJ DE MEMORIA TEMPORAL (1 hora) ============
+// Umbral ajustado a 100 para que las chispas y el color sean exclusivos del puntaje perfecto
+const UMBRAL_CELEBRACION = 100;
+
+// ============ RELOJ DE MEMORIA TEMPORAL (1 hora - Respaldo) ============
+// Nota: El juego principal termina a los 8 minutos o con el reloj final de 45 segundos, 
+// pero este reloj de 1 hora limpia la memoria por si la pestaña queda abierta indefinidamente.
 const TIEMPO_LIMITE_MS = 60 * 60 * 1000;
 let tiempoInicio = Date.now();
 let temporizadorLimpieza = null;
