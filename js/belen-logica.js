@@ -165,17 +165,41 @@ function deseleccionar() {
     panelControles.classList.remove('visible');
 }
 
-// ============ 6. BARRA GENERAL Y DISPARO DE VICTORIA ============
+// ============ 6. BARRA GENERAL, LUPA Y DISPARO DE VICTORIA ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
     
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
     if (etiquetaGeneral) {
-        etiquetaGeneral.textContent = `Progreso del Belén: ${Math.round(score)}/100`;
+        // Mostramos 2 decimales para ver la verdad exacta del puntaje sin redondeos engañosos
+        etiquetaGeneral.textContent = `Progreso del Belén: ${score.toFixed(2)}/100`;
     }
 
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
+
+    // --- LUPA MATEMÁTICA EN TIEMPO REAL ---
+    const panel = document.getElementById('debugPanel');
+    const content = document.getElementById('debugContent');
+    if (panel && content && panel.style.display === 'block') {
+        const m = obtenerMapa();
+        let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">Puntaje Real: ${score.toFixed(2)}</div>`;
+        
+        criterios.forEach(c => {
+            const val = c.eval(m);
+            const pts = (val * c.peso).toFixed(1);
+            let icon = '❌', color = '#ff4444';
+            if (val >= 0.9) { icon = '✅'; color = '#44ff44'; }
+            else if (val >= 0.5) { icon = '⚠️'; color = '#ffcc00'; }
+            
+            html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #444; padding-bottom:4px;">
+                <span style="color:#fff;">${c.nombre}</span>
+                <span style="color:${color}; font-weight:bold;">${icon} ${pts}/${c.peso}</span>
+            </div>`;
+        });
+        content.innerHTML = html;
+    }
+    // --- FIN LUPA ---
 
     // DISPARO DE VICTORIA BLINDADO: Si la barra llega a 100 con las 8 únicas, se dispara aquí mismo.
     if (typeof juegoTerminado !== 'undefined' && !juegoTerminado && Math.round(score) >= 100) {
