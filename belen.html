@@ -19,11 +19,14 @@
         VOLVER
     </a>
 
-    <!-- NUEVO: Relojes del juego (debajo del botón VOLVER) -->
+    <!-- Relojes + botón donar (a la izquierda del reloj) -->
     <div class="zona-relojes">
-        <div class="reloj" id="relojGlobal">
-            <span class="reloj-etiqueta">⏱ Global</span>
-            <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
+        <div class="fila-donate-reloj">
+            <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
+            <div class="reloj" id="relojGlobal">
+                <span class="reloj-etiqueta">⏱ Global</span>
+                <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
+            </div>
         </div>
         <div class="reloj" id="relojFinal" style="display: none;">
             <span class="reloj-etiqueta">🔥 Final</span>
@@ -31,7 +34,7 @@
         </div>
     </div>
 
-    <!-- NUEVO: Botón para ver la tabla de honor -->
+    <!-- Botón tabla de honor -->
     <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
 
     <!-- Barras de Progreso -->
@@ -92,9 +95,12 @@
         </div>
     </div>
 
-    <!-- Modal de Resultado Final (AJUSTADO con campo de nombre) -->
+    <!-- Modal de Resultado Final -->
     <div class="modal-resultado" id="modalResultado">
         <div class="modal-resultado-contenido">
+            <!-- NUEVO: Botón X para salir sin guardar -->
+            <button class="modal-cerrar-x" id="btnCerrarXResultado" title="Salir sin guardar">✕</button>
+            
             <h2 class="modal-resultado-titulo" id="resultadoTitulo">Veredicto</h2>
             <div class="modal-resultado-puntaje" id="resultadoPuntaje">0/100</div>
             <p class="modal-resultado-mensaje" id="resultadoMensaje"></p>
@@ -103,18 +109,16 @@
                 <div id="listaDetalles"></div>
             </div>
             
-            <!-- NUEVO: Campo para escribir el nombre -->
+            <!-- Campo para escribir el nombre -->
             <div class="campo-nombre" id="campoNombre">
                 <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
                 <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
                 <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
             </div>
-            
-            <button class="modal-resultado-btn" id="btnCerrarResultado" style="display: none;">Cerrar</button>
         </div>
     </div>
 
-    <!-- NUEVO: Modal de Tabla de Honor -->
+    <!-- Modal de Tabla de Honor -->
     <div class="modal-honor" id="modalHonor">
         <div class="modal-honor-contenido">
             <h3>🏆 Tabla de Honor Local</h3>
@@ -122,6 +126,9 @@
             <button class="modal-resultado-btn" id="btnCerrarHonor">Cerrar</button>
         </div>
     </div>
+
+    <!-- NUEVO: Botón grande de reinicio (aparece al terminar el juego) -->
+    <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR BELÉN</button>
 
     <!-- Scripts divididos en la carpeta js/ para mejor organización -->
     <script src="js/belen-datos.js"></script>
