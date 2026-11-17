@@ -64,8 +64,6 @@ function finalizarJuego(motivo) {
     if (rf) rf.classList.add('agotado');
     
     deseleccionar();
-    
-    // Repintar la barra general con el valor definitivo antes de mostrar el modal
     actualizarProgresoGeneral();
     
     if (typeof mostrarResultadoFinal === 'function') {
@@ -208,14 +206,12 @@ function hacerArrastrable(elemento) {
         elemento.dataset.y = Math.max(0, Math.min(100, initY + dyPct));
         aplicarTransform(elemento);
         refrescarSliders(elemento);
-        // Solo actualizamos la barra general durante el movimiento
         actualizarProgresoGeneral();
     }
 
     function fin() {
         if (arrastrando) {
             arrastrando = false;
-            // CORRECCIÓN CLAVE: Repintar la barra con el valor definitivo al soltar
             actualizarProgresoGeneral();
             verificarInicioRelojFinal();
             chequearVictoria();
@@ -231,25 +227,63 @@ function hacerArrastrable(elemento) {
     document.addEventListener('touchcancel', fin);
 }
 
-// ============ 6. SLIDERS Y BOTONES DE CONTROL ============
-sliderX.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.x = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
-});
-sliderY.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.y = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
-});
-sliderZoom.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.zoom = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
-});
-sliderGiro.addEventListener('input', function () {
-    if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); actualizarProgresoGeneral(); }
-});
+// ============ 6. SLIDERS, CAMPOS NUMÉRICOS Y BOTONES DE CONTROL ============
 
-// CORRECCIÓN CLAVE: al soltar cualquier slider, repintar la barra con el valor definitivo
-sliderX.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
-sliderY.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
-sliderZoom.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
-sliderGiro.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); actualizarProgresoGeneral(); chequearVictoria(); } });
+// Función auxiliar para sincronizar slider ↔ input numérico
+function sincronizarSliderInput(sliderId, inputId, min, max) {
+    const slider = document.getElementById(sliderId);
+    const input = document.getElementById(inputId);
+    if (!slider || !input) return;
+
+    // Cuando mueves el slider, se actualiza el número
+    slider.addEventListener('input', function () {
+        if (piezaActiva && !juegoTerminado) {
+            const val = parseFloat(this.value);
+            input.value = val;
+            piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
+            aplicarTransform(piezaActiva);
+            actualizarProgresoGeneral();
+        }
+    });
+
+    // Cuando escribes el número, se mueve el slider
+    input.addEventListener('input', function () {
+        if (piezaActiva && !juegoTerminado) {
+            let val = parseFloat(this.value);
+            if (isNaN(val)) return;
+            val = Math.max(min, Math.min(max, val)); // Respetar límites
+            slider.value = val;
+            piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
+            aplicarTransform(piezaActiva);
+            actualizarProgresoGeneral();
+        }
+    });
+
+    // Al soltar el input numérico, verificar victoria
+    input.addEventListener('change', function () {
+        if (!juegoTerminado) {
+            verificarInicioRelojFinal();
+            chequearVictoria();
+        }
+    });
+}
+
+// Inicializar los 4 pares slider ↔ input numérico
+sincronizarSliderInput('sliderX', 'inputX', 0, 100);
+sincronizarSliderInput('sliderY', 'inputY', 0, 100);
+sincronizarSliderInput('sliderZoom', 'inputZoom', 40, 300);
+sincronizarSliderInput('sliderGiro', 'inputGiro', -180, 180);
+
+// Sobrescribir refrescarSliders para que también actualice los inputs numéricos al seleccionar una pieza
+const refrescarSlidersOriginal = refrescarSliders;
+refrescarSliders = function(el) {
+    refrescarSlidersOriginal(el); // Ejecuta la lógica original de belen-logica.js
+    const s = leerEstado(el);
+    document.getElementById('inputX').value = s.x;
+    document.getElementById('inputY').value = s.y;
+    document.getElementById('inputZoom').value = s.zoom;
+    document.getElementById('inputGiro').value = s.giro;
+};
 
 btnVoltear.addEventListener('click', function () {
     if (piezaActiva && !juegoTerminado) {
