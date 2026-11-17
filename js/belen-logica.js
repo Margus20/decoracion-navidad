@@ -46,7 +46,6 @@ function distPct(a, b) {
 function cerca(a, b, umbral) { return distPct(a, b) <= umbral; }
 function zindex(el) { return parseInt(el.style.zIndex) || 100; }
 
-// Verifica si el centro de la pieza 'a' cae dentro del área de la pieza 'b' (con margen)
 function dentroDe(a, b) {
     const ca = centro(a);
     const rb = b.getBoundingClientRect();
@@ -64,7 +63,7 @@ function obtenerMapa() {
     return m;
 }
 
-// ============ 4. CRITERIOS DE COHERENCIA (Suman 100 puntos) ============
+// ============ 4. CRITERIOS DE COHERENCIA (Suman EXACTAMENTE 100 puntos) ============
 const criterios = [
     { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => {
         const presentes = idsNecesarios.filter(id => m[id]).length;
@@ -103,7 +102,7 @@ const criterios = [
         if (cerca(m.jose, m.pesebre, 38)) return 0.6;
         return 0;
     }},
-    { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 8, eval: (m) => {
+    { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 9, eval: (m) => {
         if (!m.oveja || !m.pesebre) return 0;
         const enSuelo = centroY(m.oveja) > centroY(m.pesebre);
         const cercaP = distPct(m.oveja, m.pesebre) <= 34;
@@ -111,7 +110,7 @@ const criterios = [
         if (enSuelo) return 0.5;
         return 0;
     }},
-    { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 8, eval: (m) => {
+    { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 9, eval: (m) => {
         if (!m.burro || !m.pesebre) return 0;
         const enSuelo = centroY(m.burro) > centroY(m.pesebre);
         const cercaP = distPct(m.burro, m.pesebre) <= 34;
@@ -198,7 +197,6 @@ function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
 
-    // Mostrar el puntaje en números para que el usuario sepa qué falta
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
     if (etiquetaGeneral) {
         etiquetaGeneral.textContent = 'Progreso del Belén: ' + Math.round(score) + '/100';
@@ -229,29 +227,45 @@ function mostrarResultadoFinal(score) {
     puntaje.textContent = puntajeRedondeado + '/100';
     puntaje.className = 'modal-resultado-puntaje';
 
-    // Las chispas y el color SOLO para puntaje perfecto (100, según belen-datos.js)
-    if (puntajeRedondeado >= UMBRAL_CELEBRACION) {
+    // Analizar cuántas están bien, parciales o mal para el mensaje
+    const m = obtenerMapa();
+    let parciales = 0, fallidas = 0;
+    criterios.forEach(c => {
+        const v = c.eval(m);
+        if (v < 0.9 && v >= 0.5) parciales++;
+        else if (v < 0.5) fallidas++;
+    });
+
+    if (puntajeRedondeado >= 100) {
         puntaje.classList.add('perfecto');
         titulo.textContent = '¡Belén Perfecto!';
-        mensaje.textContent = '¡Felicitaciones! Has armado el Belén con maestría. Todas las piezas están en su lugar correcto.';
+        mensaje.textContent = '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.';
         activarCelebracion();
     } else if (puntajeRedondeado >= 80) {
         puntaje.classList.add('bueno');
         titulo.textContent = '¡Belén Completado!';
-        mensaje.textContent = 'Muy bien hecho. Tu Belén está casi perfecto, pero hay algunas relaciones que pueden mejorar.';
-        // Sin chispas ni cambio de color
+        const faltan = 100 - puntajeRedondeado;
+        let detalle = 'Te faltan ' + faltan + ' puntos para la perfección. ';
+        if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
+        if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) casi correctas que puedes afinar.';
+        detalle += 'Revisa abajo las marcadas con ~ o ✗.';
+        mensaje.textContent = detalle;
     } else {
         puntaje.classList.add('regular');
         titulo.textContent = 'Belén Armado';
-        mensaje.textContent = 'Has colocado todas las piezas, pero algunas relaciones no son las ideales. Revisa los detalles abajo.';
-        // Sin chispas ni cambio de color
+        const faltan = 100 - puntajeRedondeado;
+        let detalle = 'Te faltan ' + faltan + ' puntos. ';
+        if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
+        if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) que pueden mejorar.';
+        detalle += 'Revisa abajo las marcadas con ~ o ✗.';
+        mensaje.textContent = detalle;
     }
 
+    // Detalle con PUNTOS visibles por relación (incluyendo la completitud)
     listaDetalles.innerHTML = '';
-    const m = obtenerMapa();
     criterios.forEach(c => {
-        if (c.id === 'completitud') return;
         const valor = c.eval(m);
+        const puntosObtenidos = Math.round(c.peso * valor);
         const item = document.createElement('div');
         item.className = 'detalle-item';
         
@@ -260,7 +274,7 @@ function mostrarResultadoFinal(score) {
         if (valor >= 0.9) { estado = 'ok'; texto = '✓'; }
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
         
-        item.innerHTML = '<span>' + c.nombre + '</span><span class="detalle-estado ' + estado + '">' + texto + '</span>';
+        item.innerHTML = '<span>' + c.nombre + '</span><span style="color:#ffd700; font-weight:bold; margin: 0 10px;">' + puntosObtenidos + '/' + c.peso + '</span><span class="detalle-estado ' + estado + '">' + texto + '</span>';
         listaDetalles.appendChild(item);
     });
 
@@ -304,4 +318,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-}
+        }
