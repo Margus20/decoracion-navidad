@@ -64,7 +64,7 @@ function obtenerMapa() {
     return m;
 }
 
-// ============ 4. CRITERIOS DE COHERENCIA ============
+// ============ 4. CRITERIOS DE COHERENCIA (Suman 100 puntos) ============
 const criterios = [
     { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => {
         const presentes = idsNecesarios.filter(id => m[id]).length;
@@ -225,16 +225,17 @@ function mostrarResultadoFinal(score) {
     const mensaje = document.getElementById('resultadoMensaje');
     const listaDetalles = document.getElementById('listaDetalles');
 
-    puntaje.textContent = Math.round(score) + '/100';
+    const puntajeRedondeado = Math.round(score);
+    puntaje.textContent = puntajeRedondeado + '/100';
     puntaje.className = 'modal-resultado-puntaje';
 
-    // Las chispas y el color SOLO para puntaje perfecto (>= 99, según tu belen-datos.js)
-    if (score >= UMBRAL_CELEBRACION) {
+    // Las chispas y el color SOLO para puntaje perfecto (100, según belen-datos.js)
+    if (puntajeRedondeado >= UMBRAL_CELEBRACION) {
         puntaje.classList.add('perfecto');
         titulo.textContent = '¡Belén Perfecto!';
         mensaje.textContent = '¡Felicitaciones! Has armado el Belén con maestría. Todas las piezas están en su lugar correcto.';
         activarCelebracion();
-    } else if (score >= 80) {
+    } else if (puntajeRedondeado >= 80) {
         puntaje.classList.add('bueno');
         titulo.textContent = '¡Belén Completado!';
         mensaje.textContent = 'Muy bien hecho. Tu Belén está casi perfecto, pero hay algunas relaciones que pueden mejorar.';
