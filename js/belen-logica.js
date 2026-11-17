@@ -20,7 +20,7 @@ function aplicarTransform(el) {
     el.style.left = (s.x / 100 * window.innerWidth) + 'px';
     el.style.top = (s.y / 100 * window.innerHeight) + 'px';
     const flip = s.volteada ? ' scaleX(-1)' : '';
-    el.style.transform = 'translate(-50%, -50%) rotate(' + s.giro + 'deg) scale(' + (s.zoom / 100) + ')' + flip;
+    el.style.transform = `translate(-50%, -50%) rotate(${s.giro}deg) scale(${s.zoom / 100})${flip}`;
 }
 
 function refrescarSliders(el) {
@@ -36,13 +36,16 @@ function centro(el) {
     const r = el.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
+
 function centroY(el) { return centro(el).y; }
+
 function distPct(a, b) {
     const ca = centro(a), cb = centro(b);
     const d = Math.hypot(ca.x - cb.x, ca.y - cb.y);
     const diag = Math.hypot(window.innerWidth, window.innerHeight);
-    return d / diag * 100;
+    return (d / diag) * 100;
 }
+
 function cerca(a, b, umbral) { return distPct(a, b) <= umbral; }
 function zindex(el) { return parseInt(el.style.zIndex) || 100; }
 
@@ -57,7 +60,7 @@ function dentroDe(a, b) {
 function obtenerMapa() {
     const m = {};
     idsNecesarios.forEach(id => {
-        const el = document.querySelector('.figura-activa[data-personaje="' + id + '"]');
+        const el = document.querySelector(`.figura-activa[data-personaje="${id}"]`);
         if (el) m[id] = el;
     });
     return m;
@@ -66,8 +69,7 @@ function obtenerMapa() {
 // ============ 4. CRITERIOS DE COHERENCIA (Suman EXACTAMENTE 100 puntos) ============
 const criterios = [
     { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => {
-        const presentes = idsNecesarios.filter(id => m[id]).length;
-        return presentes / idsNecesarios.length;
+        return idsNecesarios.filter(id => m[id]).length / idsNecesarios.length;
     }},
     { id: 'jesus_cuna', nombre: 'Niño Jesús en la Cuna', peso: 12, eval: (m) => {
         if (!m.jesus || !m.cuna) return 0;
@@ -140,9 +142,7 @@ const criteriosPorPieza = {
 
 function calcularScoreGeneral() {
     const m = obtenerMapa();
-    let total = 0;
-    criterios.forEach(c => { total += c.peso * c.eval(m); });
-    return total;
+    return criterios.reduce((total, c) => total + (c.peso * c.eval(m)), 0);
 }
 
 function calcularScoreIndividual(el) {
@@ -150,25 +150,27 @@ function calcularScoreIndividual(el) {
     const idP = el.dataset.personaje;
     const ids = criteriosPorPieza[idP] || ['completitud'];
     let obtenido = 0, maximo = 0;
+    
     criterios.forEach(c => {
         if (ids.includes(c.id)) {
             obtenido += c.peso * c.eval(m);
             maximo += c.peso;
         }
     });
-    if (maximo === 0) return 0;
-    return (obtenido / maximo) * 100;
+    return maximo === 0 ? 0 : (obtenido / maximo) * 100;
 }
 
 // ============ 5. SELECCIÓN Y BARRAS ============
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
+    
     piezaActiva = el;
     el.classList.add('seleccionada');
     panelControles.classList.add('visible');
     contenedorBarraInd.style.display = 'flex';
     textoBarraInd.textContent = 'Ubicación de: ' + el.alt;
+    
     refrescarSliders(el);
     actualizarBarraIndividual(el);
 }
@@ -185,41 +187,30 @@ function deseleccionar() {
 function actualizarBarraIndividual(el) {
     const pct = calcularScoreIndividual(el);
     barraIndividual.style.width = pct + '%';
-    if (pct < 40) barraIndividual.className = 'barra-relleno nivel-bajo';
-    else if (pct < 80) barraIndividual.className = 'barra-relleno nivel-medio';
-    else barraIndividual.className = 'barra-relleno nivel-alto';
+    barraIndividual.className = 'barra-relleno ' + (pct < 40 ? 'nivel-bajo' : pct < 80 ? 'nivel-medio' : 'nivel-alto');
 }
 
 // ============ 6. BARRA GENERAL Y MODAL DE RESULTADO ============
-// NOTA: La detección de VICTORIA ahora la hace exclusivamente el archivo belen-monitor.js.
-// Esta función solo se encarga de pintar la barra de progreso visualmente.
+// NOTA: La detección de VICTORIA la hace exclusivamente belen-monitor.js.
+// Esta función solo actualiza la interfaz visual de la barra.
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
-
+    
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
     if (etiquetaGeneral) {
-        etiquetaGeneral.textContent = 'Progreso del Belén: ' + Math.round(score) + '/100';
+        etiquetaGeneral.textContent = `Progreso del Belén: ${Math.round(score)}/100`;
     }
 
-    if (score < 25) barraGeneral.className = 'barra-relleno nivel-bajo';
-    else if (score < 75) barraGeneral.className = 'barra-relleno nivel-medio';
-    else barraGeneral.className = 'barra-relleno nivel-alto';
+    barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 }
 
 function mostrarResultadoFinal(score, motivo) {
     const modal = document.getElementById('modalResultado');
-    const titulo = document.getElementById('resultadoTitulo');
-    const puntaje = document.getElementById('resultadoPuntaje');
-    const mensaje = document.getElementById('resultadoMensaje');
-    const listaDetalles = document.getElementById('listaDetalles');
-    const campoNombre = document.getElementById('campoNombre');
-
     const puntajeRedondeado = Math.round(score);
-    puntaje.textContent = puntajeRedondeado + '/100';
-    puntaje.className = 'modal-resultado-puntaje';
-
     const m = obtenerMapa();
+    
+    // Contar estados para el mensaje
     let parciales = 0, fallidas = 0;
     criterios.forEach(c => {
         const v = c.eval(m);
@@ -227,34 +218,35 @@ function mostrarResultadoFinal(score, motivo) {
         else if (v < 0.5) fallidas++;
     });
 
-    const esPerfecto = puntajeRedondeado >= 100;
+    // Actualizar UI del modal
+    document.getElementById('resultadoPuntaje').textContent = `${puntajeRedondeado}/100`;
+    document.getElementById('resultadoPuntaje').className = 'modal-resultado-puntaje ' + (puntajeRedondeado >= 100 ? 'perfecto' : puntajeRedondeado >= 80 ? 'bueno' : 'regular');
+    
+    const faltan = 100 - puntajeRedondeado;
+    const prefijoTiempo = motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '';
+    let mensajeTexto = '';
 
-    if (esPerfecto) {
-        puntaje.classList.add('perfecto');
-        titulo.textContent = '¡Belén Perfecto!';
-        mensaje.textContent = '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.';
+    if (puntajeRedondeado >= 100) {
+        document.getElementById('resultadoTitulo').textContent = '¡Belén Perfecto!';
+        mensajeTexto = '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.';
         activarCelebracion();
     } else if (puntajeRedondeado >= 80) {
-        puntaje.classList.add('bueno');
-        titulo.textContent = '¡Belén Completado!';
-        const faltan = 100 - puntajeRedondeado;
-        let detalle = (motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '') + 'Te faltan ' + faltan + ' puntos para la perfección. ';
-        if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
-        if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) casi correctas que puedes afinar.';
-        detalle += 'Revisa abajo las marcadas con ~ o ✗.';
-        mensaje.textContent = detalle;
+        document.getElementById('resultadoTitulo').textContent = '¡Belén Completado!';
+        mensajeTexto = `${prefijoTiempo}Te faltan ${faltan} puntos para la perfección. `;
+        if (fallidas > 0) mensajeTexto += `Hay ${fallidas} relación(es) que no se cumplen. `;
+        if (parciales > 0) mensajeTexto += `Hay ${parciales} relación(es) casi correctas que puedes afinar. `;
+        mensajeTexto += 'Revisa abajo las marcadas con ~ o ✗.';
     } else {
-        puntaje.classList.add('regular');
-        titulo.textContent = 'Belén Armado';
-        const faltan = 100 - puntajeRedondeado;
-        let detalle = (motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '') + 'Te faltan ' + faltan + ' puntos. ';
-        if (fallidas > 0) detalle += 'Hay ' + fallidas + ' relación(es) que no se cumplen. ';
-        if (parciales > 0) detalle += 'Hay ' + parciales + ' relación(es) que pueden mejorar.';
-        detalle += 'Revisa abajo las marcadas con ~ o ✗.';
-        mensaje.textContent = detalle;
+        document.getElementById('resultadoTitulo').textContent = 'Belén Armado';
+        mensajeTexto = `${prefijoTiempo}Te faltan ${faltan} puntos. `;
+        if (fallidas > 0) mensajeTexto += `Hay ${fallidas} relación(es) que no se cumplen. `;
+        if (parciales > 0) mensajeTexto += `Hay ${parciales} relación(es) que pueden mejorar. `;
+        mensajeTexto += 'Revisa abajo las marcadas con ~ o ✗.';
     }
+    document.getElementById('resultadoMensaje').textContent = mensajeTexto;
 
-    // Detalle con PUNTOS visibles por relación (incluyendo la completitud)
+    // Generar lista de detalles
+    const listaDetalles = document.getElementById('listaDetalles');
     listaDetalles.innerHTML = '';
     criterios.forEach(c => {
         const valor = c.eval(m);
@@ -262,19 +254,17 @@ function mostrarResultadoFinal(score, motivo) {
         const item = document.createElement('div');
         item.className = 'detalle-item';
         
-        let estado = 'fallo';
-        let texto = '✗';
+        let estado = 'fallo', texto = '✗';
         if (valor >= 0.9) { estado = 'ok'; texto = '✓'; }
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
         
-        item.innerHTML = '<span>' + c.nombre + '</span><span style="color:#ffd700; font-weight:bold; margin: 0 10px;">' + puntosObtenidos + '/' + c.peso + '</span><span class="detalle-estado ' + estado + '">' + texto + '</span>';
+        item.innerHTML = `<span>${c.nombre}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
         listaDetalles.appendChild(item);
     });
 
-    // Asegurar que el campo para escribir el nombre sea visible
-    if (campoNombre) {
-        campoNombre.style.display = 'block';
-    }
+    // Asegurar que el campo de nombre sea visible
+    const campoNombre = document.getElementById('campoNombre');
+    if (campoNombre) campoNombre.style.display = 'block';
     
     modal.classList.add('visible');
 }
@@ -293,13 +283,12 @@ function desactivarCelebracion() {
 function generarChispas() {
     const simbolos = ['✨', '🌟', '❄️', '⭐', '🎉', '🎊'];
     const direcciones = ['cae', 'sube', 'derecha', 'izquierda', 'diag1', 'diag2', 'diag3', 'diag4'];
-    const totalChispas = 80;
-
-    for (let i = 0; i < totalChispas; i++) {
+    
+    for (let i = 0; i < 80; i++) {
         setTimeout(() => {
             const dir = direcciones[Math.floor(Math.random() * direcciones.length)];
             const chispa = document.createElement('div');
-            chispa.className = 'chispa ' + dir;
+            chispa.className = `chispa ${dir}`;
             chispa.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
             chispa.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
 
