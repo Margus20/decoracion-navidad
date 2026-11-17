@@ -12,7 +12,7 @@ function iniciarRelojGlobal() {
         tiempoGlobalRestante--;
         actualizarDisplayReloj('relojGlobalNumero', tiempoGlobalRestante);
         if (tiempoGlobalRestante <= 0) {
-            terminarJuego();
+            finalizarJuego('tiempo');
         }
     }, 1000);
 }
@@ -30,7 +30,7 @@ function iniciarRelojFinal() {
         }
         
         if (tiempoFinalRestante <= 0) {
-            terminarJuego();
+            finalizarJuego('tiempo');
         }
     }, 1000);
 }
@@ -38,21 +38,22 @@ function iniciarRelojFinal() {
 function actualizarDisplayReloj(idElemento, segundos) {
     const m = Math.floor(segundos / 60).toString().padStart(2, '0');
     const s = (segundos % 60).toString().padStart(2, '0');
-    document.getElementById(idElemento).textContent = `${m}:${s}`;
+    document.getElementById(idElemento).textContent = m + ':' + s;
 }
 
 function verificarInicioRelojFinal() {
-    if (juegoTerminado) return;
+    if (juegoTerminado || intervaloFinal) return;
     const figuras = document.querySelectorAll('.figura-activa');
     const hayOchoPiezas = figuras.length === 8;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
     
-    if (hayOchoPiezas && todasUnicas && !intervaloFinal) {
+    if (hayOchoPiezas && todasUnicas) {
         iniciarRelojFinal();
     }
 }
 
-function terminarJuego() {
+// Función central de cierre: la llaman tanto la victoria (logica) como el tiempo (relojes)
+function finalizarJuego(motivo) {
     if (juegoTerminado) return;
     juegoTerminado = true;
     clearInterval(intervaloGlobal);
@@ -61,11 +62,14 @@ function terminarJuego() {
     // Congelar visualmente la escena
     document.body.classList.add('juego-congelado');
     document.getElementById('relojGlobal').classList.add('agotado');
-    document.getElementById('relojFinal').classList.add('agotado');
+    const rf = document.getElementById('relojFinal');
+    if (rf) rf.classList.add('agotado');
     
-    // Llamar a la función de evaluación que está en belen-logica.js
+    deseleccionar();
+    
+    // Llamar a la función de evaluación que está en belen-logica.js, pasándole el motivo
     if (typeof mostrarResultadoFinal === 'function') {
-        mostrarResultadoFinal(calcularScoreGeneral());
+        mostrarResultadoFinal(calcularScoreGeneral(), motivo);
     }
 }
 
@@ -90,11 +94,7 @@ function mostrarTablaHonor() {
         tabla.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'item-honor';
-            div.innerHTML = `
-                <span class="puesto">#${index + 1}</span>
-                <span class="nombre">${item.nombre}</span>
-                <span class="puntaje">${item.puntaje} pts</span>
-            `;
+            div.innerHTML = '<span class="puesto">#' + (index + 1) + '</span><span class="nombre">' + item.nombre + '</span><span class="puntaje">' + item.puntaje + ' pts</span>';
             lista.appendChild(div);
         });
     }
@@ -323,28 +323,26 @@ function recalcularTodasLasFiguras() {
     document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
 }
 
-// ============ 9. GESTIÓN DEL MODAL DE RESULTADO Y TABLA DE HONOR ============
+// ============ 9. GESTIÓN DEL MODAL DE RESULTADO, X, GUARDAR Y REINICIO ============
 const btnGuardarNombre = document.getElementById('btnGuardarNombre');
 if (btnGuardarNombre) {
     btnGuardarNombre.addEventListener('click', function() {
         const inputNombre = document.getElementById('inputNombre');
         const nombre = inputNombre.value.trim() || 'Anónimo';
-        const puntaje = calcularScoreGeneral();
+        guardarEnTablaHonor(nombre, calcularScoreGeneral());
         
-        guardarEnTablaHonor(nombre, puntaje);
-        
-        document.getElementById('campoNombre').style.display = 'none';
-        document.getElementById('btnCerrarResultado').style.display = 'inline-block';
-        
-        // Mostrar la tabla de honor automáticamente después de guardar
+        // Ocultar modal de resultado y mostrar tabla de honor
+        document.getElementById('modalResultado').classList.remove('visible');
         mostrarTablaHonor();
     });
 }
 
-const btnCerrarResultado = document.getElementById('btnCerrarResultado');
-if (btnCerrarResultado) {
-    btnCerrarResultado.addEventListener('click', function() {
+// Manejo de la X para salir sin guardar
+const btnCerrarXResultado = document.getElementById('btnCerrarXResultado');
+if (btnCerrarXResultado) {
+    btnCerrarXResultado.addEventListener('click', function() {
         document.getElementById('modalResultado').classList.remove('visible');
+        // El juego sigue congelado y el botón de reiniciar sigue visible
     });
 }
 
@@ -365,6 +363,14 @@ if (btnCerrarHonor) {
 document.getElementById('modalHonor').addEventListener('click', (e) => { 
     if (e.target.id === 'modalHonor') document.getElementById('modalHonor').classList.remove('visible'); 
 });
+
+// Botón grande de reinicio en el centro
+const btnReiniciar = document.getElementById('btnReiniciar');
+if (btnReiniciar) {
+    btnReiniciar.addEventListener('click', function() {
+        location.reload();
+    });
+}
 
 // ============ 10. INICIALIZACIÓN ============
 iniciarRelojGlobal();
