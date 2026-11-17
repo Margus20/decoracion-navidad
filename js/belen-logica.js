@@ -29,6 +29,17 @@ function refrescarSliders(el) {
     sliderY.value = s.y;
     sliderZoom.value = s.zoom;
     sliderGiro.value = s.giro;
+    
+    // AJUSTE DE CONSOLIDACIÓN: Actualizar también los campos numéricos si existen
+    const inputX = document.getElementById('inputX');
+    const inputY = document.getElementById('inputY');
+    const inputZoom = document.getElementById('inputZoom');
+    const inputGiro = document.getElementById('inputGiro');
+    
+    if (inputX) inputX.value = s.x;
+    if (inputY) inputY.value = s.y;
+    if (inputZoom) inputZoom.value = s.zoom;
+    if (inputGiro) inputGiro.value = s.giro;
 }
 
 // ============ 3. GEOMETRÍA DE AYUDA ============
@@ -128,17 +139,6 @@ const criterios = [
         return pts;
     }}
 ];
-
-const criteriosPorPieza = {
-    jesus: ['completitud', 'jesus_cuna', 'capas'],
-    cuna: ['completitud', 'jesus_cuna', 'cuna_pesebre', 'capas'],
-    pesebre: ['completitud', 'cuna_pesebre', 'estrella_arriba', 'maria_pesebre', 'jose_pesebre', 'oveja_suelo', 'burro_suelo', 'capas'],
-    estrella: ['completitud', 'estrella_arriba'],
-    maria: ['completitud', 'maria_pesebre'],
-    jose: ['completitud', 'jose_pesebre'],
-    oveja: ['completitud', 'oveja_suelo'],
-    burro: ['completitud', 'burro_suelo']
-};
 
 function calcularScoreGeneral() {
     const m = obtenerMapa();
