@@ -190,13 +190,10 @@ function actualizarBarraIndividual(el) {
     else barraIndividual.className = 'barra-relleno nivel-alto';
 }
 
-// ============ 6. CELEBRACIÓN Y MODAL DE RESULTADO ============
-var victoriaLanzada = false;
-
+// ============ 6. BARRA GENERAL Y MODAL DE RESULTADO ============
+// NOTA: La detección de VICTORIA ahora la hace exclusivamente el archivo belen-monitor.js.
+// Esta función solo se encarga de pintar la barra de progreso visualmente.
 function actualizarProgresoGeneral() {
-    // Si el juego ya terminó por tiempo o victoria, no seguimos evaluando cambios
-    if (typeof juegoTerminado !== 'undefined' && juegoTerminado) return;
-
     const score = calcularScoreGeneral();
     barraGeneral.style.width = score + '%';
 
@@ -208,20 +205,6 @@ function actualizarProgresoGeneral() {
     if (score < 25) barraGeneral.className = 'barra-relleno nivel-bajo';
     else if (score < 75) barraGeneral.className = 'barra-relleno nivel-medio';
     else barraGeneral.className = 'barra-relleno nivel-alto';
-
-    const figuras = document.querySelectorAll('.figura-activa');
-    const hayOchoPiezas = figuras.length === 8;
-    const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
-
-    // CONDICIÓN 1 DE VICTORIA: 8 únicas + 100 puntos -> se termina YA con celebración
-    if (hayOchoPiezas && todasUnicas && Math.round(score) >= 100 && !victoriaLanzada) {
-        victoriaLanzada = true;
-        if (typeof finalizarJuego === 'function') {
-            finalizarJuego('victoria');
-        } else {
-            mostrarResultadoFinal(score, 'victoria');
-        }
-    }
 }
 
 function mostrarResultadoFinal(score, motivo) {
@@ -333,4 +316,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-                      }
+}
