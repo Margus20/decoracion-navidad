@@ -284,3 +284,49 @@ input[type="range"]::-moz-range-thumb {
 .ctrl-quitar {
     background: linear-gradient(180deg, #c62828, #8e1a1a);
 }
+
+/* ============ NUEVO: CAMPOS NUMÉRICOS AL LADO DE LOS SLIDERS ============ */
+/* Contenedor que pone el slider y el campo numérico uno al lado del otro */
+.fila-control-numerico {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* El slider ocupa el espacio disponible y se encoge si hace falta */
+.fila-control-numerico input[type="range"] {
+    flex: 1;
+    min-width: 0;
+}
+
+/* La cajita donde se puede escribir el número exacto con Voice Access */
+.input-numerico {
+    width: 65px;
+    padding: 6px 4px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #ffd700;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    text-align: center;
+    outline: none;
+    -webkit-appearance: none;
+    font-family: 'Courier New', monospace;
+    flex-shrink: 0;
+}
+
+/* Resaltado cuando el campo numérico está activo, para que Voice Access lo señale bien */
+.input-numerico:focus {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+/* En pantallas grandes los campos numéricos se hacen un poco más anchos */
+@media (min-width: 768px) {
+    .input-numerico {
+        width: 75px;
+        font-size: 1rem;
+    }
+}
