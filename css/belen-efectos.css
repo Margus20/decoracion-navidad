@@ -1,0 +1,50 @@
+/* ============ EFECTO DE CHISPAS MULTIDIRECCIONAL ============ */
+.chispa {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2000;
+    font-size: 1.5rem;
+    will-change: transform, opacity;
+}
+
+.chispa.cae { animation: chispaCae linear forwards; }
+.chispa.sube { animation: chispaSube linear forwards; }
+.chispa.derecha { animation: chispaDerecha linear forwards; }
+.chispa.izquierda { animation: chispaIzquierda linear forwards; }
+.chispa.diag1 { animation: chispaDiag1 linear forwards; }
+.chispa.diag2 { animation: chispaDiag2 linear forwards; }
+.chispa.diag3 { animation: chispaDiag3 linear forwards; }
+.chispa.diag4 { animation: chispaDiag4 linear forwards; }
+
+@keyframes chispaCae {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+}
+@keyframes chispaSube {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; }
+}
+@keyframes chispaDerecha {
+    0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateX(120vw) rotate(360deg); opacity: 0; }
+}
+@keyframes chispaIzquierda {
+    0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateX(-120vw) rotate(-360deg); opacity: 0; }
+}
+@keyframes chispaDiag1 {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(120vw, -120vh) rotate(360deg); opacity: 0; }
+}
+@keyframes chispaDiag2 {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-120vw, -120vh) rotate(-360deg); opacity: 0; }
+}
+@keyframes chispaDiag3 {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(120vw, 120vh) rotate(360deg); opacity: 0; }
+}
+@keyframes chispaDiag4 {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-120vw, 120vh) rotate(-360deg); opacity: 0; }
+}
