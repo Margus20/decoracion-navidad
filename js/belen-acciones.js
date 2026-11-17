@@ -73,6 +73,19 @@ function finalizarJuego(motivo) {
     }
 }
 
+// ============ RED DE SEGURIDAD: Chequeo instantáneo al interactuar ============
+function chequearVictoria() {
+    if (juegoTerminado) return;
+    const figuras = document.querySelectorAll('.figura-activa');
+    if (figuras.length !== 8) return;
+    const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
+    if (!todasUnicas) return;
+    
+    if (Math.round(calcularScoreGeneral()) >= 100) {
+        finalizarJuego('victoria');
+    }
+}
+
 // ============ 2. TABLA DE HONOR LOCAL ============
 function guardarEnTablaHonor(nombre, puntaje) {
     let tabla = JSON.parse(localStorage.getItem('belenTablaHonor')) || [];
@@ -124,6 +137,7 @@ function crearFigura(personaje) {
     seleccionarPieza(img);
     actualizarProgresoGeneral();
     verificarInicioRelojFinal();
+    chequearVictoria(); // Red de seguridad
 }
 
 function actualizarEstadoAvatar(idPersonaje) {
@@ -202,6 +216,7 @@ function hacerArrastrable(elemento) {
         if (arrastrando) {
             arrastrando = false;
             verificarInicioRelojFinal();
+            chequearVictoria(); // Red de seguridad al soltar la pieza
         }
     }
 
@@ -228,10 +243,11 @@ sliderGiro.addEventListener('input', function () {
     if (piezaActiva && !juegoTerminado) { piezaActiva.dataset.giro = this.value; aplicarTransform(piezaActiva); }
 });
 
-sliderX.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
-sliderY.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
-sliderZoom.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
-sliderGiro.addEventListener('change', function () { if (!juegoTerminado) verificarInicioRelojFinal(); });
+// Red de seguridad en los sliders al soltar
+sliderX.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
+sliderY.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
+sliderZoom.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
+sliderGiro.addEventListener('change', function () { if (!juegoTerminado) { verificarInicioRelojFinal(); chequearVictoria(); } });
 
 btnVoltear.addEventListener('click', function () {
     if (piezaActiva && !juegoTerminado) {
@@ -267,6 +283,7 @@ btnDuplicar.addEventListener('click', function () {
             seleccionarPieza(img);
             actualizarProgresoGeneral();
             verificarInicioRelojFinal();
+            chequearVictoria(); // Red de seguridad
         }
     }
 });
@@ -323,8 +340,6 @@ function recalcularTodasLasFiguras() {
 }
 
 // ============ 9. GESTIÓN DEL MODAL DE RESULTADO Y REINICIO ============
-
-// Función clave: muestra el botón de reiniciar SOLO cuando el modal se cierra
 function mostrarBotonReinicio() {
     document.body.classList.add('mostrar-reinicio');
 }
@@ -337,7 +352,7 @@ if (btnGuardarNombre) {
         guardarEnTablaHonor(nombre, calcularScoreGeneral());
         
         document.getElementById('modalResultado').classList.remove('visible');
-        mostrarBotonReinicio(); // Activa el botón de reiniciar
+        mostrarBotonReinicio();
         mostrarTablaHonor();
     });
 }
@@ -346,7 +361,7 @@ const btnCerrarXResultado = document.getElementById('btnCerrarXResultado');
 if (btnCerrarXResultado) {
     btnCerrarXResultado.addEventListener('click', function() {
         document.getElementById('modalResultado').classList.remove('visible');
-        mostrarBotonReinicio(); // Activa el botón de reiniciar
+        mostrarBotonReinicio();
     });
 }
 
