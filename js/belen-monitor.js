@@ -1,29 +1,29 @@
-// ============ MONITOR DE VICTORIA INSTANTÁNEA ============
+// ============ MONITOR DE VICTORIA INSTANTÁNEA (Sincronizado con la lógica coherente) ============
 (function () {
     const INTERVALO_MS = 400;
     let intervaloMonitor = null;
 
     function revisarVictoria() {
+        // 1. Si el juego ya terminó, apagamos el monitor
         if (typeof juegoTerminado !== 'undefined' && juegoTerminado) {
             detenerMonitor();
             return;
         }
 
-        const figuras = document.querySelectorAll('.figura-activa');
-        if (figuras.length !== 8) return;
-
-        const todasUnicas = idsNecesarios.every(id => 
-            figuras.filter(f => f.dataset.personaje === id).length === 1
-        );
-        
-        if (!todasUnicas) return;
-
+        // 2. Usamos la misma lógica "coherente" que belen-logica.js
         const score = calcularScoreGeneral();
+        const m = obtenerMapa();
         
-        // Disparar si el puntaje redondeado es 100 (o 99.5+ por seguridad de decimales)
-        if (score >= 99.5) {
+        // Verificamos que las 8 piezas requeridas estén presentes en el mapa
+        const todasPresentes = idsNecesarios.every(id => m[id]);
+
+        // 3. Si el puntaje es 100 y las 8 están, ¡VICTORIA! 
+        // (Ya no bloqueamos si hay piezas duplicadas de más, igual que la lupa)
+        if (Math.round(score) >= 100 && todasPresentes) {
             detenerMonitor();
-            finalizarJuego('victoria');
+            if (typeof finalizarJuego === 'function') {
+                finalizarJuego('victoria');
+            }
         }
     }
 
@@ -39,6 +39,7 @@
         intervaloMonitor = setInterval(revisarVictoria, INTERVALO_MS);
     }
 
+    // Iniciar tan pronto como la página cargue
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', iniciarMonitor);
     } else {
