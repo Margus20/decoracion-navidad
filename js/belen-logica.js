@@ -1,3 +1,7 @@
+// ============ REGLA DE LADO: margen "un poquito" como fracción del ancho de la figura humana ============
+// 0.25 = un cuarto del ancho de María/José de separación. Sube para más extremo, baja para más pegado.
+const MARGEN_LADO = 0.25;
+
 // ============ 1. IMAGEN DEL ESCENARIO ============
 function updateImage() {
     const stageImage = document.getElementById('stageImage');
@@ -46,6 +50,9 @@ function centro(el) {
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 function centroY(el) { return centro(el).y; }
+// Ancho REAL en píxeles de la pantalla actual (invariante visual entre dispositivos)
+function anchoPx(el) { return el.getBoundingClientRect().width; }
+
 function distPct(a, b) {
     const ca = centro(a), cb = centro(b);
     const d = Math.hypot(ca.x - cb.x, ca.y - cb.y);
@@ -61,7 +68,6 @@ function dentroDe(a, b) {
     return ca.x >= rb.left - margen && ca.x <= rb.right + margen &&
            ca.y >= rb.top - margen && ca.y <= rb.bottom + margen;
 }
-// Detecta si el centro de una pieza cae DENTRO del rectángulo de otra
 function centroDentroDe(a, b) {
     const ca = centro(a);
     const rb = b.getBoundingClientRect();
@@ -99,7 +105,6 @@ const criterios = [
         let pts = 0;
         if (e < p) pts = 1;
         else if (e < p + 60) pts = 0.5;
-        // Regla estricta: la estrella no puede tapar a nadie
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.jesus, m.cuna, m.burro, m.oveja];
             for (const pieza of prohibidas) {
@@ -113,7 +118,6 @@ const criterios = [
         let pts = 0;
         if (cerca(m.maria, m.pesebre, 24)) pts = 1;
         else if (cerca(m.maria, m.pesebre, 38)) pts = 0.6;
-        // Regla estricta: María no puede tapar estas piezas
         if (pts > 0) {
             const prohibidas = [m.estrella, m.cuna, m.jesus, m.burro, m.oveja];
             for (const pieza of prohibidas) {
@@ -127,7 +131,6 @@ const criterios = [
         let pts = 0;
         if (cerca(m.jose, m.pesebre, 24)) pts = 1;
         else if (cerca(m.jose, m.pesebre, 38)) pts = 0.6;
-        // Regla estricta: José no puede tapar estas piezas
         if (pts > 0) {
             const prohibidas = [m.estrella, m.cuna, m.jesus, m.burro, m.oveja];
             for (const pieza of prohibidas) {
@@ -143,11 +146,25 @@ const criterios = [
         let pts = 0;
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
+        
         // Regla estricta: la oveja no puede quedar sobre estas piezas
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
                 if (pieza && centroDentroDe(m.oveja, pieza)) { pts = 0; break; }
+            }
+        }
+        
+        // Regla de lado medida en píxeles reales (portable entre pantallas):
+        // el animal debe quedar en el extremo, más allá de la figura humana de su lado.
+        if (pts > 0 && m.maria && m.jose) {
+            const ladoDerecho = centro(m.oveja).x > centro(m.pesebre).x;
+            if (ladoDerecho) {
+                const margen = anchoPx(m.maria) * MARGEN_LADO;
+                if (centro(m.oveja).x < centro(m.maria).x + margen) pts = 0.5;
+            } else {
+                const margen = anchoPx(m.jose) * MARGEN_LADO;
+                if (centro(m.oveja).x > centro(m.jose).x - margen) pts = 0.5;
             }
         }
         return pts;
@@ -159,11 +176,24 @@ const criterios = [
         let pts = 0;
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
+        
         // Regla estricta: el burro no puede quedar sobre estas piezas
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
                 if (pieza && centroDentroDe(m.burro, pieza)) { pts = 0; break; }
+            }
+        }
+        
+        // Regla de lado medida en píxeles reales (portable entre pantallas)
+        if (pts > 0 && m.maria && m.jose) {
+            const ladoDerecho = centro(m.burro).x > centro(m.pesebre).x;
+            if (ladoDerecho) {
+                const margen = anchoPx(m.maria) * MARGEN_LADO;
+                if (centro(m.burro).x < centro(m.maria).x + margen) pts = 0.5;
+            } else {
+                const margen = anchoPx(m.jose) * MARGEN_LADO;
+                if (centro(m.burro).x > centro(m.jose).x - margen) pts = 0.5;
             }
         }
         return pts;
@@ -231,9 +261,8 @@ function actualizarProgresoGeneral() {
             </div>`;
         });
 
-        // COORDENADAS EN TIEMPO REAL
         html += `<div style="margin-top:12px; padding:10px; background:rgba(0,255,120,0.08); border:1px solid #44ff88; border-radius:8px; font-size:0.85em; color:#fff;">
-            <b style="color:#44ff88;">📍 COORDENADAS X / Y (0 a 100)</b><br>`;
+            <b style="color:#44ff88;">📍 COORDENADAS X / Y (guía, no plantilla fija)</b><br>`;
         idsNecesarios.forEach(id => {
             if (m[id]) {
                 const s = leerEstado(m[id]);
@@ -242,7 +271,6 @@ function actualizarProgresoGeneral() {
         });
         html += `</div>`;
 
-        // DIAGNÓSTICO DEL FESTEJO
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
             <b style="color:#ffd700;">🔧 DIAGNÓSTICO DEL FESTEJO</b><br>
             Puntaje >= 100: ${Math.round(score) >= 100 ? '✅ SÍ' : '❌ NO'}<br>
@@ -250,7 +278,8 @@ function actualizarProgresoGeneral() {
             Total piezas: ${totalFiguras} ${totalFiguras === 8 ? '✅' : '⚠️'}<br>
             Función festejo: ${disparoCargado ? '✅ SÍ' : '❌ NO'}<br>
             Juego terminado: ${juegoTerminadoActivo ? '⚠️ SÍ' : '✅ NO'}<br>
-            Modo: 🎯 Único (Experto, superposición estricta)
+            Modo: 🎯 Único (Experto, superposición + regla de lado)<br>
+            Margen de lado: ${MARGEN_LADO}
         </div>`;
         content.innerHTML = html;
     }
@@ -310,7 +339,6 @@ function mostrarResultadoFinal(score, motivo) {
     if (campoNombre) campoNombre.style.display = 'block';
 
     // CAMBIO CLAVE: Si es victoria perfecta, el resumen espera 10 segundos (10000 ms)
-    // para que el jugador disfrute el escenario a color y las chispas.
     if (puntajeRedondeado >= 100) {
         setTimeout(() => { modal.classList.add('visible'); }, 10000);
     } else {
