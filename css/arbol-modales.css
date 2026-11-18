@@ -1,0 +1,302 @@
+/* ============ MODALES DEL ÁRBOL (arbol-modales.css) ============ */
+
+/* ============ MODAL DE CAPAS ============ */
+.modal-capas {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-capas.visible {
+    display: flex;
+}
+
+.modal-contenido {
+    background: #1a1a2e;
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-contenido h3 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.item-capa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.btn-capa {
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.btn-capa:active {
+    transform: scale(0.9);
+}
+
+/* ============ MODAL DE RESULTADO FINAL ============ */
+.modal-resultado {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+}
+
+.modal-resultado.visible {
+    display: flex;
+}
+
+.modal-resultado-contenido {
+    position: relative;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+.modal-cerrar-x {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    color: #ffd700;
+    font-size: 1.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+}
+
+.modal-cerrar-x:active {
+    transform: scale(0.9);
+}
+
+.modal-resultado-titulo {
+    font-size: 1.8rem;
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.modal-resultado-puntaje {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 20px 0;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.modal-resultado-puntaje.perfecto { color: #44ff44; }
+.modal-resultado-puntaje.bueno { color: #ffcc00; }
+.modal-resultado-puntaje.regular { color: #ff8844; }
+
+.modal-resultado-mensaje {
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-resultado-detalles {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.modal-resultado-detalles h4 {
+    color: #ffd700;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.detalle-item:last-child { border-bottom: none; }
+
+.detalle-estado {
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.detalle-estado.ok { background: #44ff44; color: #000; }
+.detalle-estado.parcial { background: #ffcc00; color: #000; }
+.detalle-estado.fallo { background: #ff4444; color: #fff; }
+
+.campo-nombre {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: left;
+}
+
+.campo-nombre label {
+    display: block;
+    color: #ffd700;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.campo-nombre input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #ffd700;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    outline: none;
+}
+
+.campo-nombre input:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+}
+
+.campo-nombre .modal-resultado-btn {
+    width: 100%;
+}
+
+.modal-resultado-btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(180deg, #2e7d32, #1b5e20);
+    border: 2px solid #ffd700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.modal-resultado-btn:active {
+    transform: scale(0.95);
+}
+
+/* ============ MODAL DE TABLA DE HONOR ============ */
+.modal-honor {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+}
+
+.modal-honor.visible {
+    display: flex;
+}
+
+.modal-honor-contenido {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+.modal-honor-contenido h3 {
+    color: #ffd700;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.lista-honor {
+    text-align: left;
+    margin-bottom: 20px;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.item-honor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    color: #fff;
+    border-left: 4px solid #ffd700;
+}
+
+.item-honor .puesto {
+    font-weight: bold;
+    color: #ffd700;
+    width: 30px;
+}
+
+.item-honor .nombre {
+    flex: 1;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+.item-honor .puntaje {
+    font-weight: bold;
+    color: #44ff44;
+}
+
+.item-honor.vacio {
+    justify-content: center;
+    color: #aaa;
+    font-style: italic;
+    border-left: none;
+}
