@@ -32,7 +32,6 @@ function refrescarSliders(el) {
     sliderY.value = s.y;
     sliderZoom.value = s.zoom;
     sliderGiro.value = s.giro;
-    
     const inputX = document.getElementById('inputX');
     const inputY = document.getElementById('inputY');
     const inputZoom = document.getElementById('inputZoom');
@@ -50,7 +49,6 @@ function centro(el) {
 }
 function centroY(el) { return centro(el).y; }
 function anchoPx(el) { return el.getBoundingClientRect().width; }
-
 function distPct(a, b) {
     const ca = centro(a), cb = centro(b);
     const d = Math.hypot(ca.x - cb.x, ca.y - cb.y);
@@ -80,33 +78,33 @@ function obtenerMapa() {
     return m;
 }
 
-// NUEVO: verifica si una figura humana está orientada correctamente (mirando hacia el centro)
-function orientacionCorrecta(figuraEl, pesebreEl) {
+// ============ 4. ORIENTACIÓN (MIRAR HACIA EL CENTRO) ============
+// naturalIzquierda = true  -> la pieza sin voltear mira a la IZQUIERDA (María, José, Oveja)
+// naturalIzquierda = false -> la pieza sin voltear mira a la DERECHA  (Burro)
+function orientacionCorrecta(figuraEl, pesebreEl, naturalIzquierda) {
     if (!figuraEl || !pesebreEl) return true;
     const estaVolteada = figuraEl.dataset.volteada === 'true';
     const estaALaIzquierda = centro(figuraEl).x < centro(pesebreEl).x;
-    
-    // Si está a la izquierda, debe estar volteada (mirando a la derecha, hacia el centro)
-    // Si está a la derecha, NO debe estar volteada (mirando a la izquierda, hacia el centro)
-    if (estaALaIzquierda) {
-        return estaVolteada; 
+    // Si está a la IZQUIERDA del pesebre debe mirar DERECHA (no izquierda); si está a la DERECHA debe mirar IZQUIERDA
+    const debeMirarIzquierda = !estaALaIzquierda;
+    let miraIzquierda;
+    if (naturalIzquierda) {
+        miraIzquierda = !estaVolteada;
     } else {
-        return !estaVolteada; 
+        miraIzquierda = estaVolteada;
     }
+    return miraIzquierda === debeMirarIzquierda;
 }
 
-// ACTUALIZADO: verifica el balance de lados detectando automáticamente quién está a cada lado
+// ============ 5. BALANCE DE LADOS ============
 function ladoAnimalOk(m, animalEl) {
     if (!m.pesebre || !m.oveja || !m.burro || !m.maria || !m.jose) return true;
-    
     const mariaADerecha = centro(m.maria).x > centro(m.pesebre).x;
     const figuraDerecha = mariaADerecha ? m.maria : m.jose;
     const figuraIzquierda = mariaADerecha ? m.jose : m.maria;
-    
     const ladoO = centro(m.oveja).x > centro(m.pesebre).x ? 1 : -1;
     const ladoB = centro(m.burro).x > centro(m.pesebre).x ? 1 : -1;
-    if (ladoO === ladoB) return false; // Ambos del mismo lado
-    
+    if (ladoO === ladoB) return false;
     const ladoActual = centro(animalEl).x > centro(m.pesebre).x ? 1 : -1;
     if (ladoActual === 1) {
         const margen = anchoPx(figuraDerecha) * MARGEN_LADO;
@@ -117,7 +115,7 @@ function ladoAnimalOk(m, animalEl) {
     }
 }
 
-// ============ 4. CRITERIOS DE COHERENCIA (NIVEL ÚNICO: EXPERTO) ============
+// ============ 6. CRITERIOS DE COHERENCIA (NIVEL ÚNICO: EXPERTO) ============
 const criterios = [
     { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => idsNecesarios.filter(id => m[id]).length / idsNecesarios.length },
     { id: 'jesus_cuna', nombre: 'Niño Jesús en la Cuna', peso: 12, eval: (m) => {
@@ -159,10 +157,7 @@ const criterios = [
                 if (pieza && centroDentroDe(m.maria, pieza)) { pts = 0; break; }
             }
         }
-        // NUEVA REGLA: verificar orientación correcta
-        if (pts > 0 && !orientacionCorrecta(m.maria, m.pesebre)) {
-            pts = 0.5;
-        }
+        if (pts > 0 && !orientacionCorrecta(m.maria, m.pesebre, true)) pts = 0.5;
         return pts;
     }},
     { id: 'jose_pesebre', nombre: 'José cerca del Pesebre', peso: 10, eval: (m) => {
@@ -176,10 +171,7 @@ const criterios = [
                 if (pieza && centroDentroDe(m.jose, pieza)) { pts = 0; break; }
             }
         }
-        // NUEVA REGLA: verificar orientación correcta
-        if (pts > 0 && !orientacionCorrecta(m.jose, m.pesebre)) {
-            pts = 0.5;
-        }
+        if (pts > 0 && !orientacionCorrecta(m.jose, m.pesebre, true)) pts = 0.5;
         return pts;
     }},
     { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 9, eval: (m) => {
@@ -189,15 +181,15 @@ const criterios = [
         let pts = 0;
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
-        
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
                 if (pieza && centroDentroDe(m.oveja, pieza)) { pts = 0; break; }
             }
         }
-        
         if (pts === 1 && !ladoAnimalOk(m, m.oveja)) pts = 0.5;
+        // OVEJA nace mirando IZQUIERDA
+        if (pts > 0 && !orientacionCorrecta(m.oveja, m.pesebre, true)) pts = 0.5;
         return pts;
     }},
     { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 9, eval: (m) => {
@@ -207,15 +199,15 @@ const criterios = [
         let pts = 0;
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
-        
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
                 if (pieza && centroDentroDe(m.burro, pieza)) { pts = 0; break; }
             }
         }
-        
         if (pts === 1 && !ladoAnimalOk(m, m.burro)) pts = 0.5;
+        // BURRO nace mirando DERECHA
+        if (pts > 0 && !orientacionCorrecta(m.burro, m.pesebre, false)) pts = 0.5;
         return pts;
     }},
     { id: 'capas', nombre: 'Orden visual correcto', peso: 16, eval: (m) => {
@@ -232,7 +224,7 @@ function calcularScoreGeneral() {
     return criterios.reduce((total, c) => total + (c.peso * c.eval(m)), 0);
 }
 
-// ============ 5. SELECCIÓN ============
+// ============ 7. SELECCIÓN ============
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
@@ -249,7 +241,7 @@ function deseleccionar() {
     panelControles.classList.remove('visible');
 }
 
-// ============ 6. BARRA, LUPA, COORDENADAS Y DISPARO ============
+// ============ 8. BARRA, LUPA, COORDENADAS, INSTRUCCIONES Y DISPARO ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     const m = obtenerMapa();
@@ -286,14 +278,45 @@ function actualizarProgresoGeneral() {
         idsNecesarios.forEach(id => {
             if (m[id]) {
                 const s = leerEstado(m[id]);
-                // Indicador de orientación para María y José
                 let orientacionIcon = '';
-                if ((id === 'maria' || id === 'jose') && m.pesebre) {
-                    orientacionIcon = orientacionCorrecta(m[id], m.pesebre) ? ' ✅' : ' ❌';
+                if ((id === 'maria' || id === 'jose' || id === 'oveja') && m.pesebre) {
+                    orientacionIcon = orientacionCorrecta(m[id], m.pesebre, true) ? ' ✅' : ' ❌';
+                }
+                if (id === 'burro' && m.pesebre) {
+                    orientacionIcon = orientacionCorrecta(m[id], m.pesebre, false) ? ' ✅' : ' ❌';
                 }
                 html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span style="text-transform:capitalize;">${id}</span><span style="font-family:monospace; color:#ffd700;">X ${s.x.toFixed(1)} &nbsp; Y ${s.y.toFixed(1)}${orientacionIcon}</span></div>`;
             }
         });
+        html += `</div>`;
+
+        // ===== SECCIÓN NARANJA: INSTRUCCIONES EXPLÍCITAS PARA VOLTEAR =====
+        const instrucciones = [];
+        if (m.maria && m.pesebre && !orientacionCorrecta(m.maria, m.pesebre, true)) {
+            instrucciones.push('María está mirando hacia afuera. Selecciona María y pulsa el botón VOLTEAR para que mire al niño.');
+        }
+        if (m.jose && m.pesebre && !orientacionCorrecta(m.jose, m.pesebre, true)) {
+            instrucciones.push('José está mirando hacia afuera. Selecciona José y pulsa el botón VOLTEAR para que mire al niño.');
+        }
+        if (m.oveja && m.pesebre && !orientacionCorrecta(m.oveja, m.pesebre, true)) {
+            instrucciones.push('La Oveja está mirando hacia afuera. Selecciona la Oveja y pulsa el botón VOLTEAR para que mire al pesebre.');
+        }
+        if (m.burro && m.pesebre && !orientacionCorrecta(m.burro, m.pesebre, false)) {
+            instrucciones.push('El Burro está mirando hacia afuera. Selecciona el Burro y pulsa el botón VOLTEAR para que mire al pesebre.');
+        }
+        if (m.oveja && m.burro && m.pesebre && (centro(m.oveja).x > centro(m.pesebre).x) === (centro(m.burro).x > centro(m.pesebre).x)) {
+            instrucciones.push('Los dos animales están del mismo lado. Mueve uno a la derecha de María y otro a la izquierda de José.');
+        }
+
+        html += `<div style="margin-top:12px; padding:10px; background:rgba(255,140,0,0.12); border:1px solid #ff8c00; border-radius:8px; font-size:0.9em; color:#fff; line-height:1.5;">
+            <b style="color:#ff8c00;">📋 CÓMO LLEGAR AL 100</b><br>`;
+        if (instrucciones.length === 0) {
+            html += `<div style="color:#44ff44; margin-top:6px;">✅ Todo correcto. Todas las piezas miran al centro y están en su lugar.</div>`;
+        } else {
+            instrucciones.forEach(texto => {
+                html += `<div style="margin-top:6px; border-bottom:1px dashed #664422; padding-bottom:6px;">👉 ${texto}</div>`;
+            });
+        }
         html += `</div>`;
 
         const mariaADerecha = m.maria && m.pesebre && centro(m.maria).x > centro(m.pesebre).x;
@@ -386,24 +409,4 @@ function desactivarCelebracion() {
 }
 function generarChispas() {
     const simbolos = ['✨', '🌟', '❄️', '⭐', '🎉', '🎊'];
-    const direcciones = ['cae', 'sube', 'derecha', 'izquierda', 'diag1', 'diag2', 'diag3', 'diag4'];
-    for (let i = 0; i < 80; i++) {
-        setTimeout(() => {
-            const dir = direcciones[Math.floor(Math.random() * direcciones.length)];
-            const chispa = document.createElement('div');
-            chispa.className = `chispa ${dir}`;
-            chispa.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
-            chispa.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
-            if (dir === 'cae') { chispa.style.left = (Math.random() * 100) + 'vw'; chispa.style.top = '-8vh'; }
-            else if (dir === 'sube') { chispa.style.left = (Math.random() * 100) + 'vw'; chispa.style.top = '108vh'; }
-            else if (dir === 'derecha') { chispa.style.top = (Math.random() * 100) + 'vh'; chispa.style.left = '-8vw'; }
-            else if (dir === 'izquierda') { chispa.style.top = (Math.random() * 100) + 'vh'; chispa.style.left = '108vw'; }
-            else if (dir === 'diag1') { chispa.style.left = '-8vw'; chispa.style.top = '108vh'; }
-            else if (dir === 'diag2') { chispa.style.left = '108vw'; chispa.style.top = '108vh'; }
-            else if (dir === 'diag3') { chispa.style.left = '-8vw'; chispa.style.top = '-8vh'; }
-            else if (dir === 'diag4') { chispa.style.left = '108vw'; chispa.style.top = '-8vh'; }
-            document.body.appendChild(chispa);
-            setTimeout(() => chispa.remove(), 5000);
-        }, i * 50);
-    }
-                                }
+    const direcciones = ['cae', 'sube', 'derecha', 'izquierda', 'di
