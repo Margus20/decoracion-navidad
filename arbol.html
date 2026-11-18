@@ -2,128 +2,184 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Árbol Navideño</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: #1a1a2e;
-            overflow: hidden;
-        }
-
-        .container {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            display: block;
-        }
-
-        .stage-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-
-        /* 🎄 LETRERO TIPO POLO NORTE */
-        .back-button {
-            position: fixed;
-            top: 18px;
-            left: 18px;
-            z-index: 1000;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px 10px 14px;
-            background: linear-gradient(180deg, #d32f2f 0%, #a31515 100%);
-            color: #ffffff;
-            font-family: 'Bebas Neue', Arial, sans-serif;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            line-height: 1;
-            text-decoration: none;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.35);
-            border: 4px solid #ffffff;
-            border-radius: 14px;
-            box-shadow:
-                0 0 0 2px #a31515 inset,
-                0 5px 0 rgba(0,0,0,0.25),
-                0 8px 22px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .back-button:hover {
-            transform: translateY(-2px) rotate(-2deg);
-            box-shadow:
-                0 0 0 2px #a31515 inset,
-                0 7px 0 rgba(0,0,0,0.25),
-                0 12px 26px rgba(0,0,0,0.55);
-        }
-
-        .back-button .arrow {
-            width: 26px;
-            height: 26px;
-            flex-shrink: 0;
-        }
-
-        /* ❄ Copito de nieve en la esquina del letrero */
-        .back-button::after {
-            content: '❄';
-            position: absolute;
-            top: -12px;
-            right: -10px;
-            font-size: 1.3rem;
-            color: #ffffff;
-            text-shadow: 0 0 6px rgba(255,255,255,0.9);
-            pointer-events: none;
-        }
-    </style>
+    
+    <!-- Estilos fragmentados con anti-caché v=1 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=1">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=1">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=1">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=1">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=1">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=1">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=1">
 </head>
 <body>
+    <!-- Botón Volver -->
     <a href="index.html" class="back-button">
         <svg class="arrow" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20"
-                  stroke="#ffffff" stroke-width="5"
-                  stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
         VOLVER
     </a>
 
-    <div class="container">
-        <img id="stageImage" class="stage-image" src="" alt="Árbol Navideño">
+    <!-- Relojes y Botón de Donar -->
+    <div class="zona-relojes">
+        <div class="fila-donate-reloj">
+            <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
+            <div class="reloj" id="relojGlobal">
+                <span class="reloj-etiqueta">⏱ Restan</span>
+                <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
+            </div>
+        </div>
+        <div class="reloj" id="relojFinal" style="display: none;">
+            <span class="reloj-etiqueta">🔥 Final</span>
+            <span class="reloj-numero" id="relojFinalNumero">00:45</span>
+        </div>
     </div>
 
-    <script>
-        function updateImage() {
-            const stageImage = document.getElementById('stageImage');
+    <!-- Botón Tabla de Honor -->
+    <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
 
-            if (window.innerHeight > window.innerWidth) {
-                // Pantalla vertical
-                stageImage.src = 'img/arbol/vertical_stage.jpg';
-            } else {
-                // Pantalla horizontal
-                stageImage.src = 'img/arbol/horizontal_stage.jpg';
-            }
+    <!-- Barra de Progreso General (Única) -->
+    <div class="panel-progreso">
+        <div class="barra-contenedor">
+            <span class="label-progreso">Progreso del Árbol</span>
+            <div class="barra-fondo">
+                <div id="barraGeneral" class="barra-relleno" style="width: 0%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Escenario -->
+    <div class="container">
+        <img id="stageImage" class="stage-image" src="" alt="Árbol Navideño">
+        <div class="escena-overlay">
+            <div class="zona-figuras" id="zonaFiguras"></div>
+        </div>
+    </div>
+
+    <!-- Panel de Avatares -->
+    <aside class="panel-avatars" id="panelAvatars"></aside>
+
+    <!-- Panel de Controles (CON CAMPOS NUMÉRICOS) -->
+    <div class="panel-controles" id="panelControles">
+        <div class="fila-bloques">
+            <div class="bloque-control">
+                <label for="sliderX">↔ Horizontal</label>
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderX" min="0" max="100" value="50" step="0.5">
+                    <input type="number" id="inputX" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor horizontal">
+                </div>
+            </div>
+            <div class="bloque-control">
+                <label for="sliderY">↕ Vertical</label>
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderY" min="0" max="100" value="50" step="0.5">
+                    <input type="number" id="inputY" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor vertical">
+                </div>
+            </div>
+            <div class="bloque-control">
+                <label for="sliderZoom">🔍 Tamaño</label>
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderZoom" min="40" max="300" value="100" step="1">
+                    <input type="number" id="inputZoom" min="40" max="300" step="1" value="100" class="input-numerico" aria-label="Valor tamaño">
+                </div>
+            </div>
+            <div class="bloque-control">
+                <label for="sliderGiro">🔄 Girar</label>
+                <div class="fila-control-numerico">
+                    <input type="range" id="sliderGiro" min="-180" max="180" value="0" step="1">
+                    <input type="number" id="inputGiro" min="-180" max="180" step="1" value="0" class="input-numerico" aria-label="Valor giro">
+                </div>
+            </div>
+        </div>
+        <div class="fila-botones">
+            <button id="btnVoltear" class="ctrl-btn">🪞 Voltear</button>
+            <button id="btnDuplicar" class="ctrl-btn">📋 Duplicar</button>
+            <button id="btnCapas" class="ctrl-btn">📚 Capas</button>
+            <button id="btnQuitar" class="ctrl-btn ctrl-quitar">✕ Quitar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Capas -->
+    <div class="modal-capas" id="modalCapas">
+        <div class="modal-contenido">
+            <h3>Orden de Capas</h3>
+            <div id="listaCapas" class="lista-capas"></div>
+            <button id="btnCerrarCapas" class="ctrl-btn" style="margin-top: 15px; width: 100%;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado Final -->
+    <div class="modal-resultado" id="modalResultado">
+        <div class="modal-resultado-contenido">
+            <button class="modal-cerrar-x" id="btnCerrarXResultado" title="Salir sin guardar">✕</button>
+            <h2 class="modal-resultado-titulo" id="resultadoTitulo">Veredicto</h2>
+            <div class="modal-resultado-puntaje" id="resultadoPuntaje">0/100</div>
+            <p class="modal-resultado-mensaje" id="resultadoMensaje"></p>
+            
+            <div class="modal-resultado-detalles">
+                <h4>Detalle de relaciones:</h4>
+                <div id="listaDetalles"></div>
+            </div>
+            
+            <div class="campo-nombre" id="campoNombre">
+                <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
+                <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
+                <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Tabla de Honor -->
+    <div class="modal-honor" id="modalHonor">
+        <div class="modal-honor-contenido">
+            <h3>🏆 Tabla de Honor Local</h3>
+            <div id="listaHonor" class="lista-honor"></div>
+            <button class="modal-resultado-btn" id="btnCerrarHonor">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Botón de Reinicio -->
+    <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR ÁRBOL</button>
+
+    <!-- Lupa Matemática Completa (Rayos X del Juego) -->
+    <div id="debugPanel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; max-height: 80vh; background: rgba(20, 20, 30, 0.98); color: #fff; padding: 20px; font-family: sans-serif; font-size: 14px; z-index: 9999; border: 2px solid #ffd700; border-radius: 15px; display: none; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
+        <h3 style="color: #ffd700; margin-top: 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px;">🔍 Lupa Matemática</h3>
+        <div id="debugContent" style="margin-bottom: 15px;">Cargando datos...</div>
+        <button onclick="document.getElementById('debugPanel').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold;">Cerrar</button>
+    </div>
+
+    <!-- Botón flotante para abrir la lupa (Oculto por defecto) -->
+    <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;">🔍 Ver Solución</button>
+
+    <script>
+        // ============ INTERRUPTOR DE LA LUPA ============
+        // Cambia a true para mostrar el botón y usar la lupa (modo pruebas).
+        // Déjalo en false para que esté oculto para los usuarios finales.
+        const LUPA_ACTIVA = false;
+
+        if (LUPA_ACTIVA) {
+            document.getElementById('btnDebug').style.display = 'block';
         }
 
-        // Ejecutar al cargar la página
-        updateImage();
-
-        // Ejecutar cuando cambie la orientación
-        window.addEventListener('resize', updateImage);
-        window.addEventListener('orientationchange', updateImage);
+        document.getElementById('btnDebug').addEventListener('click', function() {
+            document.getElementById('debugPanel').style.display = 'block';
+            // Forzar actualización inmediata al abrir
+            if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
+        });
     </script>
+
+    <!-- Scripts con anti-caché v=1 y orden obligatorio -->
+    <script src="js/arbol-datos.js?v=1"></script>
+    <script src="js/arbol-geometria.js?v=1"></script>
+    <script src="js/arbol-reglas.js?v=1"></script>
+    <script src="js/arbol-interfaz.js?v=1"></script>
+    <script src="js/arbol-acciones.js?v=1"></script>
+    <script src="js/arbol-monitor.js?v=1"></script>
 </body>
 </html>
