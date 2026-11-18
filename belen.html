@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché actualizado a v=8 -->
+    <!-- Estilos fragmentados con anti-caché -->
     <link rel="stylesheet" href="css/belen-base.css?v=8">
     <link rel="stylesheet" href="css/belen-relojes.css?v=8">
     <link rel="stylesheet" href="css/belen-ui.css?v=8">
@@ -31,7 +31,8 @@
         <div class="fila-donate-reloj">
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
             <div class="reloj" id="relojGlobal">
-                <span class="reloj-etiqueta">⏱ Global</span>
+                <!-- AJUSTE 1: Cambiado de "Global" a "Restan" -->
+                <span class="reloj-etiqueta">⏱ Restan</span>
                 <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
             </div>
         </div>
@@ -154,10 +155,19 @@
         <button onclick="document.getElementById('debugPanel').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold;">Cerrar</button>
     </div>
 
-    <!-- Botón flotante para abrir la lupa -->
-    <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px;">🔍 Ver Solución</button>
+    <!-- Botón flotante para abrir la lupa (Oculto por defecto) -->
+    <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;">🔍 Ver Solución</button>
 
     <script>
+        // ============ INTERRUPTOR DE LA LUPA ============
+        // Cambia a true para mostrar el botón y usar la lupa (modo pruebas).
+        // Déjalo en false para que esté oculto para los usuarios finales.
+        const LUPA_ACTIVA = false;
+
+        if (LUPA_ACTIVA) {
+            document.getElementById('btnDebug').style.display = 'block';
+        }
+
         document.getElementById('btnDebug').addEventListener('click', function() {
             document.getElementById('debugPanel').style.display = 'block';
             // Forzar actualización inmediata al abrir
@@ -165,7 +175,7 @@
         });
     </script>
 
-    <!-- Scripts con anti-caché actualizado a v=8 y orden obligatorio -->
+    <!-- Scripts con anti-caché y orden obligatorio -->
     <script src="js/belen-datos.js?v=8"></script>
     <script src="js/belen-geometria.js?v=8"></script>
     <script src="js/belen-reglas.js?v=8"></script>
