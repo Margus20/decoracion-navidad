@@ -35,7 +35,6 @@ function refrescarSliders(el) {
     const inputY = document.getElementById('inputY');
     const inputZoom = document.getElementById('inputZoom');
     const inputGiro = document.getElementById('inputGiro');
-    
     if (inputX) inputX.value = s.x;
     if (inputY) inputY.value = s.y;
     if (inputZoom) inputZoom.value = s.zoom;
@@ -47,19 +46,15 @@ function centro(el) {
     const r = el.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
-
 function centroY(el) { return centro(el).y; }
-
 function distPct(a, b) {
     const ca = centro(a), cb = centro(b);
     const d = Math.hypot(ca.x - cb.x, ca.y - cb.y);
     const diag = Math.hypot(window.innerWidth, window.innerHeight);
     return (d / diag) * 100;
 }
-
 function cerca(a, b, umbral) { return distPct(a, b) <= umbral; }
 function zindex(el) { return parseInt(el.style.zIndex) || 100; }
-
 function dentroDe(a, b) {
     const ca = centro(a);
     const rb = b.getBoundingClientRect();
@@ -67,7 +62,6 @@ function dentroDe(a, b) {
     return ca.x >= rb.left - margen && ca.x <= rb.right + margen &&
            ca.y >= rb.top - margen && ca.y <= rb.bottom + margen;
 }
-
 function obtenerMapa() {
     const m = {};
     idsNecesarios.forEach(id => {
@@ -79,9 +73,7 @@ function obtenerMapa() {
 
 // ============ 4. CRITERIOS DE COHERENCIA (Suman EXACTAMENTE 100 puntos) ============
 const criterios = [
-    { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => {
-        return idsNecesarios.filter(id => m[id]).length / idsNecesarios.length;
-    }},
+    { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => idsNecesarios.filter(id => m[id]).length / idsNecesarios.length },
     { id: 'jesus_cuna', nombre: 'Niño Jesús en la Cuna', peso: 12, eval: (m) => {
         if (!m.jesus || !m.cuna) return 0;
         if (dentroDe(m.jesus, m.cuna)) return 1;
@@ -149,14 +141,11 @@ function calcularScoreGeneral() {
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
-    
     piezaActiva = el;
     el.classList.add('seleccionada');
     panelControles.classList.add('visible');
-    
     refrescarSliders(el);
 }
-
 function deseleccionar() {
     if (piezaActiva) {
         piezaActiva.classList.remove('seleccionada');
@@ -165,51 +154,56 @@ function deseleccionar() {
     panelControles.classList.remove('visible');
 }
 
-// ============ 6. BARRA GENERAL, LUPA Y DISPARO DE VICTORIA ============
+// ============ 6. BARRA, LUPA, DIAGNÓSTICO Y DISPARO COHERENTE ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
+    const m = obtenerMapa();
+    const todasPresentes = idsNecesarios.every(id => m[id]);
+    const totalFiguras = document.querySelectorAll('.figura-activa').length;
+    const juegoTerminadoActivo = (typeof juegoTerminado !== 'undefined' && juegoTerminado);
+    const disparoCargado = (typeof finalizarJuego === 'function');
+
     barraGeneral.style.width = score + '%';
-    
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
     if (etiquetaGeneral) {
-        // Mostramos 2 decimales para ver la verdad exacta del puntaje sin redondeos engañosos
         etiquetaGeneral.textContent = `Progreso del Belén: ${score.toFixed(2)}/100`;
     }
-
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 
-    // --- LUPA MATEMÁTICA EN TIEMPO REAL ---
+    // --- LUPA MATEMÁTICA + DIAGNÓSTICO EN VIVO ---
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
     if (panel && content && panel.style.display === 'block') {
-        const m = obtenerMapa();
         let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">Puntaje Real: ${score.toFixed(2)}</div>`;
-        
         criterios.forEach(c => {
             const val = c.eval(m);
             const pts = (val * c.peso).toFixed(1);
             let icon = '❌', color = '#ff4444';
             if (val >= 0.9) { icon = '✅'; color = '#44ff44'; }
             else if (val >= 0.5) { icon = '⚠️'; color = '#ffcc00'; }
-            
             html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #444; padding-bottom:4px;">
                 <span style="color:#fff;">${c.nombre}</span>
                 <span style="color:${color}; font-weight:bold;">${icon} ${pts}/${c.peso}</span>
             </div>`;
         });
+        
+        // DIAGNÓSTICO DEL DISPARO: aquí ves en vivo por qué celebra o no
+        html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
+            <b style="color:#ffd700;">🔧 DIAGNÓSTICO DEL FESTEJO</b><br>
+            Puntaje >= 100: ${Math.round(score) >= 100 ? '✅ SÍ' : '❌ NO'}<br>
+            Las 8 presentes: ${todasPresentes ? '✅ SÍ' : '❌ NO'}<br>
+            Total piezas en pantalla: ${totalFiguras} ${totalFiguras === 8 ? '✅' : '⚠️ (revisa duplicadas)'}<br>
+            Función festejo cargada: ${disparoCargado ? '✅ SÍ' : '❌ NO (falta belen-acciones.js o caché)'}<br>
+            Juego ya terminado: ${juegoTerminadoActivo ? '⚠️ SÍ (por eso no dispara)' : '✅ NO'}
+        </div>`;
         content.innerHTML = html;
     }
-    // --- FIN LUPA ---
 
-    // DISPARO DE VICTORIA BLINDADO: Si la barra llega a 100 con las 8 únicas, se dispara aquí mismo.
-    if (typeof juegoTerminado !== 'undefined' && !juegoTerminado && Math.round(score) >= 100) {
-        const figuras = document.querySelectorAll('.figura-activa');
-        const hayOcho = figuras.length === 8;
-        const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
-        
-        if (hayOcho && todasUnicas && typeof finalizarJuego === 'function') {
-            finalizarJuego('victoria');
-        }
+    // --- DISPARO COHERENTE CON LA LUPA ---
+    // Antes exigía "exactamente 8 y sin duplicados". Ahora exige lo mismo que la lupa:
+    // puntaje 100 con las 8 presentes. Así barra, lupa y festejo dicen lo mismo.
+    if (!juegoTerminadoActivo && Math.round(score) >= 100 && todasPresentes && disparoCargado) {
+        finalizarJuego('victoria');
     }
 }
 
@@ -217,21 +211,17 @@ function mostrarResultadoFinal(score, motivo) {
     const modal = document.getElementById('modalResultado');
     const puntajeRedondeado = Math.round(score);
     const m = obtenerMapa();
-    
     let parciales = 0, fallidas = 0;
     criterios.forEach(c => {
         const v = c.eval(m);
         if (v < 0.9 && v >= 0.5) parciales++;
         else if (v < 0.5) fallidas++;
     });
-
     document.getElementById('resultadoPuntaje').textContent = `${puntajeRedondeado}/100`;
     document.getElementById('resultadoPuntaje').className = 'modal-resultado-puntaje ' + (puntajeRedondeado >= 100 ? 'perfecto' : puntajeRedondeado >= 80 ? 'bueno' : 'regular');
-    
     const faltan = 100 - puntajeRedondeado;
     const prefijoTiempo = motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '';
     let mensajeTexto = '';
-
     if (puntajeRedondeado >= 100) {
         document.getElementById('resultadoTitulo').textContent = '¡Belén Perfecto!';
         mensajeTexto = '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.';
@@ -250,7 +240,6 @@ function mostrarResultadoFinal(score, motivo) {
         mensajeTexto += 'Revisa abajo las marcadas con ~ o ✗.';
     }
     document.getElementById('resultadoMensaje').textContent = mensajeTexto;
-
     const listaDetalles = document.getElementById('listaDetalles');
     listaDetalles.innerHTML = '';
     criterios.forEach(c => {
@@ -258,18 +247,14 @@ function mostrarResultadoFinal(score, motivo) {
         const puntosObtenidos = Math.round(c.peso * valor);
         const item = document.createElement('div');
         item.className = 'detalle-item';
-        
         let estado = 'fallo', texto = '✗';
         if (valor >= 0.9) { estado = 'ok'; texto = '✓'; }
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
-        
         item.innerHTML = `<span>${c.nombre}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
         listaDetalles.appendChild(item);
     });
-
     const campoNombre = document.getElementById('campoNombre');
     if (campoNombre) campoNombre.style.display = 'block';
-    
     modal.classList.add('visible');
 }
 
@@ -278,16 +263,13 @@ function activarCelebracion() {
     document.body.classList.add('celebracion-activa');
     generarChispas();
 }
-
 function desactivarCelebracion() {
     celebracionActivada = false;
     document.body.classList.remove('celebracion-activa');
 }
-
 function generarChispas() {
     const simbolos = ['✨', '🌟', '❄️', '⭐', '🎉', '🎊'];
     const direcciones = ['cae', 'sube', 'derecha', 'izquierda', 'diag1', 'diag2', 'diag3', 'diag4'];
-    
     for (let i = 0; i < 80; i++) {
         setTimeout(() => {
             const dir = direcciones[Math.floor(Math.random() * direcciones.length)];
@@ -295,7 +277,6 @@ function generarChispas() {
             chispa.className = `chispa ${dir}`;
             chispa.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
             chispa.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
-
             if (dir === 'cae') { chispa.style.left = (Math.random() * 100) + 'vw'; chispa.style.top = '-8vh'; }
             else if (dir === 'sube') { chispa.style.left = (Math.random() * 100) + 'vw'; chispa.style.top = '108vh'; }
             else if (dir === 'derecha') { chispa.style.top = (Math.random() * 100) + 'vh'; chispa.style.left = '-8vw'; }
@@ -304,7 +285,6 @@ function generarChispas() {
             else if (dir === 'diag2') { chispa.style.left = '108vw'; chispa.style.top = '108vh'; }
             else if (dir === 'diag3') { chispa.style.left = '-8vw'; chispa.style.top = '-8vh'; }
             else if (dir === 'diag4') { chispa.style.left = '108vw'; chispa.style.top = '-8vh'; }
-
             document.body.appendChild(chispa);
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
