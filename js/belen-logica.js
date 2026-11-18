@@ -30,7 +30,6 @@ function refrescarSliders(el) {
     sliderZoom.value = s.zoom;
     sliderGiro.value = s.giro;
     
-    // AJUSTE DE CONSOLIDACIÓN: Actualizar también los campos numéricos si existen
     const inputX = document.getElementById('inputX');
     const inputY = document.getElementById('inputY');
     const inputZoom = document.getElementById('inputZoom');
@@ -62,6 +61,12 @@ function dentroDe(a, b) {
     return ca.x >= rb.left - margen && ca.x <= rb.right + margen &&
            ca.y >= rb.top - margen && ca.y <= rb.bottom + margen;
 }
+// Detecta si el centro de una pieza cae DENTRO del rectángulo de otra
+function centroDentroDe(a, b) {
+    const ca = centro(a);
+    const rb = b.getBoundingClientRect();
+    return ca.x >= rb.left && ca.x <= rb.right && ca.y >= rb.top && ca.y <= rb.bottom;
+}
 function obtenerMapa() {
     const m = {};
     idsNecesarios.forEach(id => {
@@ -71,7 +76,7 @@ function obtenerMapa() {
     return m;
 }
 
-// ============ 4. CRITERIOS DE COHERENCIA (Suman EXACTAMENTE 100 puntos) ============
+// ============ 4. CRITERIOS DE COHERENCIA (NIVEL ÚNICO: EXPERTO) ============
 const criterios = [
     { id: 'completitud', nombre: 'Las 8 piezas presentes', peso: 12, eval: (m) => idsNecesarios.filter(id => m[id]).length / idsNecesarios.length },
     { id: 'jesus_cuna', nombre: 'Niño Jesús en la Cuna', peso: 12, eval: (m) => {
@@ -91,37 +96,77 @@ const criterios = [
     { id: 'estrella_arriba', nombre: 'Estrella arriba del Pesebre', peso: 10, eval: (m) => {
         if (!m.estrella || !m.pesebre) return 0;
         const e = centroY(m.estrella), p = centroY(m.pesebre);
-        if (e < p) return 1;
-        if (e < p + 60) return 0.5;
-        return 0;
+        let pts = 0;
+        if (e < p) pts = 1;
+        else if (e < p + 60) pts = 0.5;
+        // Regla estricta: la estrella no puede tapar a nadie
+        if (pts > 0) {
+            const prohibidas = [m.maria, m.jose, m.jesus, m.cuna, m.burro, m.oveja];
+            for (const pieza of prohibidas) {
+                if (pieza && centroDentroDe(m.estrella, pieza)) { pts = 0; break; }
+            }
+        }
+        return pts;
     }},
     { id: 'maria_pesebre', nombre: 'María cerca del Pesebre', peso: 10, eval: (m) => {
         if (!m.maria || !m.pesebre) return 0;
-        if (cerca(m.maria, m.pesebre, 24)) return 1;
-        if (cerca(m.maria, m.pesebre, 38)) return 0.6;
-        return 0;
+        let pts = 0;
+        if (cerca(m.maria, m.pesebre, 24)) pts = 1;
+        else if (cerca(m.maria, m.pesebre, 38)) pts = 0.6;
+        // Regla estricta: María no puede tapar estas piezas
+        if (pts > 0) {
+            const prohibidas = [m.estrella, m.cuna, m.jesus, m.burro, m.oveja];
+            for (const pieza of prohibidas) {
+                if (pieza && centroDentroDe(m.maria, pieza)) { pts = 0; break; }
+            }
+        }
+        return pts;
     }},
     { id: 'jose_pesebre', nombre: 'José cerca del Pesebre', peso: 10, eval: (m) => {
         if (!m.jose || !m.pesebre) return 0;
-        if (cerca(m.jose, m.pesebre, 24)) return 1;
-        if (cerca(m.jose, m.pesebre, 38)) return 0.6;
-        return 0;
+        let pts = 0;
+        if (cerca(m.jose, m.pesebre, 24)) pts = 1;
+        else if (cerca(m.jose, m.pesebre, 38)) pts = 0.6;
+        // Regla estricta: José no puede tapar estas piezas
+        if (pts > 0) {
+            const prohibidas = [m.estrella, m.cuna, m.jesus, m.burro, m.oveja];
+            for (const pieza of prohibidas) {
+                if (pieza && centroDentroDe(m.jose, pieza)) { pts = 0; break; }
+            }
+        }
+        return pts;
     }},
     { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 9, eval: (m) => {
         if (!m.oveja || !m.pesebre) return 0;
         const enSuelo = centroY(m.oveja) > centroY(m.pesebre);
         const cercaP = distPct(m.oveja, m.pesebre) <= 34;
-        if (enSuelo && cercaP) return 1;
-        if (enSuelo) return 0.5;
-        return 0;
+        let pts = 0;
+        if (enSuelo && cercaP) pts = 1;
+        else if (enSuelo) pts = 0.5;
+        // Regla estricta: la oveja no puede quedar sobre estas piezas
+        if (pts > 0) {
+            const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
+            for (const pieza of prohibidas) {
+                if (pieza && centroDentroDe(m.oveja, pieza)) { pts = 0; break; }
+            }
+        }
+        return pts;
     }},
     { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 9, eval: (m) => {
         if (!m.burro || !m.pesebre) return 0;
         const enSuelo = centroY(m.burro) > centroY(m.pesebre);
         const cercaP = distPct(m.burro, m.pesebre) <= 34;
-        if (enSuelo && cercaP) return 1;
-        if (enSuelo) return 0.5;
-        return 0;
+        let pts = 0;
+        if (enSuelo && cercaP) pts = 1;
+        else if (enSuelo) pts = 0.5;
+        // Regla estricta: el burro no puede quedar sobre estas piezas
+        if (pts > 0) {
+            const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
+            for (const pieza of prohibidas) {
+                if (pieza && centroDentroDe(m.burro, pieza)) { pts = 0; break; }
+            }
+        }
+        return pts;
     }},
     { id: 'capas', nombre: 'Orden visual correcto', peso: 16, eval: (m) => {
         if (!m.jesus || !m.cuna || !m.pesebre) return 0;
@@ -154,7 +199,7 @@ function deseleccionar() {
     panelControles.classList.remove('visible');
 }
 
-// ============ 6. BARRA, LUPA, DIAGNÓSTICO Y DISPARO COHERENTE ============
+// ============ 6. BARRA, LUPA, COORDENADAS Y DISPARO ============
 function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     const m = obtenerMapa();
@@ -170,7 +215,6 @@ function actualizarProgresoGeneral() {
     }
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 
-    // --- LUPA MATEMÁTICA + DIAGNÓSTICO EN VIVO ---
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
     if (panel && content && panel.style.display === 'block') {
@@ -186,22 +230,31 @@ function actualizarProgresoGeneral() {
                 <span style="color:${color}; font-weight:bold;">${icon} ${pts}/${c.peso}</span>
             </div>`;
         });
-        
-        // DIAGNÓSTICO DEL DISPARO: aquí ves en vivo por qué celebra o no
+
+        // COORDENADAS EN TIEMPO REAL
+        html += `<div style="margin-top:12px; padding:10px; background:rgba(0,255,120,0.08); border:1px solid #44ff88; border-radius:8px; font-size:0.85em; color:#fff;">
+            <b style="color:#44ff88;">📍 COORDENADAS X / Y (0 a 100)</b><br>`;
+        idsNecesarios.forEach(id => {
+            if (m[id]) {
+                const s = leerEstado(m[id]);
+                html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span style="text-transform:capitalize;">${id}</span><span style="font-family:monospace; color:#ffd700;">X ${s.x.toFixed(1)} &nbsp; Y ${s.y.toFixed(1)}</span></div>`;
+            }
+        });
+        html += `</div>`;
+
+        // DIAGNÓSTICO DEL FESTEJO
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
             <b style="color:#ffd700;">🔧 DIAGNÓSTICO DEL FESTEJO</b><br>
             Puntaje >= 100: ${Math.round(score) >= 100 ? '✅ SÍ' : '❌ NO'}<br>
             Las 8 presentes: ${todasPresentes ? '✅ SÍ' : '❌ NO'}<br>
-            Total piezas en pantalla: ${totalFiguras} ${totalFiguras === 8 ? '✅' : '⚠️ (revisa duplicadas)'}<br>
-            Función festejo cargada: ${disparoCargado ? '✅ SÍ' : '❌ NO (falta belen-acciones.js o caché)'}<br>
-            Juego ya terminado: ${juegoTerminadoActivo ? '⚠️ SÍ (por eso no dispara)' : '✅ NO'}
+            Total piezas: ${totalFiguras} ${totalFiguras === 8 ? '✅' : '⚠️'}<br>
+            Función festejo: ${disparoCargado ? '✅ SÍ' : '❌ NO'}<br>
+            Juego terminado: ${juegoTerminadoActivo ? '⚠️ SÍ' : '✅ NO'}<br>
+            Modo: 🎯 Único (Experto, superposición estricta)
         </div>`;
         content.innerHTML = html;
     }
 
-    // --- DISPARO COHERENTE CON LA LUPA ---
-    // Antes exigía "exactamente 8 y sin duplicados". Ahora exige lo mismo que la lupa:
-    // puntaje 100 con las 8 presentes. Así barra, lupa y festejo dicen lo mismo.
     if (!juegoTerminadoActivo && Math.round(score) >= 100 && todasPresentes && disparoCargado) {
         finalizarJuego('victoria');
     }
@@ -255,7 +308,14 @@ function mostrarResultadoFinal(score, motivo) {
     });
     const campoNombre = document.getElementById('campoNombre');
     if (campoNombre) campoNombre.style.display = 'block';
-    modal.classList.add('visible');
+
+    // CAMBIO CLAVE: Si es victoria perfecta, el resumen espera 10 segundos (10000 ms)
+    // para que el jugador disfrute el escenario a color y las chispas.
+    if (puntajeRedondeado >= 100) {
+        setTimeout(() => { modal.classList.add('visible'); }, 10000);
+    } else {
+        modal.classList.add('visible');
+    }
 }
 
 function activarCelebracion() {
