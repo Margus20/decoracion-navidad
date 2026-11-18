@@ -1,5 +1,4 @@
 // ============ REGLA DE LADO: margen "un poquito" como fracción del ancho de la figura humana ============
-// 0.25 = un cuarto del ancho de María/José de separación. Sube para más extremo, baja para más pegado.
 const MARGEN_LADO = 0.25;
 
 // ============ 1. IMAGEN DEL ESCENARIO ============
@@ -50,7 +49,6 @@ function centro(el) {
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 function centroY(el) { return centro(el).y; }
-// Ancho REAL en píxeles de la pantalla actual (invariante visual entre dispositivos)
 function anchoPx(el) { return el.getBoundingClientRect().width; }
 
 function distPct(a, b) {
@@ -80,6 +78,43 @@ function obtenerMapa() {
         if (el) m[id] = el;
     });
     return m;
+}
+
+// NUEVO: verifica si una figura humana está orientada correctamente (mirando hacia el centro)
+function orientacionCorrecta(figuraEl, pesebreEl) {
+    if (!figuraEl || !pesebreEl) return true;
+    const estaVolteada = figuraEl.dataset.volteada === 'true';
+    const estaALaIzquierda = centro(figuraEl).x < centro(pesebreEl).x;
+    
+    // Si está a la izquierda, debe estar volteada (mirando a la derecha, hacia el centro)
+    // Si está a la derecha, NO debe estar volteada (mirando a la izquierda, hacia el centro)
+    if (estaALaIzquierda) {
+        return estaVolteada; 
+    } else {
+        return !estaVolteada; 
+    }
+}
+
+// ACTUALIZADO: verifica el balance de lados detectando automáticamente quién está a cada lado
+function ladoAnimalOk(m, animalEl) {
+    if (!m.pesebre || !m.oveja || !m.burro || !m.maria || !m.jose) return true;
+    
+    const mariaADerecha = centro(m.maria).x > centro(m.pesebre).x;
+    const figuraDerecha = mariaADerecha ? m.maria : m.jose;
+    const figuraIzquierda = mariaADerecha ? m.jose : m.maria;
+    
+    const ladoO = centro(m.oveja).x > centro(m.pesebre).x ? 1 : -1;
+    const ladoB = centro(m.burro).x > centro(m.pesebre).x ? 1 : -1;
+    if (ladoO === ladoB) return false; // Ambos del mismo lado
+    
+    const ladoActual = centro(animalEl).x > centro(m.pesebre).x ? 1 : -1;
+    if (ladoActual === 1) {
+        const margen = anchoPx(figuraDerecha) * MARGEN_LADO;
+        return centro(animalEl).x >= centro(figuraDerecha).x + margen;
+    } else {
+        const margen = anchoPx(figuraIzquierda) * MARGEN_LADO;
+        return centro(animalEl).x <= centro(figuraIzquierda).x - margen;
+    }
 }
 
 // ============ 4. CRITERIOS DE COHERENCIA (NIVEL ÚNICO: EXPERTO) ============
@@ -124,6 +159,10 @@ const criterios = [
                 if (pieza && centroDentroDe(m.maria, pieza)) { pts = 0; break; }
             }
         }
+        // NUEVA REGLA: verificar orientación correcta
+        if (pts > 0 && !orientacionCorrecta(m.maria, m.pesebre)) {
+            pts = 0.5;
+        }
         return pts;
     }},
     { id: 'jose_pesebre', nombre: 'José cerca del Pesebre', peso: 10, eval: (m) => {
@@ -137,6 +176,10 @@ const criterios = [
                 if (pieza && centroDentroDe(m.jose, pieza)) { pts = 0; break; }
             }
         }
+        // NUEVA REGLA: verificar orientación correcta
+        if (pts > 0 && !orientacionCorrecta(m.jose, m.pesebre)) {
+            pts = 0.5;
+        }
         return pts;
     }},
     { id: 'oveja_suelo', nombre: 'Oveja en el suelo', peso: 9, eval: (m) => {
@@ -147,7 +190,6 @@ const criterios = [
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
         
-        // Regla estricta: la oveja no puede quedar sobre estas piezas
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
@@ -155,18 +197,7 @@ const criterios = [
             }
         }
         
-        // Regla de lado medida en píxeles reales (portable entre pantallas):
-        // el animal debe quedar en el extremo, más allá de la figura humana de su lado.
-        if (pts > 0 && m.maria && m.jose) {
-            const ladoDerecho = centro(m.oveja).x > centro(m.pesebre).x;
-            if (ladoDerecho) {
-                const margen = anchoPx(m.maria) * MARGEN_LADO;
-                if (centro(m.oveja).x < centro(m.maria).x + margen) pts = 0.5;
-            } else {
-                const margen = anchoPx(m.jose) * MARGEN_LADO;
-                if (centro(m.oveja).x > centro(m.jose).x - margen) pts = 0.5;
-            }
-        }
+        if (pts === 1 && !ladoAnimalOk(m, m.oveja)) pts = 0.5;
         return pts;
     }},
     { id: 'burro_suelo', nombre: 'Burro en el suelo', peso: 9, eval: (m) => {
@@ -177,7 +208,6 @@ const criterios = [
         if (enSuelo && cercaP) pts = 1;
         else if (enSuelo) pts = 0.5;
         
-        // Regla estricta: el burro no puede quedar sobre estas piezas
         if (pts > 0) {
             const prohibidas = [m.maria, m.jose, m.cuna, m.jesus, m.estrella];
             for (const pieza of prohibidas) {
@@ -185,17 +215,7 @@ const criterios = [
             }
         }
         
-        // Regla de lado medida en píxeles reales (portable entre pantallas)
-        if (pts > 0 && m.maria && m.jose) {
-            const ladoDerecho = centro(m.burro).x > centro(m.pesebre).x;
-            if (ladoDerecho) {
-                const margen = anchoPx(m.maria) * MARGEN_LADO;
-                if (centro(m.burro).x < centro(m.maria).x + margen) pts = 0.5;
-            } else {
-                const margen = anchoPx(m.jose) * MARGEN_LADO;
-                if (centro(m.burro).x > centro(m.jose).x - margen) pts = 0.5;
-            }
-        }
+        if (pts === 1 && !ladoAnimalOk(m, m.burro)) pts = 0.5;
         return pts;
     }},
     { id: 'capas', nombre: 'Orden visual correcto', peso: 16, eval: (m) => {
@@ -266,10 +286,18 @@ function actualizarProgresoGeneral() {
         idsNecesarios.forEach(id => {
             if (m[id]) {
                 const s = leerEstado(m[id]);
-                html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span style="text-transform:capitalize;">${id}</span><span style="font-family:monospace; color:#ffd700;">X ${s.x.toFixed(1)} &nbsp; Y ${s.y.toFixed(1)}</span></div>`;
+                // Indicador de orientación para María y José
+                let orientacionIcon = '';
+                if ((id === 'maria' || id === 'jose') && m.pesebre) {
+                    orientacionIcon = orientacionCorrecta(m[id], m.pesebre) ? ' ✅' : ' ❌';
+                }
+                html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span style="text-transform:capitalize;">${id}</span><span style="font-family:monospace; color:#ffd700;">X ${s.x.toFixed(1)} &nbsp; Y ${s.y.toFixed(1)}${orientacionIcon}</span></div>`;
             }
         });
         html += `</div>`;
+
+        const mariaADerecha = m.maria && m.pesebre && centro(m.maria).x > centro(m.pesebre).x;
+        const ladoTexto = mariaADerecha ? 'María derecha, José izquierda' : 'José derecha, María izquierda';
 
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
             <b style="color:#ffd700;">🔧 DIAGNÓSTICO DEL FESTEJO</b><br>
@@ -278,7 +306,9 @@ function actualizarProgresoGeneral() {
             Total piezas: ${totalFiguras} ${totalFiguras === 8 ? '✅' : '⚠️'}<br>
             Función festejo: ${disparoCargado ? '✅ SÍ' : '❌ NO'}<br>
             Juego terminado: ${juegoTerminadoActivo ? '⚠️ SÍ' : '✅ NO'}<br>
-            Modo: 🎯 Único (Experto, superposición + regla de lado)<br>
+            Posición figuras: ${ladoTexto}<br>
+            Balance de animales: ${(m.oveja && m.burro && m.pesebre && (centro(m.oveja).x > centro(m.pesebre).x) !== (centro(m.burro).x > centro(m.pesebre).x)) ? '✅ Uno a cada lado' : '⚠️ Ambos del mismo lado'}<br>
+            Modo: 🎯 Único (Experto, superposición + orientación + lado + balance)<br>
             Margen de lado: ${MARGEN_LADO}
         </div>`;
         content.innerHTML = html;
@@ -338,7 +368,6 @@ function mostrarResultadoFinal(score, motivo) {
     const campoNombre = document.getElementById('campoNombre');
     if (campoNombre) campoNombre.style.display = 'block';
 
-    // CAMBIO CLAVE: Si es victoria perfecta, el resumen espera 10 segundos (10000 ms)
     if (puntajeRedondeado >= 100) {
         setTimeout(() => { modal.classList.add('visible'); }, 10000);
     } else {
@@ -377,4 +406,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-}
+                                }
