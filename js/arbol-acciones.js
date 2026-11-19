@@ -1,11 +1,12 @@
 // ============ ACCIONES DEL ÁRBOL (arbol-acciones.js) ============
 
 // ============ VARIABLES DE TIEMPO Y ESTADO ============
-let tiempoGlobalRestante = 8 * 60;
-let tiempoFinalRestante = 45;
+let tiempoGlobalRestante = 16 * 60; // AJUSTE: 16 minutos
+let tiempoFinalRestante = 90;       // AJUSTE: 90 segundos para el ajuste final
 let intervaloGlobal = null;
 let intervaloFinal = null;
 let juegoTerminado = false;
+let modoLibre = false;              // NUEVO: Control del modo sin presión
 
 // ============ 1. RELOJES DEL JUEGO ============
 function iniciarRelojGlobal() {
@@ -44,7 +45,7 @@ function actualizarDisplayReloj(idElemento, segundos) {
 }
 
 function verificarInicioRelojFinal() {
-    if (juegoTerminado || intervaloFinal) return;
+    if (juegoTerminado || modoLibre || intervaloFinal) return;
     const figuras = document.querySelectorAll('.figura-activa');
     const hayOchoPiezas = figuras.length === 8;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
@@ -73,9 +74,38 @@ function finalizarJuego(motivo) {
     }
 }
 
+// ============ NUEVO: MODO LIBRE (Decorar sin presión) ============
+function activarModoLibre() {
+    modoLibre = true;
+    juegoTerminado = false; // Esto reactiva la interacción con las piezas
+    clearInterval(intervaloGlobal);
+    clearInterval(intervaloFinal);
+    
+    document.body.classList.remove('juego-congelado');
+    
+    // Ocultar elementos de competencia
+    const zonaRelojes = document.querySelector('.zona-relojes');
+    if (zonaRelojes) zonaRelojes.style.display = 'none';
+    
+    const panelProgreso = document.querySelector('.panel-progreso');
+    if (panelProgreso) panelProgreso.style.display = 'none';
+    
+    const btnHonor = document.getElementById('btnHonor');
+    if (btnHonor) btnHonor.style.display = 'none';
+
+    // Cerrar modales si están abiertos
+    const modalResultado = document.getElementById('modalResultado');
+    if (modalResultado) modalResultado.classList.remove('visible');
+    
+    const modalHonor = document.getElementById('modalHonor');
+    if (modalHonor) modalHonor.classList.remove('visible');
+    
+    deseleccionar();
+}
+
 // ============ RED DE SEGURIDAD: Chequeo instantáneo ============
 function chequearVictoria() {
-    if (juegoTerminado) return;
+    if (juegoTerminado || modoLibre) return;
     const figuras = document.querySelectorAll('.figura-activa');
     if (figuras.length !== 8) return;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
@@ -88,7 +118,6 @@ function chequearVictoria() {
 
 // ============ 2. TABLA DE HONOR LOCAL ============
 function guardarEnTablaHonor(nombre, puntaje) {
-    // AJUSTE: Clave única para el Árbol
     let tabla = JSON.parse(localStorage.getItem('arbolTablaHonor')) || [];
     const fecha = new Date().toLocaleDateString('es-VE');
     tabla.push({ nombre: nombre || 'Anónimo', puntaje: Math.round(puntaje), fecha });
@@ -98,7 +127,6 @@ function guardarEnTablaHonor(nombre, puntaje) {
 }
 
 function mostrarTablaHonor() {
-    // AJUSTE: Clave única para el Árbol
     const tabla = JSON.parse(localStorage.getItem('arbolTablaHonor')) || [];
     const lista = document.getElementById('listaHonor');
     lista.innerHTML = '';
@@ -137,9 +165,12 @@ function crearFigura(personaje) {
     zonaFiguras.appendChild(img);
     actualizarEstadoAvatar(personaje.id);
     seleccionarPieza(img);
-    actualizarProgresoGeneral();
-    verificarInicioRelojFinal();
-    chequearVictoria();
+    
+    if (!modoLibre) {
+        actualizarProgresoGeneral();
+        verificarInicioRelojFinal();
+        chequearVictoria();
+    }
 }
 
 function actualizarEstadoAvatar(idPersonaje) {
@@ -172,7 +203,7 @@ personajes.forEach(function (personaje) {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
-                actualizarProgresoGeneral();
+                if (!modoLibre) actualizarProgresoGeneral();
             }
         } else {
             crearFigura(personaje);
@@ -210,15 +241,17 @@ function hacerArrastrable(elemento) {
         elemento.dataset.y = Math.max(0, Math.min(100, initY + dyPct));
         aplicarTransform(elemento);
         refrescarSliders(elemento);
-        actualizarProgresoGeneral();
+        if (!modoLibre) actualizarProgresoGeneral();
     }
 
     function fin() {
         if (arrastrando) {
             arrastrando = false;
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
-            chequearVictoria();
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+                chequearVictoria();
+            }
         }
     }
 
@@ -233,55 +266,49 @@ function hacerArrastrable(elemento) {
 
 // ============ 6. SLIDERS, CAMPOS NUMÉRICOS Y BOTONES DE CONTROL ============
 
-// Función auxiliar para sincronizar slider ↔ input numérico
 function sincronizarSliderInput(sliderId, inputId, min, max) {
     const slider = document.getElementById(sliderId);
     const input = document.getElementById(inputId);
     if (!slider || !input) return;
 
-    // Cuando mueves el slider, se actualiza el número
     slider.addEventListener('input', function () {
         if (piezaActiva && !juegoTerminado) {
             const val = parseFloat(this.value);
             input.value = val;
             piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
             aplicarTransform(piezaActiva);
-            actualizarProgresoGeneral();
+            if (!modoLibre) actualizarProgresoGeneral();
         }
     });
 
-    // Cuando escribes el número, se mueve el slider
     input.addEventListener('input', function () {
         if (piezaActiva && !juegoTerminado) {
             let val = parseFloat(this.value);
             if (isNaN(val)) return;
-            val = Math.max(min, Math.min(max, val)); // Respetar límites
+            val = Math.max(min, Math.min(max, val));
             slider.value = val;
             piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
             aplicarTransform(piezaActiva);
-            actualizarProgresoGeneral();
+            if (!modoLibre) actualizarProgresoGeneral();
         }
     });
 
-    // Al soltar el input numérico, verificar victoria
     input.addEventListener('change', function () {
-        if (!juegoTerminado) {
+        if (!juegoTerminado && !modoLibre) {
             verificarInicioRelojFinal();
             chequearVictoria();
         }
     });
 }
 
-// Inicializar los 4 pares slider ↔ input numérico
 sincronizarSliderInput('sliderX', 'inputX', 0, 100);
 sincronizarSliderInput('sliderY', 'inputY', 0, 100);
 sincronizarSliderInput('sliderZoom', 'inputZoom', 40, 300);
 sincronizarSliderInput('sliderGiro', 'inputGiro', -180, 180);
 
-// Sobrescribir refrescarSliders para que también actualice los inputs numéricos al seleccionar una pieza
 const refrescarSlidersOriginal = refrescarSliders;
 refrescarSliders = function(el) {
-    refrescarSlidersOriginal(el); // Ejecuta la lógica original de arbol-geometria.js
+    refrescarSlidersOriginal(el);
     const s = leerEstado(el);
     document.getElementById('inputX').value = s.x;
     document.getElementById('inputY').value = s.y;
@@ -321,9 +348,11 @@ btnDuplicar.addEventListener('click', function () {
             zonaFiguras.appendChild(img);
             actualizarEstadoAvatar(personaje.id);
             seleccionarPieza(img);
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
-            chequearVictoria();
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+                chequearVictoria();
+            }
         }
     }
 });
@@ -338,8 +367,10 @@ btnQuitar.addEventListener('click', function () {
             el.remove();
             panelControles.classList.remove('visible');
             actualizarEstadoAvatar(idP);
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+            }
         }
     }
 });
@@ -362,7 +393,7 @@ window.cambiarCapa = function (id, direccion) {
     if (!el) return;
     el.style.zIndex = zindex(el) + (direccion * 10);
     renderizarCapas();
-    verificarInicioRelojFinal();
+    if (!modoLibre) verificarInicioRelojFinal();
 };
 
 btnCapas.addEventListener('click', () => { if (!juegoTerminado) { renderizarCapas(); modalCapas.classList.add('visible'); } });
@@ -431,10 +462,9 @@ if (btnReiniciar) {
 
 // ============ 10. INICIALIZACIÓN ============
 iniciarRelojGlobal();
-// iniciarRelojLimpieza(); // Esta función debe estar definida en arbol-monitor.js
 updateImage();
 window.addEventListener('resize', () => { updateImage(); recalcularTodasLasFiguras(); });
 window.addEventListener('orientationchange', updateImage);
 document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) verificarTiempoTranscurrido(); // Esta función debe estar definida en arbol-monitor.js
+    if (!document.hidden) verificarTiempoTranscurrido();
 });
