@@ -4,8 +4,8 @@
     let intervaloMonitor = null;
 
     function revisarVictoria() {
-        // 1. Si el juego ya terminó, apagamos el monitor
-        if (typeof juegoTerminado !== 'undefined' && juegoTerminado) {
+        // 1. Si el juego ya terminó o estamos en modo libre, apagamos el monitor
+        if ((typeof juegoTerminado !== 'undefined' && juegoTerminado) || (typeof modoLibre !== 'undefined' && modoLibre)) {
             detenerMonitor();
             return;
         }
