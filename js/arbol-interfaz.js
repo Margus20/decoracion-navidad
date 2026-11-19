@@ -155,4 +155,16 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-      }
+}
+
+// ============ NUEVO: EVENT LISTENER PARA EL MODO LIBRE ============
+// Este botón se añadirá en el HTML en el siguiente paso
+const btnSeguirDecorando = document.getElementById('btnSeguirDecorando');
+if (btnSeguirDecorando) {
+    btnSeguirDecorando.addEventListener('click', function() {
+        // Llama a la función que creamos en arbol-acciones.js
+        if (typeof activarModoLibre === 'function') {
+            activarModoLibre();
+        }
+    });
+}
