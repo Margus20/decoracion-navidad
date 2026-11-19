@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché v=1 -->
+    <!-- Estilos fragmentados con anti-caché -->
     <link rel="stylesheet" href="css/arbol-base.css?v=1">
     <link rel="stylesheet" href="css/arbol-relojes.css?v=1">
     <link rel="stylesheet" href="css/arbol-ui.css?v=1">
@@ -32,12 +32,14 @@
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
             <div class="reloj" id="relojGlobal">
                 <span class="reloj-etiqueta">⏱ Restan</span>
-                <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
+                <!-- AJUSTE: Tiempo inicial a 16 minutos -->
+                <span class="reloj-numero" id="relojGlobalNumero">16:00</span>
             </div>
         </div>
         <div class="reloj" id="relojFinal" style="display: none;">
             <span class="reloj-etiqueta">🔥 Final</span>
-            <span class="reloj-numero" id="relojFinalNumero">00:45</span>
+            <!-- AJUSTE: Tiempo final a 90 segundos (1:30) -->
+            <span class="reloj-numero" id="relojFinalNumero">01:30</span>
         </div>
     </div>
 
@@ -131,6 +133,11 @@
                 <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
                 <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
                 <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
+                
+                <!-- NUEVO BOTÓN: MODO LIBRE -->
+                <button class="modal-resultado-btn" id="btnSeguirDecorando" style="background: linear-gradient(180deg, #1565c0, #0d47a1); margin-top: 12px; border-color: #64b5f6;">
+                    🎄 Seguir decorando tu Árbol
+                </button>
             </div>
         </div>
     </div>
@@ -159,8 +166,6 @@
 
     <script>
         // ============ INTERRUPTOR DE LA LUPA ============
-        // Cambia a true para mostrar el botón y usar la lupa (modo pruebas).
-        // Déjalo en false para que esté oculto para los usuarios finales.
         const LUPA_ACTIVA = false;
 
         if (LUPA_ACTIVA) {
@@ -169,12 +174,11 @@
 
         document.getElementById('btnDebug').addEventListener('click', function() {
             document.getElementById('debugPanel').style.display = 'block';
-            // Forzar actualización inmediata al abrir
             if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
         });
     </script>
 
-    <!-- Scripts con anti-caché v=1 y orden obligatorio -->
+    <!-- Scripts con anti-caché y orden obligatorio -->
     <script src="js/arbol-datos.js?v=1"></script>
     <script src="js/arbol-geometria.js?v=1"></script>
     <script src="js/arbol-reglas.js?v=1"></script>
