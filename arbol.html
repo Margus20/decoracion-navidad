@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché v=13 -->
-    <link rel="stylesheet" href="css/arbol-base.css?v=13">
-    <link rel="stylesheet" href="css/arbol-relojes.css?v=13">
-    <link rel="stylesheet" href="css/arbol-ui.css?v=13">
-    <link rel="stylesheet" href="css/arbol-botones.css?v=13">
-    <link rel="stylesheet" href="css/arbol-modales.css?v=13">
-    <link rel="stylesheet" href="css/arbol-efectos.css?v=13">
-    <link rel="stylesheet" href="css/arbol-responsive.css?v=13">
+    <!-- Estilos fragmentados con anti-caché v=15 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=15">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=15">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=15">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=15">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=15">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=15">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=15">
 </head>
 <body>
     <!-- MENÚ HAMBURGUESA (Siempre visible, unificado) -->
@@ -174,55 +174,92 @@
     <!-- Botón flotante para abrir la lupa -->
     <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;">🔍 Ver Solución</button>
 
+    <!-- ========================================================== -->
+    <!-- ============ SCRIPTS DE LÓGICA E INTERACCIÓN ============ -->
+    <!-- ========================================================== -->
     <script>
-        // ============ INTERRUPTOR DE LA LUPA ============
+        // 1. INTERRUPTOR DE LA LUPA
         const LUPA_ACTIVA = false;
-        if (LUPA_ACTIVA) { document.getElementById('btnDebug').style.display = 'block'; }
-        document.getElementById('btnDebug').addEventListener('click', function() {
-            document.getElementById('debugPanel').style.display = 'block';
-            if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
-        });
-
-        // ============ LÓGICA DEL MENÚ HAMBURGUESA ============
-        const btnMenu = document.getElementById('btnMenuHamburguesa');
-        const menuDesplegable = document.getElementById('menuDesplegable');
-        const btnHonorMenu = document.getElementById('btnHonorMenu');
-
-        if (btnMenu && menuDesplegable) {
-            btnMenu.addEventListener('click', () => {
-                menuDesplegable.classList.toggle('activo');
-                btnMenu.classList.toggle('activo');
+        if (LUPA_ACTIVA) { 
+            const btnDebug = document.getElementById('btnDebug');
+            if(btnDebug) btnDebug.style.display = 'block'; 
+        }
+        const btnDebugEl = document.getElementById('btnDebug');
+        if (btnDebugEl) {
+            btnDebugEl.addEventListener('click', function() {
+                document.getElementById('debugPanel').style.display = 'block';
+                if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
             });
         }
 
-        // Conectar el botón "Mejores" del menú con la función original
-        if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
-            btnHonorMenu.addEventListener('click', () => {
-                mostrarTablaHonor();
-                menuDesplegable.classList.remove('activo');
-                btnMenu.classList.remove('activo');
-            });
-        }
-
-        // Cerrar menú al tocar fuera de él
-        document.addEventListener('click', (e) => {
-            if (menuDesplegable && menuDesplegable.classList.contains('activo')) {
-                if (!menuDesplegable.contains(e.target) && e.target !== btnMenu) {
-                    menuDesplegable.classList.remove('activo');
-                    btnMenu.classList.remove('activo');
+        // 2. PRUEBA DE FUEGO DEL MENÚ HAMBURGUESA (Infalible)
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnMenu = document.getElementById('btnMenuHamburguesa');
+            const menuDesplegable = document.getElementById('menuDesplegable');
+            const btnHonorMenu = document.getElementById('btnHonorMenu');
+            
+            if (btnMenu && menuDesplegable) {
+                console.log("✅ ÉXITO: El botón y el menú fueron encontrados.");
+                
+                function probarMenu(e) {
+                    e.preventDefault(); 
+                    e.stopPropagation(); 
+                    
+                    // === PRUEBA DE FUEGO VISUAL ===
+                    // Si el JavaScript está funcionando, el botón se pondrá ROJO BRILLANTE
+                    btnMenu.style.backgroundColor = '#ff0000'; 
+                    btnMenu.style.borderColor = '#ffffff';
+                    
+                    menuDesplegable.classList.toggle('activo');
+                    btnMenu.classList.toggle('activo');
+                    
+                    console.log("📌 Estado del menú:", menuDesplegable.classList.contains('activo') ? "ABIERTO" : "CERRADO");
                 }
+
+                // Escuchamos AMBOS eventos para garantizar que funcione en tablet y PC
+                btnMenu.addEventListener('click', probarMenu);
+                btnMenu.addEventListener('touchstart', probarMenu, { passive: false });
+                
+                // Conectar el botón "Mejores" del menú
+                if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
+                    btnHonorMenu.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        mostrarTablaHonor();
+                        menuDesplegable.classList.remove('activo');
+                        btnMenu.classList.remove('activo');
+                        // Restaurar color original
+                        btnMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+                        btnMenu.style.borderColor = '#ffd700';
+                    });
+                }
+
+                // Cerrar menú al tocar fuera de él
+                document.addEventListener('click', (e) => {
+                    if (menuDesplegable.classList.contains('activo')) {
+                        if (!menuDesplegable.contains(e.target) && e.target !== btnMenu) {
+                            setTimeout(() => {
+                                menuDesplegable.classList.remove('activo');
+                                btnMenu.classList.remove('activo');
+                                btnMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+                                btnMenu.style.borderColor = '#ffd700';
+                            }, 150);
+                        }
+                    }
+                });
+            } else {
+                console.error("❌ ERROR: No se encontró el botón o el menú. Revisa los IDs en el HTML.");
             }
         });
     </script>
 
-    <!-- Scripts con anti-caché v=13 -->
-    <script src="js/arbol-datos.js?v=13"></script>
-    <script src="js/arbol-geometria.js?v=13"></script>
-    <script src="js/arbol-reglas.js?v=13"></script>
-    <script src="js/arbol-interfaz.js?v=13"></script>
-    <script src="js/arbol-tiempo.js?v=13"></script>
-    <script src="js/arbol-figuras.js?v=13"></script>
-    <script src="js/arbol-controles.js?v=13"></script>
-    <script src="js/arbol-monitor.js?v=13"></script>
+    <!-- Scripts con anti-caché v=15 -->
+    <script src="js/arbol-datos.js?v=15"></script>
+    <script src="js/arbol-geometria.js?v=15"></script>
+    <script src="js/arbol-reglas.js?v=15"></script>
+    <script src="js/arbol-interfaz.js?v=15"></script>
+    <script src="js/arbol-tiempo.js?v=15"></script>
+    <script src="js/arbol-figuras.js?v=15"></script>
+    <script src="js/arbol-controles.js?v=15"></script>
+    <script src="js/arbol-monitor.js?v=15"></script>
 </body>
 </html>
