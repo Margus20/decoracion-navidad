@@ -1,5 +1,5 @@
 // ============ TIEMPO Y ESTADO DEL JUEGO (arbol-tiempo.js) ============
-let tiempoGlobalRestante = 8 * 60;   // AJUSTE: Bajado a 8 minutos (como el Belén)
+let tiempoGlobalRestante = 8 * 60;   // 8 minutos (como el Belén)
 let tiempoFinalRestante = 90;        // 90 segundos de ajuste fino (cámbialo a 45 si lo prefieres)
 let intervaloGlobal = null;
 let intervaloFinal = null;
@@ -61,15 +61,20 @@ function activarModoLibre() {
     clearInterval(intervaloGlobal);
     clearInterval(intervaloFinal);
     document.body.classList.remove('juego-congelado');
-    
-    // AJUSTE: Ocultamos la zona de los botones al entrar en modo libre para limpiar la pantalla
     document.body.classList.remove('mostrar-reinicio');
-    
-    const zr = document.querySelector('.zona-relojes'); if (zr) zr.style.display = 'none';
+
+    // === AJUSTE CLAVE PARA EL BOTÓN DONAR ===
+    // Ocultamos SOLO los relojes individuales, NO el contenedor .zona-relojes.
+    // Así, el botón DONAR (que está dentro de ese contenedor) permanece visible.
+    const rg = document.getElementById('relojGlobal'); if (rg) rg.style.display = 'none';
+    const rf2 = document.getElementById('relojFinal'); if (rf2) rf2.style.display = 'none';
+
+    // El resto de elementos de competencia sí se ocultan:
     const pp = document.querySelector('.panel-progreso'); if (pp) pp.style.display = 'none';
     const bh = document.getElementById('btnHonor'); if (bh) bh.style.display = 'none';
     const mr = document.getElementById('modalResultado'); if (mr) mr.classList.remove('visible');
     const mh = document.getElementById('modalHonor'); if (mh) mh.classList.remove('visible');
+    
     deseleccionar();
 }
 
