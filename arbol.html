@@ -8,17 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché v=12 -->
-    <link rel="stylesheet" href="css/arbol-base.css?v=12">
-    <link rel="stylesheet" href="css/arbol-relojes.css?v=12">
-    <link rel="stylesheet" href="css/arbol-ui.css?v=12">
-    <link rel="stylesheet" href="css/arbol-botones.css?v=12">
-    <link rel="stylesheet" href="css/arbol-modales.css?v=12">
-    <link rel="stylesheet" href="css/arbol-efectos.css?v=12">
-    <link rel="stylesheet" href="css/arbol-responsive.css?v=12">
+    <!-- Estilos fragmentados con anti-caché v=13 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=13">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=13">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=13">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=13">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=13">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=13">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=13">
 </head>
 <body>
-    <!-- MENÚ HAMBURGUESA (Visible solo en pantallas pequeñas) -->
+    <!-- MENÚ HAMBURGUESA (Siempre visible, unificado) -->
     <button id="btnMenuHamburguesa" class="menu-hamburguesa-btn" aria-label="Abrir menú de opciones">
         <span></span>
         <span></span>
@@ -32,7 +32,7 @@
         <button id="btnHonorMenu" class="menu-item menu-btn">🏆 MEJORES</button>
     </nav>
 
-    <!-- Botón Volver (Visible en pantallas grandes, oculto en pequeñas por CSS) -->
+    <!-- Botón Volver (Oculto por CSS, vive en el menú) -->
     <a href="index.html" class="back-button">
         <svg class="arrow" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
             <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -52,10 +52,10 @@
         <div class="reloj" id="relojFinal" style="display: none;">
             <span class="reloj-etiqueta">🔥 Final</span>
             <span class="reloj-numero" id="relojFinalNumero">01:30</span>
-        </div
+        </div>
     </div>
 
-    <!-- Botón Tabla de Honor (Visible en pantallas grandes) -->
+    <!-- Botón Tabla de Honor (Oculto por CSS, vive en el menú) -->
     <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
 
     <!-- Barra de Progreso General -->
@@ -161,7 +161,7 @@
     <!-- ZONA DE REINICIO -->
     <div class="zona-reinicio" id="zonaReinicio">
         <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR ÁRBOL</button>
-        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🎄 Seguir decorando tu Árbol</button
+        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🎄 Seguir decorando tu Árbol</button>
     </div>
 
     <!-- Lupa Matemática Completa -->
@@ -199,7 +199,7 @@
         if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
             btnHonorMenu.addEventListener('click', () => {
                 mostrarTablaHonor();
-                menuDesplegable.classList.remove('activo'); // Cerrar menú al abrir la tabla
+                menuDesplegable.classList.remove('activo');
                 btnMenu.classList.remove('activo');
             });
         }
@@ -215,14 +215,14 @@
         });
     </script>
 
-    <!-- Scripts con anti-caché v=12 -->
-    <script src="js/arbol-datos.js?v=12"></script>
-    <script src="js/arbol-geometria.js?v=12"></script>
-    <script src="js/arbol-reglas.js?v=12"></script>
-    <script src="js/arbol-interfaz.js?v=12"></script>
-    <script src="js/arbol-tiempo.js?v=12"></script>
-    <script src="js/arbol-figuras.js?v=12"></script>
-    <script src="js/arbol-controles.js?v=12"></script>
-    <script src="js/arbol-monitor.js?v=12"></script>
+    <!-- Scripts con anti-caché v=13 -->
+    <script src="js/arbol-datos.js?v=13"></script>
+    <script src="js/arbol-geometria.js?v=13"></script>
+    <script src="js/arbol-reglas.js?v=13"></script>
+    <script src="js/arbol-interfaz.js?v=13"></script>
+    <script src="js/arbol-tiempo.js?v=13"></script>
+    <script src="js/arbol-figuras.js?v=13"></script>
+    <script src="js/arbol-controles.js?v=13"></script>
+    <script src="js/arbol-monitor.js?v=13"></script>
 </body>
 </html>
