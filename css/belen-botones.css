@@ -1,6 +1,108 @@
 /* ============ BOTONES DEL BELÉN (belen-botones.css) ============ */
 
-/* ============ ZONA DE REINICIO (Contenedor que centra los dos botones) ============ */
+/* 1. MENÚ HAMBURGUESA (Siempre visible, z-index máximo) */
+.menu-hamburguesa-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999; /* Máximo para que nada lo bloquee */
+    width: 3rem;
+    height: 3rem;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; /* Siempre visible, no depende del responsive */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: var(--transicion-liquida);
+    pointer-events: auto; /* Asegura que reciba clics */
+}
+
+.menu-hamburguesa-btn:active {
+    transform: scale(0.95);
+    background: rgba(0, 0, 0, 0.95);
+}
+
+.menu-hamburguesa-btn span {
+    display: block;
+    width: 1.5rem;
+    height: 0.15rem;
+    background: #ffd700;
+    border-radius: 2px;
+    transition: var(--transicion-liquida);
+}
+
+.menu-hamburguesa-btn.activo span:nth-child(1) {
+    transform: translateY(0.5rem) rotate(45deg);
+}
+.menu-hamburguesa-btn.activo span:nth-child(2) {
+    opacity: 0;
+}
+.menu-hamburguesa-btn.activo span:nth-child(3) {
+    transform: translateY(-0.5rem) rotate(-45deg);
+}
+
+/* 2. MENÚ DESPLEGABLE (Se abre al tocar el hamburguesa) */
+.menu-desplegable {
+    position: fixed;
+    top: 4.5rem;
+    right: 1rem;
+    z-index: 9998; /* Justo debajo del hamburguesa */
+    background: rgba(20, 20, 40, 0.95);
+    border: 2px solid #ffd700;
+    border-radius: var(--radio-borde);
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 10rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    transform: translateY(-1rem);
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transicion-liquida);
+}
+
+.menu-desplegable.activo {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.menu-item {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    background: linear-gradient(180deg, #2e7d32, #1b5e20);
+    border: 2px solid #ffd700;
+    border-radius: var(--radio-borde);
+    cursor: pointer;
+    transition: var(--transicion-liquida);
+}
+
+.menu-item:active {
+    transform: scale(0.95);
+}
+
+.menu-btn {
+    background: linear-gradient(180deg, #b8860b, #8b6508);
+    border: none;
+    font: inherit;
+}
+
+/* 3. ZONA DE REINICIO (Contenedor centrado) */
 .zona-reinicio {
     position: fixed;
     top: 50%;
@@ -9,31 +111,31 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 1rem;
     z-index: 1500;
+    width: 90%;
+    max-width: 20rem;
 }
 
 body.mostrar-reinicio .zona-reinicio {
     display: flex;
 }
 
-/* ============ BOTÓN REINICIAR ============ */
-/* Mantenemos tu estilo exacto, solo quitamos el position: fixed porque ahora lo maneja el contenedor */
+/* 4. BOTÓN REINICIAR */
 .btn-reiniciar {
     width: 100%;
-    max-width: 320px;
-    padding: 18px 36px;
-    font-size: 1.7rem;
+    padding: 1rem 2rem;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
     font-family: 'Bebas Neue', Arial, sans-serif;
     letter-spacing: 2px;
     color: #fff;
     background: linear-gradient(180deg, #c62828, #8e1a1a);
     border: 4px solid #ffd700;
-    border-radius: 16px;
+    border-radius: var(--radio-borde);
     cursor: pointer;
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.6);
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
-    transition: transform 0.15s ease;
+    transition: var(--transicion-liquida);
     text-align: center;
 }
 
@@ -41,23 +143,21 @@ body.mostrar-reinicio .zona-reinicio {
     transform: scale(0.95);
 }
 
-/* ============ BOTÓN SEGUIR DECORANDO (Modo Libre) ============ */
-/* Nuevo botón con el mismo estilo robusto que el de reiniciar, pero en azul */
+/* 5. BOTÓN SEGUIR DECORANDO */
 .btn-seguir-decorando {
     width: 100%;
-    max-width: 320px;
-    padding: 16px 32px;
-    font-size: 1.5rem;
+    padding: 0.9rem 2rem;
+    font-size: clamp(1.1rem, 3.5vw, 1.5rem);
     font-family: 'Bebas Neue', Arial, sans-serif;
     letter-spacing: 2px;
     color: #fff;
     background: linear-gradient(180deg, #1565c0, #0d47a1);
     border: 4px solid #64b5f6;
-    border-radius: 16px;
+    border-radius: var(--radio-borde);
     cursor: pointer;
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.6);
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
-    transition: transform 0.15s ease;
+    transition: var(--transicion-liquida);
     text-align: center;
 }
 
@@ -65,55 +165,12 @@ body.mostrar-reinicio .zona-reinicio {
     transform: scale(0.95);
 }
 
-/* ============ BOTÓN VOLVER ============ */
-/* Exactamente como tú lo tenías, 100% intacto */
+/* 6. BOTÓN VOLVER (Oculto, vive dentro del menú hamburguesa) */
 .back-button {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    z-index: 1000;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px 10px 14px;
-    background: linear-gradient(180deg, #d32f2f 0%, #a31515 100%);
-    color: #ffffff;
-    font-family: 'Bebas Neue', Arial, sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 2px;
-    line-height: 1;
-    text-decoration: none;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
-    border: 4px solid #ffffff;
-    border-radius: 14px;
-    box-shadow:
-        0 0 0 2px #a31515 inset,
-        0 5px 0 rgba(0, 0, 0, 0.25),
-        0 8px 22px rgba(0, 0, 0, 0.5);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: none !important; /* Oculto siempre, ya está en el menú */
 }
 
-.back-button:hover {
-    transform: translateY(-2px) rotate(-2deg);
-    box-shadow:
-        0 0 0 2px #a31515 inset,
-        0 7px 0 rgba(0, 0, 0, 0.25),
-        0 12px 26px rgba(0, 0, 0, 0.55);
-}
-
-.back-button .arrow {
-    width: 26px;
-    height: 26px;
-    flex-shrink: 0;
-}
-
-.back-button::after {
-    content: '❄';
-    position: absolute;
-    top: -12px;
-    right: -10px;
-    font-size: 1.3rem;
-    color: #ffffff;
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
-    pointer-events: none;
+/* 7. BOTÓN MEJORES (Oculto, vive dentro del menú hamburguesa) */
+.btn-honor {
+    display: none !important; /* Oculto siempre, ya está en el menú */
 }
