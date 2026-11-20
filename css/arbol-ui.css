@@ -1,70 +1,68 @@
 /* ============ INTERFAZ DEL ÁRBOL (arbol-ui.css) ============ */
 
-/* ============ BOTÓN TABLA DE HONOR ============ */
+/* 1. BOTÓN TABLA DE HONOR (Solo visible en pantallas grandes) */
 .btn-honor {
     position: fixed;
-    top: 18px;
-    left: 160px;
-    z-index: 900;
-    padding: 10px 14px;
+    top: 1rem; /* Relativo, no 18px fijos */
+    right: 1rem; /* Pegado a la derecha con margen seguro */
+    z-index: var(--z-ui);
+    padding: 0.6rem 1rem;
     background: linear-gradient(180deg, #b8860b 0%, #8b6508 100%);
     color: #fff;
     font-family: 'Bebas Neue', Arial, sans-serif;
     font-size: 1.1rem;
     letter-spacing: 1px;
     border: 3px solid #ffffff;
-    border-radius: 12px;
+    border-radius: var(--radio-borde);
     cursor: pointer;
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.5);
-    transition: transform 0.15s ease;
+    box-shadow: var(--sombra-base);
+    transition: var(--transicion-liquida);
 }
 
 .btn-honor:active {
     transform: scale(0.93);
 }
 
-/* ============ BARRAS DE PROGRESO ============ */
+/* 2. BARRA DE PROGRESO (Adaptable: Vertical u Horizontal según pantalla) */
 .panel-progreso {
     position: fixed;
-    top: 85px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(80vw, 500px);
-    z-index: 800;
+    z-index: var(--z-ui);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
+    transition: var(--transicion-liquida);
 }
 
 .barra-contenedor {
     background: rgba(0, 0, 0, 0.6);
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radio-borde);
     border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(4px);
 }
 
 .label-progreso {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #fff;
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    text-align: center;
 }
 
 .barra-fondo {
     width: 100%;
-    height: 12px;
+    height: 0.75rem; /* Relativo */
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
+    border-radius: 1rem;
     overflow: hidden;
 }
 
 .barra-relleno {
     height: 100%;
     width: 0%;
-    border-radius: 6px;
+    border-radius: 1rem;
     transition: width 0.4s ease, background-color 0.4s ease;
     background-color: #ff4444;
 }
@@ -73,17 +71,17 @@
 .barra-relleno.nivel-medio { background-color: #ffcc00; }
 .barra-relleno.nivel-alto { background-color: #44ff44; box-shadow: 0 0 10px #44ff44; }
 
-/* ============ FIGURAS COLOCADAS ============ */
+/* 3. FIGURAS COLOCADAS (Limpio y funcional) */
 .figura-activa {
     position: absolute;
-    width: 90px;
+    width: clamp(60px, 15vw, 100px); /* ¡MÁXIMA!: Se adapta entre 60px y 100px según la pantalla */
     height: auto;
     pointer-events: auto;
     cursor: grab;
-    z-index: 100;
+    z-index: var(--z-figuras);
     filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
     touch-action: none;
-    transition: outline 0.15s ease, filter 0.15s ease;
+    transition: outline 0.15s ease, filter 0.15s ease, transform 0.1s ease;
     outline: 3px solid transparent;
     outline-offset: 4px;
     border-radius: 8px;
@@ -91,14 +89,13 @@
 
 .figura-activa:active {
     cursor: grabbing;
-    z-index: 200;
+    z-index: calc(var(--z-figuras) + 50);
     filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
 }
 
 .figura-activa.seleccionada {
     outline: 3px solid #ffd700;
     filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.85)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
-    z-index: 250;
 }
 
 .juego-congelado .figura-activa,
@@ -114,35 +111,25 @@ body.celebracion-activa .figura-activa {
     filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6)) !important;
 }
 
-body.celebracion-activa .panel-avatars,
-body.celebracion-activa .panel-controles {
-    opacity: 0.7 !important;
-    filter: none !important;
-}
-
-/* ============ PANEL DE AVATARES ============ */
+/* 4. PANEL DE AVATARES (El corazón del diseño líquido) */
 .panel-avatars {
     position: fixed;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    z-index: var(--z-ui);
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    background: rgba(26, 26, 46, 0.75);
+    gap: 0.6rem;
+    padding: 0.6rem;
+    background: rgba(26, 26, 46, 0.85);
     border: 2px solid #ffd700;
     border-radius: 16px;
-    z-index: 600;
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    transition: var(--transicion-liquida);
 }
 
 .avatar-btn {
-    width: 58px;
-    height: 58px;
-    border-radius: 12px;
+    width: clamp(45px, 8vw, 60px); /* Se adapta al tamaño de pantalla */
+    height: clamp(45px, 8vw, 60px);
+    border-radius: 10px;
     border: 2px solid #ffd700;
     background: #2c1810;
     cursor: pointer;
@@ -150,8 +137,9 @@ body.celebracion-activa .panel-controles {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: var(--transicion-liquida);
     padding: 0;
+    flex-shrink: 0; /* Evita que se aplasten */
 }
 
 .avatar-btn img {
@@ -161,148 +149,118 @@ body.celebracion-activa .panel-controles {
     pointer-events: none;
 }
 
-.avatar-btn:active {
-    transform: scale(0.9);
-}
-
+.avatar-btn:active { transform: scale(0.9); }
 .avatar-btn.activo {
     border-color: #ffffff;
     box-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 22px rgba(255, 215, 0, 0.6);
     background: #5a3a20;
 }
 
-/* ============ PANEL DE CONTROLES ============ */
+/* 5. PANEL DE CONTROLES (Optimizado para no desbordar) */
 .panel-controles {
     position: fixed;
-    bottom: 14px;
+    bottom: 1rem;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100vw - 40px);
-    max-width: 640px;
-    background: rgba(20, 20, 40, 0.9);
+    width: min(95vw, 600px); /* Nunca más ancho que la pantalla */
+    max-height: 45vh; /* Nunca ocupa más de la mitad de la pantalla */
+    overflow-y: auto; /* Si es muy pequeño, permite scroll interno */
+    background: rgba(20, 20, 40, 0.95);
     border: 2px solid #ffd700;
     border-radius: 16px;
-    padding: 12px 10px;
-    z-index: 700;
+    padding: 1rem;
+    z-index: var(--z-ui);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
     display: none;
 }
 
-.panel-controles.visible {
-    display: block;
-}
+.panel-controles.visible { display: block; }
 
 .fila-bloques {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
-    margin-bottom: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* ¡MÁXIMA!: Se ajusta automáticamente */
+    gap: 0.8rem;
+    margin-bottom: 1rem;
 }
 
 .bloque-control {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0.25rem;
 }
 
 .bloque-control label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #ffd700;
     font-weight: bold;
     letter-spacing: 0.5px;
 }
 
+/* Sliders e Inputs (Limpieza de código repetitivo) */
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 24px;
+    height: 1.5rem;
     background: transparent;
     cursor: pointer;
 }
 
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 8px;
-    background: linear-gradient(90deg, #3a3a5e, #5a5a8e);
-    border-radius: 6px;
-    border: 1px solid #ffd700;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fff6c8, #ffd700 60%, #b8860b);
-    border: 2px solid #ffffff;
-    margin-top: -8px;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-}
-
+input[type="range"]::-webkit-slider-runnable-track,
 input[type="range"]::-moz-range-track {
-    height: 8px;
+    height: 0.5rem;
     background: linear-gradient(90deg, #3a3a5e, #5a5a8e);
     border-radius: 6px;
     border: 1px solid #ffd700;
 }
 
+input[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
+    -webkit-appearance: none;
+    width: 1.4rem;
+    height: 1.4rem;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #fff6c8, #ffd700 60%, #b8860b);
     border: 2px solid #ffffff;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    margin-top: -0.45rem; /* Ajuste para webkit */
 }
 
 .fila-botones {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .ctrl-btn {
     flex: 1;
-    min-width: 65px;
-    padding: 10px 4px;
-    font-size: 0.85rem;
+    min-width: 70px;
+    padding: 0.6rem 0.4rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #fff;
     background: linear-gradient(180deg, #2e7d32, #1b5e20);
     border: 2px solid #ffd700;
     border-radius: 10px;
     cursor: pointer;
-    transition: transform 0.15s ease;
+    transition: var(--transicion-liquida);
 }
 
-.ctrl-btn:active {
-    transform: scale(0.93);
-}
+.ctrl-btn:active { transform: scale(0.93); }
+.ctrl-quitar { background: linear-gradient(180deg, #c62828, #8e1a1a); }
 
-.ctrl-quitar {
-    background: linear-gradient(180deg, #c62828, #8e1a1a);
-}
-
-/* ============ CAMPOS NUMÉRICOS AL LADO DE LOS SLIDERS ============ */
 .fila-control-numerico {
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-
-.fila-control-numerico input[type="range"] {
-    flex: 1;
-    min-width: 0;
+    gap: 0.5rem;
 }
 
 .input-numerico {
-    width: 65px;
-    padding: 6px 4px;
-    font-size: 0.95rem;
+    width: 3.5rem;
+    padding: 0.4rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #ffd700;
     background: rgba(0, 0, 0, 0.6);
@@ -310,42 +268,27 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 8px;
     text-align: center;
     outline: none;
-    -webkit-appearance: none;
     font-family: 'Courier New', monospace;
     flex-shrink: 0;
 }
 
-.input-numerico:focus {
-    border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-}
-
-@media (min-width: 768px) {
-    .input-numerico {
-        width: 75px;
-        font-size: 1rem;
-    }
-}
-
-/* ============ SELECTOR DE COLOR (paleta) ============ */
+/* 6. SELECTOR DE COLOR (Paleta) - Ya estaba bien, solo usamos variables */
 .paleta-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 1300;
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
 }
 
 .paleta-panel {
     background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%);
     border: 3px solid #ffd700;
     border-radius: 20px;
-    padding: 20px;
+    padding: 1.5rem;
     width: 90%;
     max-width: 360px;
     text-align: center;
@@ -355,62 +298,45 @@ input[type="range"]::-moz-range-thumb {
 .paleta-panel h3 {
     color: #ffd700;
     font-size: 1.2rem;
-    margin-bottom: 16px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 1rem;
 }
 
 .paleta-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1rem;
 }
 
 .paleta-opcion {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 0.4rem;
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid rgba(255, 215, 0, 0.4);
     border-radius: 12px;
-    padding: 8px;
+    padding: 0.5rem;
     cursor: pointer;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: var(--transicion-liquida);
 }
 
 .paleta-opcion img {
-    width: 64px;
-    height: 64px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     background: #f5f5f5;
     border-radius: 8px;
     padding: 4px;
-    pointer-events: none;
 }
 
-.paleta-opcion span {
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.paleta-opcion:active {
-    transform: scale(0.92);
-}
-
-.paleta-opcion:hover {
-    border-color: #ffd700;
-}
-
-.paleta-opcion.activo {
-    border-color: #44ff44;
-    box-shadow: 0 0 14px rgba(68, 255, 68, 0.8);
-}
+.paleta-opcion span { color: #fff; font-size: 0.8rem; font-weight: bold; }
+.paleta-opcion:active { transform: scale(0.92); }
+.paleta-opcion.activo { border-color: #44ff44; box-shadow: 0 0 14px rgba(68, 255, 68, 0.8); }
 
 .paleta-cancelar {
     width: 100%;
-    padding: 10px;
+    padding: 0.8rem;
     font-size: 1rem;
     font-weight: bold;
     color: #fff;
@@ -418,9 +344,5 @@ input[type="range"]::-moz-range-thumb {
     border: 2px solid #ffd700;
     border-radius: 10px;
     cursor: pointer;
-    transition: transform 0.15s ease;
-}
-
-.paleta-cancelar:active {
-    transform: scale(0.95);
+    transition: var(--transicion-liquida);
 }
