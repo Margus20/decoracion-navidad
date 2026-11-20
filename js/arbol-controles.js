@@ -161,7 +161,6 @@ function mostrarBotonReinicio() {
 function guardarEnTablaHonor(nombre, puntaje) {
     let tabla = JSON.parse(localStorage.getItem('arbolTablaHonor')) || [];
     tabla.push({ nombre: nombre || 'Anónimo', puntaje: Math.round(puntaje), fecha: new Date().toLocaleDateString('es-VE') });
-    // CORREGIDO: Ahora sí recorta la tabla a los 10 mejores y la reasigna
     tabla = tabla.sort((a, b) => b.puntaje - a.puntaje).slice(0, 10);
     localStorage.setItem('arbolTablaHonor', JSON.stringify(tabla));
 }
@@ -228,12 +227,20 @@ if (btnReiniciar) {
     btnReiniciar.addEventListener('click', () => location.reload());
 }
 
-// --- INICIALIZACIÓN BLINDADA ---
-// Esto asegura que el código solo corra cuando el HTML esté 100% listo
-document.addEventListener('DOMContentLoaded', () => {
+// ==========================================================
+// --- INICIALIZACIÓN A PRUEBA DE FALLOS (CORREGIDO) ---
+// ==========================================================
+function arrancarJuego() {
     if (typeof iniciarRelojGlobal === 'function') iniciarRelojGlobal();
-    if (typeof updateImage === 'function') updateImage();
-});
+    if (typeof updateImage === 'function') updateImage(); // Esto carga el fondo
+}
+
+// Si la página aún se está cargando, espera. Si ya está lista, ejecuta YA.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', arrancarJuego);
+} else {
+    arrancarJuego();
+}
 
 window.addEventListener('resize', () => { 
     if (typeof updateImage === 'function') updateImage(); 
