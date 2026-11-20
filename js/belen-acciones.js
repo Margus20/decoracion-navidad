@@ -4,6 +4,7 @@ let tiempoFinalRestante = 45;
 let intervaloGlobal = null;
 let intervaloFinal = null;
 let juegoTerminado = false;
+let modoLibre = false; // NUEVO: Control del modo sin presión
 
 // ============ 1. RELOJES DEL JUEGO ============
 function iniciarRelojGlobal() {
@@ -42,7 +43,7 @@ function actualizarDisplayReloj(idElemento, segundos) {
 }
 
 function verificarInicioRelojFinal() {
-    if (juegoTerminado || intervaloFinal) return;
+    if (juegoTerminado || modoLibre || intervaloFinal) return;
     const figuras = document.querySelectorAll('.figura-activa');
     const hayOchoPiezas = figuras.length === 8;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
@@ -71,9 +72,35 @@ function finalizarJuego(motivo) {
     }
 }
 
+// ============ NUEVO: MODO LIBRE (Decorar sin presión) ============
+function activarModoLibre() {
+    modoLibre = true;
+    juegoTerminado = false;
+    clearInterval(intervaloGlobal);
+    clearInterval(intervaloFinal);
+    document.body.classList.remove('juego-congelado');
+    document.body.classList.remove('mostrar-reinicio');
+    
+    // FORZAMOS que la zona de relojes y el botón DONAR queden visibles
+    const zonaRelojes = document.querySelector('.zona-relojes'); if (zonaRelojes) zonaRelojes.style.display = 'flex';
+    const btnDonate = document.querySelector('.btn-donate'); if (btnDonate) btnDonate.style.display = 'inline-flex';
+    
+    // Ocultamos SOLO los relojes individuales
+    const rg = document.getElementById('relojGlobal'); if (rg) rg.style.display = 'none';
+    const rf2 = document.getElementById('relojFinal'); if (rf2) rf2.style.display = 'none';
+    
+    // El resto de elementos de competencia sí se ocultan
+    const pp = document.querySelector('.panel-progreso'); if (pp) pp.style.display = 'none';
+    const bh = document.getElementById('btnHonor'); if (bh) bh.style.display = 'none';
+    const mr = document.getElementById('modalResultado'); if (mr) mr.classList.remove('visible');
+    const mh = document.getElementById('modalHonor'); if (mh) mh.classList.remove('visible');
+    
+    deseleccionar();
+}
+
 // ============ RED DE SEGURIDAD: Chequeo instantáneo ============
 function chequearVictoria() {
-    if (juegoTerminado) return;
+    if (juegoTerminado || modoLibre) return;
     const figuras = document.querySelectorAll('.figura-activa');
     if (figuras.length !== 8) return;
     const todasUnicas = idsNecesarios.every(id => figuras.filter(f => f.dataset.personaje === id).length === 1);
@@ -133,9 +160,12 @@ function crearFigura(personaje) {
     zonaFiguras.appendChild(img);
     actualizarEstadoAvatar(personaje.id);
     seleccionarPieza(img);
-    actualizarProgresoGeneral();
-    verificarInicioRelojFinal();
-    chequearVictoria();
+    
+    if (!modoLibre) {
+        actualizarProgresoGeneral();
+        verificarInicioRelojFinal();
+        chequearVictoria();
+    }
 }
 
 function actualizarEstadoAvatar(idPersonaje) {
@@ -164,12 +194,14 @@ personajes.forEach(function (personaje) {
         const existentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
-            if (confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?')) {
+            
+            // AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo
+            confirmarAccion('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?', function () {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
-                actualizarProgresoGeneral();
-            }
+                if (!modoLibre) actualizarProgresoGeneral();
+            });
         } else {
             crearFigura(personaje);
         }
@@ -206,15 +238,17 @@ function hacerArrastrable(elemento) {
         elemento.dataset.y = Math.max(0, Math.min(100, initY + dyPct));
         aplicarTransform(elemento);
         refrescarSliders(elemento);
-        actualizarProgresoGeneral();
+        if (!modoLibre) actualizarProgresoGeneral();
     }
 
     function fin() {
         if (arrastrando) {
             arrastrando = false;
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
-            chequearVictoria();
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+                chequearVictoria();
+            }
         }
     }
 
@@ -228,56 +262,49 @@ function hacerArrastrable(elemento) {
 }
 
 // ============ 6. SLIDERS, CAMPOS NUMÉRICOS Y BOTONES DE CONTROL ============
-
-// Función auxiliar para sincronizar slider ↔ input numérico
 function sincronizarSliderInput(sliderId, inputId, min, max) {
     const slider = document.getElementById(sliderId);
     const input = document.getElementById(inputId);
     if (!slider || !input) return;
 
-    // Cuando mueves el slider, se actualiza el número
     slider.addEventListener('input', function () {
         if (piezaActiva && !juegoTerminado) {
             const val = parseFloat(this.value);
             input.value = val;
             piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
             aplicarTransform(piezaActiva);
-            actualizarProgresoGeneral();
+            if (!modoLibre) actualizarProgresoGeneral();
         }
     });
 
-    // Cuando escribes el número, se mueve el slider
     input.addEventListener('input', function () {
         if (piezaActiva && !juegoTerminado) {
             let val = parseFloat(this.value);
             if (isNaN(val)) return;
-            val = Math.max(min, Math.min(max, val)); // Respetar límites
+            val = Math.max(min, Math.min(max, val));
             slider.value = val;
             piezaActiva.dataset[sliderId.replace('slider', '').toLowerCase()] = val;
             aplicarTransform(piezaActiva);
-            actualizarProgresoGeneral();
+            if (!modoLibre) actualizarProgresoGeneral();
         }
     });
 
-    // Al soltar el input numérico, verificar victoria
     input.addEventListener('change', function () {
-        if (!juegoTerminado) {
+        if (!juegoTerminado && !modoLibre) {
             verificarInicioRelojFinal();
             chequearVictoria();
         }
     });
 }
 
-// Inicializar los 4 pares slider ↔ input numérico
 sincronizarSliderInput('sliderX', 'inputX', 0, 100);
 sincronizarSliderInput('sliderY', 'inputY', 0, 100);
 sincronizarSliderInput('sliderZoom', 'inputZoom', 40, 300);
 sincronizarSliderInput('sliderGiro', 'inputGiro', -180, 180);
 
-// Sobrescribir refrescarSliders para que también actualice los inputs numéricos al seleccionar una pieza
 const refrescarSlidersOriginal = refrescarSliders;
 refrescarSliders = function(el) {
-    refrescarSlidersOriginal(el); // Ejecuta la lógica original de belen-logica.js
+    refrescarSlidersOriginal(el);
     const s = leerEstado(el);
     document.getElementById('inputX').value = s.x;
     document.getElementById('inputY').value = s.y;
@@ -317,26 +344,32 @@ btnDuplicar.addEventListener('click', function () {
             zonaFiguras.appendChild(img);
             actualizarEstadoAvatar(personaje.id);
             seleccionarPieza(img);
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
-            chequearVictoria();
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+                chequearVictoria();
+            }
         }
     }
 });
 
 btnQuitar.addEventListener('click', function () {
     if (piezaActiva && !juegoTerminado) {
-        const idP = piezaActiva.dataset.personaje;
+        const el = piezaActiva;
+        const idP = el.dataset.personaje;
         const personaje = personajes.find(p => p.id === idP);
-        if (confirm('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?')) {
-            const el = piezaActiva;
-            piezaActiva = null;
+        
+        // AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo
+        confirmarAccion('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?', function () {
+            if (piezaActiva === el) piezaActiva = null;
             el.remove();
             panelControles.classList.remove('visible');
             actualizarEstadoAvatar(idP);
-            actualizarProgresoGeneral();
-            verificarInicioRelojFinal();
-        }
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+            }
+        });
     }
 });
 
@@ -358,7 +391,7 @@ window.cambiarCapa = function (id, direccion) {
     if (!el) return;
     el.style.zIndex = zindex(el) + (direccion * 10);
     renderizarCapas();
-    verificarInicioRelojFinal();
+    if (!modoLibre) verificarInicioRelojFinal();
 };
 
 btnCapas.addEventListener('click', () => { if (!juegoTerminado) { renderizarCapas(); modalCapas.classList.add('visible'); } });
@@ -400,6 +433,16 @@ if (btnCerrarXResultado) {
     });
 }
 
+// NUEVO: Event listener para el botón Seguir Decorando
+const btnSeguirDecorando = document.getElementById('btnSeguirDecorando');
+if (btnSeguirDecorando) {
+    btnSeguirDecorando.addEventListener('click', function() {
+        if (typeof activarModoLibre === 'function') {
+            activarModoLibre();
+        }
+    });
+}
+
 const btnHonor = document.getElementById('btnHonor');
 if (btnHonor) {
     btnHonor.addEventListener('click', function() {
@@ -427,10 +470,10 @@ if (btnReiniciar) {
 
 // ============ 10. INICIALIZACIÓN ============
 iniciarRelojGlobal();
-iniciarRelojLimpieza();
+if (typeof iniciarRelojLimpieza === 'function') iniciarRelojLimpieza();
 updateImage();
 window.addEventListener('resize', () => { updateImage(); recalcularTodasLasFiguras(); });
 window.addEventListener('orientationchange', updateImage);
 document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) verificarTiempoTranscurrido();
+    if (!document.hidden && typeof verificarTiempoTranscurrido === 'function') verificarTiempoTranscurrido();
 });
