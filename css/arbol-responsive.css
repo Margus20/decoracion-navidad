@@ -1,50 +1,241 @@
 /* ============ RESPONSIVE DEL ÁRBOL (arbol-responsive.css) ============ */
 
-/* ============ MODO HORIZONTAL ============ */
+/* ============================================================
+   MOBILE FIRST (Base: pantallas pequeñas - celular/tablet vertical)
+   ============================================================ */
+
+/* 1. OCULTAR elementos que solo van en pantallas grandes */
+.back-button,
+.btn-honor,
+.zona-relojes .btn-donate {
+    display: none !important;
+}
+
+/* 2. MOSTRAR menú hamburguesa (solo en móvil) */
+.menu-hamburguesa-btn {
+    display: flex;
+}
+
+/* 3. RELOJ: arriba a la izquierda */
+.zona-relojes {
+    top: 1rem;
+    right: auto;
+    left: 1rem;
+    align-items: flex-start;
+}
+
+.fila-donate-reloj {
+    justify-content: flex-start;
+}
+
+/* 4. AVATARES: columna vertical a la IZQUIERDA */
+.panel-avatars {
+    top: 50%;
+    left: 0.5rem;
+    right: auto;
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    max-width: 4rem;
+}
+
+.avatar-btn {
+    width: clamp(2.5rem, 10vw, 3.5rem);
+    height: clamp(2.5rem, 10vw, 3.5rem);
+}
+
+/* 5. BARRA DE PROGRESO: vertical a la DERECHA, subiendo desde abajo */
+.panel-progreso {
+    top: auto;
+    bottom: 1rem;
+    left: auto;
+    right: 1rem;
+    transform: none;
+    width: 2rem;
+    height: 60vh;
+    flex-direction: column-reverse; /* La barra crece hacia arriba */
+    align-items: center;
+}
+
+.barra-contenedor {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.4rem;
+}
+
+.label-progreso {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.65rem;
+    margin-bottom: 0.3rem;
+    margin-right: 0;
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+}
+
+.barra-relleno {
+    width: 100% !important;
+    height: 0%;
+    transition: height 0.4s ease, background-color 0.4s ease;
+}
+
+/* 6. PANEL DE CONTROLES: abajo, compacto */
+.panel-controles {
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95vw;
+    max-width: 22rem;
+    padding: 0.8rem;
+}
+
+.fila-bloques {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+/* 7. FIGURAS: tamaño adaptable */
+.figura-activa {
+    width: clamp(3.5rem, 12vw, 5rem);
+}
+
+/* ============================================================
+   PANTALLAS GRANDES (Tablet horizontal / Escritorio)
+   ============================================================ */
 @media (min-width: 768px) {
+    /* 1. MOSTRAR botones sueltos, OCULTAR menú hamburguesa */
+    .back-button,
+    .btn-honor {
+        display: inline-flex;
+    }
+    
+    .zona-relojes .btn-donate {
+        display: inline-block;
+    }
+    
+    .menu-hamburguesa-btn,
+    .menu-desplegable {
+        display: none !important;
+    }
+
+    /* 2. RELOJ y DONAR: arriba a la derecha */
+    .zona-relojes {
+        top: 1rem;
+        right: 1rem;
+        left: auto;
+        align-items: flex-end;
+    }
+
+    .fila-donate-reloj {
+        justify-content: flex-end;
+    }
+
+    /* 3. AVATARES: fila horizontal a la DERECHA */
     .panel-avatars {
-        top: auto;
-        bottom: 18px;
-        right: 50%;
-        transform: translateX(50%);
-        flex-direction: row;
-        gap: 14px;
-        padding: 12px 18px;
-        max-width: 95vw;
-        flex-wrap: wrap;
-        justify-content: center;
+        top: 50%;
+        left: auto;
+        right: 0.5rem;
+        transform: translateY(-50%);
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 0.6rem;
+        max-width: 4.5rem;
     }
 
     .avatar-btn {
-        width: 68px;
-        height: 68px;
+        width: clamp(3rem, 5vw, 4rem);
+        height: clamp(3rem, 5vw, 4rem);
     }
 
-    .figura-activa {
-        width: 120px;
+    /* 4. BARRA DE PROGRESO: vertical a la IZQUIERDA, subiendo desde abajo */
+    .panel-progreso {
+        top: auto;
+        bottom: 1rem;
+        left: 1rem;
+        right: auto;
+        transform: none;
+        width: 2.5rem;
+        height: 70vh;
+        flex-direction: column-reverse;
+        align-items: center;
     }
 
+    .barra-contenedor {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0.5rem;
+    }
+
+    .label-progreso {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-size: 0.75rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .barra-fondo {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+    }
+
+    .barra-relleno {
+        width: 100% !important;
+        height: 0%;
+    }
+
+    /* 5. PANEL DE CONTROLES: más amplio */
     .panel-controles {
-        bottom: auto;
-        top: 14px;
+        bottom: 1rem;
         left: 50%;
         transform: translateX(-50%);
-        width: calc(100vw - 40px);
-        max-width: 760px;
+        width: min(90vw, 40rem);
+        max-width: 40rem;
+        padding: 1rem;
     }
 
     .fila-bloques {
         grid-template-columns: repeat(4, 1fr);
+        gap: 0.8rem;
+    }
+
+    /* 6. FIGURAS: más grandes */
+    .figura-activa {
+        width: clamp(5rem, 10vw, 7rem);
+    }
+}
+
+/* ============================================================
+   PANTALLAS MUY GRANDES (Escritorio amplio)
+   ============================================================ */
+@media (min-width: 1200px) {
+    .panel-avatars {
+        right: 1rem;
+        gap: 0.8rem;
+    }
+
+    .avatar-btn {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+
+    .figura-activa {
+        width: clamp(6rem, 8vw, 8rem);
     }
 
     .panel-progreso {
-        top: auto;
-        bottom: 130px;
-    }
-
-    .zona-relojes {
-        top: auto;
-        bottom: 18px;
-        right: 12px;
+        width: 3rem;
+        height: 75vh;
     }
 }
