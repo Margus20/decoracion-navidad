@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché -->
-    <link rel="stylesheet" href="css/arbol-base.css?v=1">
-    <link rel="stylesheet" href="css/arbol-relojes.css?v=1">
-    <link rel="stylesheet" href="css/arbol-ui.css?v=1">
-    <link rel="stylesheet" href="css/arbol-botones.css?v=1">
-    <link rel="stylesheet" href="css/arbol-modales.css?v=1">
-    <link rel="stylesheet" href="css/arbol-efectos.css?v=1">
-    <link rel="stylesheet" href="css/arbol-responsive.css?v=1">
+    <!-- Estilos fragmentados con anti-caché actualizado a v=4 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=4">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=4">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=4">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=4">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=4">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=4">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=4">
 </head>
 <body>
     <!-- Botón Volver -->
@@ -32,13 +32,11 @@
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
             <div class="reloj" id="relojGlobal">
                 <span class="reloj-etiqueta">⏱ Restan</span>
-                <!-- AJUSTE: Tiempo inicial a 16 minutos -->
                 <span class="reloj-numero" id="relojGlobalNumero">16:00</span>
             </div>
         </div>
         <div class="reloj" id="relojFinal" style="display: none;">
             <span class="reloj-etiqueta">🔥 Final</span>
-            <!-- AJUSTE: Tiempo final a 90 segundos (1:30) -->
             <span class="reloj-numero" id="relojFinalNumero">01:30</span>
         </div>
     </div>
@@ -134,7 +132,7 @@
                 <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
                 <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
                 
-                <!-- NUEVO BOTÓN: MODO LIBRE -->
+                <!-- BOTÓN: MODO LIBRE -->
                 <button class="modal-resultado-btn" id="btnSeguirDecorando" style="background: linear-gradient(180deg, #1565c0, #0d47a1); margin-top: 12px; border-color: #64b5f6;">
                     🎄 Seguir decorando tu Árbol
                 </button>
@@ -178,12 +176,15 @@
         });
     </script>
 
-    <!-- Scripts con anti-caché y orden obligatorio -->
-    <script src="js/arbol-datos.js?v=1"></script>
-    <script src="js/arbol-geometria.js?v=1"></script>
-    <script src="js/arbol-reglas.js?v=1"></script>
-    <script src="js/arbol-interfaz.js?v=1"></script>
-    <script src="js/arbol-acciones.js?v=1"></script>
-    <script src="js/arbol-monitor.js?v=1"></script>
+    <!-- Scripts con anti-caché v=4 y orden obligatorio (DIVIDIDOS) -->
+    <script src="js/arbol-datos.js?v=4"></script>
+    <script src="js/arbol-geometria.js?v=4"></script>
+    <script src="js/arbol-reglas.js?v=4"></script>
+    <script src="js/arbol-interfaz.js?v=4"></script>
+    <!-- Nuevos archivos divididos para facilitar la edición en tablet -->
+    <script src="js/arbol-tiempo.js?v=4"></script>
+    <script src="js/arbol-figuras.js?v=4"></script>
+    <script src="js/arbol-controles.js?v=4"></script>
+    <script src="js/arbol-monitor.js?v=4"></script>
 </body>
 </html>
