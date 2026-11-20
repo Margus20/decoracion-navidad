@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché -->
-    <link rel="stylesheet" href="css/belen-base.css?v=8">
-    <link rel="stylesheet" href="css/belen-relojes.css?v=8">
-    <link rel="stylesheet" href="css/belen-ui.css?v=8">
-    <link rel="stylesheet" href="css/belen-botones.css?v=8">
-    <link rel="stylesheet" href="css/belen-modales.css?v=8">
-    <link rel="stylesheet" href="css/belen-efectos.css?v=8">
-    <link rel="stylesheet" href="css/belen-responsive.css?v=8">
+    <!-- Estilos fragmentados con anti-caché v=11 -->
+    <link rel="stylesheet" href="css/belen-base.css?v=11">
+    <link rel="stylesheet" href="css/belen-relojes.css?v=11">
+    <link rel="stylesheet" href="css/belen-ui.css?v=11">
+    <link rel="stylesheet" href="css/belen-botones.css?v=11">
+    <link rel="stylesheet" href="css/belen-modales.css?v=11">
+    <link rel="stylesheet" href="css/belen-efectos.css?v=11">
+    <link rel="stylesheet" href="css/belen-responsive.css?v=11">
 </head>
 <body>
     <!-- Botón Volver -->
@@ -31,7 +31,6 @@
         <div class="fila-donate-reloj">
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
             <div class="reloj" id="relojGlobal">
-                <!-- AJUSTE 1: Cambiado de "Global" a "Restan" -->
                 <span class="reloj-etiqueta">⏱ Restan</span>
                 <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
             </div>
@@ -145,8 +144,11 @@
         </div>
     </div>
 
-    <!-- Botón de Reinicio -->
-    <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR BELÉN</button>
+    <!-- ZONA DE REINICIO: las dos opciones juntas -->
+    <div class="zona-reinicio" id="zonaReinicio">
+        <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR BELÉN</button>
+        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🌟 Seguir decorando tu Belén</button>
+    </div>
 
     <!-- Lupa Matemática Completa (Rayos X del Juego) -->
     <div id="debugPanel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; max-height: 80vh; background: rgba(20, 20, 30, 0.98); color: #fff; padding: 20px; font-family: sans-serif; font-size: 14px; z-index: 9999; border: 2px solid #ffd700; border-radius: 15px; display: none; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
@@ -160,8 +162,6 @@
 
     <script>
         // ============ INTERRUPTOR DE LA LUPA ============
-        // Cambia a true para mostrar el botón y usar la lupa (modo pruebas).
-        // Déjalo en false para que esté oculto para los usuarios finales.
         const LUPA_ACTIVA = false;
 
         if (LUPA_ACTIVA) {
@@ -170,17 +170,16 @@
 
         document.getElementById('btnDebug').addEventListener('click', function() {
             document.getElementById('debugPanel').style.display = 'block';
-            // Forzar actualización inmediata al abrir
             if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
         });
     </script>
 
-    <!-- Scripts con anti-caché y orden obligatorio -->
-    <script src="js/belen-datos.js?v=8"></script>
-    <script src="js/belen-geometria.js?v=8"></script>
-    <script src="js/belen-reglas.js?v=8"></script>
-    <script src="js/belen-interfaz.js?v=8"></script>
-    <script src="js/belen-acciones.js?v=8"></script>
-    <script src="js/belen-monitor.js?v=8"></script>
+    <!-- Scripts con anti-caché v=11 y orden obligatorio -->
+    <script src="js/belen-datos.js?v=11"></script>
+    <script src="js/belen-geometria.js?v=11"></script>
+    <script src="js/belen-reglas.js?v=11"></script>
+    <script src="js/belen-interfaz.js?v=11"></script>
+    <script src="js/belen-acciones.js?v=11"></script>
+    <script src="js/belen-monitor.js?v=11"></script>
 </body>
 </html>
