@@ -21,7 +21,6 @@ function actualizarProgresoGeneral() {
     const score = calcularScoreGeneral();
     const m = obtenerMapa();
     const todasPresentes = idsNecesarios.every(id => m[id]);
-    const totalFiguras = document.querySelectorAll('.figura-activa').length;
     const juegoTerminadoActivo = (typeof juegoTerminado !== 'undefined' && juegoTerminado);
     const disparoCargado = (typeof finalizarJuego === 'function');
 
@@ -156,15 +155,4 @@ function generarChispas() {
         }, i * 50);
     }
 }
-
-// ============ NUEVO: EVENT LISTENER PARA EL MODO LIBRE ============
-// Este botón se añadirá en el HTML en el siguiente paso
-const btnSeguirDecorando = document.getElementById('btnSeguirDecorando');
-if (btnSeguirDecorando) {
-    btnSeguirDecorando.addEventListener('click', function() {
-        // Llama a la función que creamos en arbol-acciones.js
-        if (typeof activarModoLibre === 'function') {
-            activarModoLibre();
-        }
-    });
-}
+// Nota: El listener del botón "btnSeguirDecorando" ya está centralizado en arbol-controles.js para evitar duplicados.
