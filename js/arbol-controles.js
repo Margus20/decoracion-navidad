@@ -100,11 +100,13 @@ if (btnDuplicar) {
 if (btnQuitar) {
     btnQuitar.addEventListener('click', () => {
         if (piezaActiva && !juegoTerminado) {
-            const idP = piezaActiva.dataset.personaje;
+            // === AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo ===
+            const el = piezaActiva; // Capturamos la referencia antes de la función asíncrona
+            const idP = el.dataset.personaje;
             const personaje = personajes.find(p => p.id === idP);
-            if (confirm('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?')) {
-                const el = piezaActiva; 
-                piezaActiva = null; 
+            
+            confirmarAccion('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?', function () {
+                if (piezaActiva === el) piezaActiva = null;
                 el.remove();
                 panelControles.classList.remove('visible');
                 actualizarEstadoAvatar(idP);
@@ -112,7 +114,7 @@ if (btnQuitar) {
                     actualizarProgresoGeneral(); 
                     verificarInicioRelojFinal(); 
                 }
-            }
+            });
         }
     });
 }
@@ -228,7 +230,7 @@ if (btnReiniciar) {
 }
 
 // ==========================================================
-// --- INICIALIZACIÓN A PRUEBA DE FALLOS (CORREGIDO) ---
+// --- INICIALIZACIÓN A PRUEBA DE FALLOS ---
 // ==========================================================
 function arrancarJuego() {
     if (typeof iniciarRelojGlobal === 'function') iniciarRelojGlobal();
