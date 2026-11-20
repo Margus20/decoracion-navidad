@@ -1,4 +1,46 @@
 // ============ INTERFAZ Y CELEBRACIÓN (belen-interfaz.js) ============
+
+// --- MODAL DE CONFIRMACIÓN PERSONALIZADO (paleta del juego) ---
+(function inyectarEstilosConfirmacion() {
+    if (document.getElementById('confStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'confStyles';
+    s.textContent = `
+        .conf-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .conf-panel { background: linear-gradient(135deg, #1a1a2e 0%, #2c1810 100%); border: 3px solid #ffd700; border-radius: 20px; padding: 24px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 0 40px rgba(255,215,0,0.5); }
+        .conf-titulo { color: #ffd700; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 1.6rem; letter-spacing: 1px; margin: 0 0 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+        .conf-msg { color: #fff; font-size: 1.05rem; margin: 0 0 20px; line-height: 1.4; }
+        .conf-botones { display: flex; gap: 12px; justify-content: center; }
+        .conf-btn { flex: 1; padding: 12px; font-size: 1.05rem; font-weight: bold; font-family: 'Bebas Neue', Arial, sans-serif; letter-spacing: 1px; color: #fff; border: 3px solid #ffd700; border-radius: 12px; cursor: pointer; transition: transform 0.15s ease; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
+        .conf-btn:active { transform: scale(0.94); }
+        .conf-cancelar { background: linear-gradient(180deg, #c62828, #8e1a1a); }
+        .conf-aceptar { background: linear-gradient(180deg, #2e7d32, #1b5e20); }
+    `;
+    document.head.appendChild(s);
+})();
+
+function cerrarConfirmacion() {
+    const o = document.getElementById('confOverlay');
+    if (o) o.remove();
+}
+
+function confirmarAccion(mensaje, onAceptar) {
+    cerrarConfirmacion();
+    const ov = document.createElement('div');
+    ov.className = 'conf-overlay';
+    ov.id = 'confOverlay';
+    ov.innerHTML = '<div class="conf-panel"><h3 class="conf-titulo">Confirmar</h3><p class="conf-msg">' + mensaje + '</p><div class="conf-botones"><button class="conf-btn conf-cancelar">Cancelar</button><button class="conf-btn conf-aceptar">Aceptar</button></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('.conf-aceptar').addEventListener('click', function () {
+        cerrarConfirmacion();
+        if (typeof onAceptar === 'function') onAceptar();
+    });
+    ov.querySelector('.conf-cancelar').addEventListener('click', cerrarConfirmacion);
+    ov.addEventListener('click', function (e) { if (e.target === ov) cerrarConfirmacion(); });
+}
+
+// ============ CÓDIGO ORIGINAL CONSOLIDADO ============
+
 function seleccionarPieza(el) {
     if (piezaActiva === el) return;
     if (piezaActiva) piezaActiva.classList.remove('seleccionada');
@@ -172,4 +214,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-              }
+}
