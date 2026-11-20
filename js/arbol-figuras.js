@@ -83,12 +83,14 @@ personajes.forEach(function (personaje) {
         const existentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
-            if (confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?')) {
+            
+            // === AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo ===
+            confirmarAccion('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?', function () {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
                 if (!modoLibre) actualizarProgresoGeneral();
-            }
+            });
         } else {
             crearFigura(personaje);
         }
