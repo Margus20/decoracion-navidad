@@ -3,12 +3,42 @@
 // ============ LISTA DE LOS 8 PERSONAJES ============
 const personajes = [
     { id: 'arbol', nombre: 'el Árbol', avatar: 'img/arbol/arbol_avatar.jpg', png: 'img/arbol/arbol.png' },
-    { id: 'bambalina', nombre: 'la Bambalina', avatar: 'img/arbol/bambalina_avatar.jpg', png: 'img/arbol/bambalina.png' },
+    
+    { id: 'bambalina', nombre: 'la Bambalina', avatar: 'img/arbol/bambalina_avatar.jpg', png: 'img/arbol/bambalina.png',
+        colores: [
+            { nombre: 'Original', png: 'bambalina.png' },
+            { nombre: 'Rojo', png: 'bambalina_roja.png' },
+            { nombre: 'Amarillo', png: 'bambalina_amarilla.png' },
+            { nombre: 'Morado', png: 'bambalina_morada.png' },
+            { nombre: 'Plateado', png: 'bambalina_plateada.png' }
+        ]
+    },
+    
     { id: 'baston', nombre: 'el Bastón', avatar: 'img/arbol/baston_avatar.jpg', png: 'img/arbol/baston.png' },
-    { id: 'bombilla', nombre: 'la Bombilla', avatar: 'img/arbol/bombilla_avatar.jpg', png: 'img/arbol/bombilla.png' },
+    
+    { id: 'bombilla', nombre: 'la Bombilla', avatar: 'img/arbol/bombilla_avatar.jpg', png: 'img/arbol/bombilla.png',
+        colores: [
+            { nombre: 'Original', png: 'bombilla.png' },
+            { nombre: 'Rojo', png: 'bombilla_roja.png' },
+            { nombre: 'Azul', png: 'bombilla_azul.png' },
+            { nombre: 'Morado', png: 'bombilla_morado.png' },
+            { nombre: 'Anaranjado', png: 'bombilla_anaranjado.png' }
+        ]
+    },
+    
     { id: 'cascanuez', nombre: 'el Cascanueces', avatar: 'img/arbol/cascanuez_avatar.jpg', png: 'img/arbol/cascanuez.png' },
     { id: 'estrella', nombre: 'la Estrella', avatar: 'img/arbol/estrella_avatar.jpg', png: 'img/arbol/estrella.png' },
-    { id: 'lazo', nombre: 'el Lazo', avatar: 'img/arbol/lazo_avatar.jpg', png: 'img/arbol/lazo.png' },
+    
+    { id: 'lazo', nombre: 'el Lazo', avatar: 'img/arbol/lazo_avatar.jpg', png: 'img/arbol/lazo.png',
+        colores: [
+            { nombre: 'Original', png: 'lazo.png' },
+            { nombre: 'Amarillo', png: 'lazo_amarillo.png' },
+            { nombre: 'Anaranjado', png: 'lazo_anaranjado.png' },
+            { nombre: 'Azul', png: 'lazo_azul.png' },
+            { nombre: 'Morado', png: 'lazo_morado.png' }
+        ]
+    },
+    
     { id: 'osito', nombre: 'el Osito', avatar: 'img/arbol/osito_avatar.jpg', png: 'img/arbol/osito.png' }
 ];
 
@@ -30,7 +60,6 @@ const barraGeneral = document.getElementById('barraGeneral');
 const modalCapas = document.getElementById('modalCapas');
 const listaCapas = document.getElementById('listaCapas');
 const btnCerrarCapas = document.getElementById('btnCerrarCapas');
-// (Se eliminaron las referencias a la barra individual que ya no usamos)
 
 // ============ ESTADO GLOBAL ============
 let piezaActiva = null;
@@ -42,7 +71,7 @@ const UMBRAL_CELEBRACION = 100;
 
 // ============ RELOJ DE MEMORIA TEMPORAL (Respaldo de 1 hora) ============
 // Limpia la escena si la pestaña se deja abierta indefinidamente, 
-// independiente de los relojes de juego (8 min / 45 seg).
+// independiente de los relojes de juego (16 min / 90 seg).
 const TIEMPO_LIMITE_MS = 60 * 60 * 1000;
 let tiempoInicio = Date.now();
 let temporizadorLimpieza = null;
