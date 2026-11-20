@@ -1,6 +1,6 @@
 // ============ TIEMPO Y ESTADO DEL JUEGO (arbol-tiempo.js) ============
-let tiempoGlobalRestante = 16 * 60;
-let tiempoFinalRestante = 90;
+let tiempoGlobalRestante = 8 * 60;   // AJUSTE: Bajado a 8 minutos (como el Belén)
+let tiempoFinalRestante = 90;        // 90 segundos de ajuste fino (cámbialo a 45 si lo prefieres)
 let intervaloGlobal = null;
 let intervaloFinal = null;
 let juegoTerminado = false;
@@ -61,6 +61,10 @@ function activarModoLibre() {
     clearInterval(intervaloGlobal);
     clearInterval(intervaloFinal);
     document.body.classList.remove('juego-congelado');
+    
+    // AJUSTE: Ocultamos la zona de los botones al entrar en modo libre para limpiar la pantalla
+    document.body.classList.remove('mostrar-reinicio');
+    
     const zr = document.querySelector('.zona-relojes'); if (zr) zr.style.display = 'none';
     const pp = document.querySelector('.panel-progreso'); if (pp) pp.style.display = 'none';
     const bh = document.getElementById('btnHonor'); if (bh) bh.style.display = 'none';
