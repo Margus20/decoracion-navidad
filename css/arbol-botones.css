@@ -1,13 +1,27 @@
 /* ============ BOTONES DEL ÁRBOL (arbol-botones.css) ============ */
 
-/* ============ BOTÓN REINICIAR ============ */
-.btn-reiniciar {
+/* ============ ZONA DE REINICIO (Contenedor que centra los dos botones) ============ */
+.zona-reinicio {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    display: none;
+    display: none; /* Se activa con body.mostrar-reinicio */
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
     z-index: 1500;
+}
+
+body.mostrar-reinicio .zona-reinicio {
+    display: flex;
+}
+
+/* ============ BOTÓN REINICIAR ============ */
+/* Mantenemos tu estilo exacto, solo quitamos el position: fixed porque ahora lo maneja el contenedor */
+.btn-reiniciar {
+    width: 100%;
+    max-width: 320px;
     padding: 18px 36px;
     font-size: 1.7rem;
     font-family: 'Bebas Neue', Arial, sans-serif;
@@ -20,17 +34,39 @@
     box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.6);
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
     transition: transform 0.15s ease;
+    text-align: center;
 }
 
 .btn-reiniciar:active {
-    transform: translate(-50%, -50%) scale(0.95);
+    transform: scale(0.95);
 }
 
-body.mostrar-reinicio .btn-reiniciar {
-    display: block;
+/* ============ BOTÓN SEGUIR DECORANDO (Modo Libre) ============ */
+/* Nuevo botón con el mismo estilo robusto que el de reiniciar, pero en azul */
+.btn-seguir-decorando {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px 32px;
+    font-size: 1.5rem;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    letter-spacing: 2px;
+    color: #fff;
+    background: linear-gradient(180deg, #1565c0, #0d47a1);
+    border: 4px solid #64b5f6;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+    transition: transform 0.15s ease;
+    text-align: center;
+}
+
+.btn-seguir-decorando:active {
+    transform: scale(0.95);
 }
 
 /* ============ BOTÓN VOLVER ============ */
+/* Exactamente como tú lo tenías, intacto */
 .back-button {
     position: fixed;
     top: 18px;
