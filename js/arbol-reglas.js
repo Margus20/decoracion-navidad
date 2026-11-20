@@ -38,33 +38,29 @@ const criterios = [
         return dentroDe(m.baston, m.arbol) ? 1 : (cerca(m.baston, m.arbol, 30) ? 0.5 : 0);
     }},
 
-    // NUEVA REGLA: No superposición entre adornos
+    // REGLA: No superposición entre adornos
     { id: 'no_superposicion_adornos', nombre: 'Adornos no amontonados (sin superposición)', peso: 14, eval: (m) => {
         const adornos = ['bambalina', 'bombilla', 'lazo', 'osito', 'baston'];
         const presentes = adornos.filter(id => m[id]);
-        
-        // Si hay 1 o menos adornos, no hay superposición posible
         if (presentes.length <= 1) return 1;
-        
-        // Comparamos cada adorno con los demás
         for (let i = 0; i < presentes.length; i++) {
             for (let j = i + 1; j < presentes.length; j++) {
                 const a = m[presentes[i]];
                 const b = m[presentes[j]];
-                // Si el centro de 'a' está dentro de 'b' o viceversa, hay superposición
                 if (centroDentroDe(a, b) || centroDentroDe(b, a)) {
-                    return 0; // Penalización total si se amontonan
+                    return 0;
                 }
             }
         }
-        return 1; // Todo limpio, sin amontonamientos
+        return 1;
     }},
     
     { id: 'orden_visual', nombre: 'Orden visual correcto (Estrella arriba, Cascanueces abajo)', peso: 12, eval: (m) => {
         if (!m.estrella || !m.cascanuez || !m.arbol) return 0;
+        // CORREGIDO: devuelve porcentaje (0, 0.5 o 1), no puntos absolutos.
         let pts = 0;
-        if (centroY(m.estrella) < centroY(m.arbol)) pts += 6;
-        if (centroY(m.cascanuez) > centroY(m.arbol)) pts += 6;
+        if (centroY(m.estrella) < centroY(m.arbol)) pts += 0.5;
+        if (centroY(m.cascanuez) > centroY(m.arbol)) pts += 0.5;
         return pts;
     }}
 ];
