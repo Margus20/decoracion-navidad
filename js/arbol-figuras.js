@@ -1,0 +1,137 @@
+// ============ FIGURAS Y ARRASTRE (arbol-figuras.js) ============
+
+function crearFigura(personaje, pngOverride) {
+    contadorCopias++;
+    const img = document.createElement('img');
+    img.src = pngOverride || personaje.png;
+    img.id = 'figura-' + personaje.id + '-' + contadorCopias;
+    img.alt = personaje.nombre;
+    img.classList.add('figura-activa');
+    img.draggable = false;
+    img.dataset.personaje = personaje.id;
+    img.dataset.x = 50; img.dataset.y = 50; img.dataset.zoom = 100; img.dataset.giro = 0; img.dataset.volteada = 'false';
+    aplicarTransform(img);
+    hacerArrastrable(img);
+    zonaFiguras.appendChild(img);
+    actualizarEstadoAvatar(personaje.id);
+    seleccionarPieza(img);
+    if (!modoLibre) { actualizarProgresoGeneral(); verificarInicioRelojFinal(); chequearVictoria(); }
+}
+
+function actualizarEstadoAvatar(idPersonaje) {
+    const btn = panelAvatars.querySelector('[data-id="' + idPersonaje + '"]');
+    if (!btn) return;
+    btn.classList.toggle('activo', document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]').length > 0);
+}
+
+// --- PALETA DE COLORES ---
+function abrirPaletaColores(personaje) {
+    cerrarPaleta();
+    const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
+    const srcActual = existente ? existente.getAttribute('src') : null;
+    const overlay = document.createElement('div');
+    overlay.className = 'paleta-overlay';
+    overlay.id = 'paletaOverlay';
+    let opcionesHtml = '';
+    personaje.colores.forEach(c => {
+        const ruta = 'img/arbol/' + c.png;
+        const esActual = srcActual && srcActual.indexOf(c.png) !== -1;
+        opcionesHtml += `<button class="paleta-opcion${esActual ? ' activo' : ''}" data-ruta="${ruta}" aria-label="Color ${c.nombre}"><img src="${ruta}" alt="${c.nombre}"><span>${c.nombre}</span></button>`;
+    });
+    overlay.innerHTML = `<div class="paleta-panel"><h3>Elige el color de ${personaje.nombre}</h3><div class="paleta-grid">${opcionesHtml}</div><button class="paleta-cancelar">Cancelar</button></div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelectorAll('.paleta-opcion').forEach(btn => {
+        btn.addEventListener('click', () => { aplicarColor(personaje, btn.dataset.ruta); cerrarPaleta(); });
+    });
+    const cancelar = overlay.querySelector('.paleta-cancelar');
+    if (cancelar) cancelar.addEventListener('click', cerrarPaleta);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrarPaleta(); });
+}
+
+function cerrarPaleta() {
+    const o = document.getElementById('paletaOverlay');
+    if (o) o.remove();
+}
+
+function aplicarColor(personaje, rutaPng) {
+    const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
+    if (existente) {
+        existente.src = rutaPng; // Cambia color sin mover la pieza
+    } else {
+        crearFigura(personaje, rutaPng);
+    }
+    if (!modoLibre && typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
+}
+
+// --- BOTONES DE AVATAR ---
+personajes.forEach(function (personaje) {
+    const btn = document.createElement('button');
+    btn.classList.add('avatar-btn');
+    btn.setAttribute('data-id', personaje.id);
+    btn.setAttribute('aria-label', personaje.nombre);
+    const img = document.createElement('img');
+    img.src = personaje.avatar; img.alt = personaje.nombre; img.draggable = false;
+    btn.appendChild(img);
+    panelAvatars.appendChild(btn);
+
+    btn.addEventListener('click', function () {
+        if (juegoTerminado) return;
+        if (personaje.colores && personaje.colores.length) {
+            abrirPaletaColores(personaje); // Abre selector de color
+            return;
+        }
+        const existentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
+        if (existentes.length > 0) {
+            const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
+            if (confirm('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?')) {
+                if (piezaActiva === aQuitar) deseleccionar();
+                aQuitar.remove();
+                actualizarEstadoAvatar(personaje.id);
+                if (!modoLibre) actualizarProgresoGeneral();
+            }
+        } else {
+            crearFigura(personaje);
+        }
+        if (modalCapas.classList.contains('visible')) renderizarCapas();
+    });
+});
+
+// --- ARRASTRE ---
+function hacerArrastrable(elemento) {
+    let arrastrando = false, startX = 0, startY = 0, initX = 0, initY = 0;
+    function inicio(e) {
+        if (juegoTerminado) return;
+        seleccionarPieza(elemento);
+        arrastrando = true;
+        e.preventDefault();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        startX = cx; startY = cy;
+        initX = parseFloat(elemento.dataset.x) || 50;
+        initY = parseFloat(elemento.dataset.y) || 50;
+    }
+    function mover(e) {
+        if (!arrastrando || juegoTerminado) return;
+        e.preventDefault();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        elemento.dataset.x = Math.max(0, Math.min(100, initX + (cx - startX) / window.innerWidth * 100));
+        elemento.dataset.y = Math.max(0, Math.min(100, initY + (cy - startY) / window.innerHeight * 100));
+        aplicarTransform(elemento);
+        refrescarSliders(elemento);
+        if (!modoLibre) actualizarProgresoGeneral();
+    }
+    function fin() {
+        if (arrastrando) {
+            arrastrando = false;
+            if (!modoLibre) { actualizarProgresoGeneral(); verificarInicioRelojFinal(); chequearVictoria(); }
+        }
+    }
+    elemento.addEventListener('mousedown', inicio);
+    document.addEventListener('mousemove', mover);
+    document.addEventListener('mouseup', fin);
+    elemento.addEventListener('touchstart', inicio, { passive: false });
+    document.addEventListener('touchmove', mover, { passive: false });
+    document.addEventListener('touchend', fin);
+    document.addEventListener('touchcancel', fin);
+}
