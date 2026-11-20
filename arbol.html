@@ -8,17 +8,31 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché v=9 -->
-    <link rel="stylesheet" href="css/arbol-base.css?v=9">
-    <link rel="stylesheet" href="css/arbol-relojes.css?v=9">
-    <link rel="stylesheet" href="css/arbol-ui.css?v=9">
-    <link rel="stylesheet" href="css/arbol-botones.css?v=9">
-    <link rel="stylesheet" href="css/arbol-modales.css?v=9">
-    <link rel="stylesheet" href="css/arbol-efectos.css?v=9">
-    <link rel="stylesheet" href="css/arbol-responsive.css?v=9">
+    <!-- Estilos fragmentados con anti-caché v=12 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=12">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=12">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=12">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=12">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=12">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=12">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=12">
 </head>
 <body>
-    <!-- Botón Volver -->
+    <!-- MENÚ HAMBURGUESA (Visible solo en pantallas pequeñas) -->
+    <button id="btnMenuHamburguesa" class="menu-hamburguesa-btn" aria-label="Abrir menú de opciones">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- CONTENEDOR DEL MENÚ DESPLEGABLE -->
+    <nav id="menuDesplegable" class="menu-desplegable">
+        <a href="index.html" class="menu-item">🏠 VOLVER</a>
+        <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="menu-item">☕ DONAR</a>
+        <button id="btnHonorMenu" class="menu-item menu-btn">🏆 MEJORES</button>
+    </nav>
+
+    <!-- Botón Volver (Visible en pantallas grandes, oculto en pequeñas por CSS) -->
     <a href="index.html" class="back-button">
         <svg class="arrow" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
             <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -32,21 +46,19 @@
             <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
             <div class="reloj" id="relojGlobal">
                 <span class="reloj-etiqueta">⏱ Restan</span>
-                <!-- AJUSTE: 8 minutos -->
                 <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
             </div>
         </div>
         <div class="reloj" id="relojFinal" style="display: none;">
             <span class="reloj-etiqueta">🔥 Final</span>
-            <!-- Si quieres 45 seg como el Belén, cambia 01:30 por 00:45 -->
             <span class="reloj-numero" id="relojFinalNumero">01:30</span>
-        </div>
+        </div
     </div>
 
-    <!-- Botón Tabla de Honor -->
+    <!-- Botón Tabla de Honor (Visible en pantallas grandes) -->
     <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
 
-    <!-- Barra de Progreso General (Única) -->
+    <!-- Barra de Progreso General -->
     <div class="panel-progreso">
         <div class="barra-contenedor">
             <span class="label-progreso">Progreso del Árbol</span>
@@ -146,44 +158,71 @@
         </div>
     </div>
 
-    <!-- ZONA DE REINICIO: las dos opciones juntas -->
+    <!-- ZONA DE REINICIO -->
     <div class="zona-reinicio" id="zonaReinicio">
         <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR ÁRBOL</button>
-        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🎄 Seguir decorando tu Árbol</button>
+        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🎄 Seguir decorando tu Árbol</button
     </div>
 
-    <!-- Lupa Matemática Completa (Rayos X del Juego) -->
+    <!-- Lupa Matemática Completa -->
     <div id="debugPanel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; max-height: 80vh; background: rgba(20, 20, 30, 0.98); color: #fff; padding: 20px; font-family: sans-serif; font-size: 14px; z-index: 9999; border: 2px solid #ffd700; border-radius: 15px; display: none; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
         <h3 style="color: #ffd700; margin-top: 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px;">🔍 Lupa Matemática</h3>
         <div id="debugContent" style="margin-bottom: 15px;">Cargando datos...</div>
         <button onclick="document.getElementById('debugPanel').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold;">Cerrar</button>
     </div>
 
-    <!-- Botón flotante para abrir la lupa (Oculto por defecto) -->
+    <!-- Botón flotante para abrir la lupa -->
     <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;">🔍 Ver Solución</button>
 
     <script>
         // ============ INTERRUPTOR DE LA LUPA ============
         const LUPA_ACTIVA = false;
-
-        if (LUPA_ACTIVA) {
-            document.getElementById('btnDebug').style.display = 'block';
-        }
-
+        if (LUPA_ACTIVA) { document.getElementById('btnDebug').style.display = 'block'; }
         document.getElementById('btnDebug').addEventListener('click', function() {
             document.getElementById('debugPanel').style.display = 'block';
             if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
         });
+
+        // ============ LÓGICA DEL MENÚ HAMBURGUESA ============
+        const btnMenu = document.getElementById('btnMenuHamburguesa');
+        const menuDesplegable = document.getElementById('menuDesplegable');
+        const btnHonorMenu = document.getElementById('btnHonorMenu');
+
+        if (btnMenu && menuDesplegable) {
+            btnMenu.addEventListener('click', () => {
+                menuDesplegable.classList.toggle('activo');
+                btnMenu.classList.toggle('activo');
+            });
+        }
+
+        // Conectar el botón "Mejores" del menú con la función original
+        if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
+            btnHonorMenu.addEventListener('click', () => {
+                mostrarTablaHonor();
+                menuDesplegable.classList.remove('activo'); // Cerrar menú al abrir la tabla
+                btnMenu.classList.remove('activo');
+            });
+        }
+
+        // Cerrar menú al tocar fuera de él
+        document.addEventListener('click', (e) => {
+            if (menuDesplegable && menuDesplegable.classList.contains('activo')) {
+                if (!menuDesplegable.contains(e.target) && e.target !== btnMenu) {
+                    menuDesplegable.classList.remove('activo');
+                    btnMenu.classList.remove('activo');
+                }
+            }
+        });
     </script>
 
-    <!-- Scripts con anti-caché v=9 y orden obligatorio -->
-    <script src="js/arbol-datos.js?v=9"></script>
-    <script src="js/arbol-geometria.js?v=9"></script>
-    <script src="js/arbol-reglas.js?v=9"></script>
-    <script src="js/arbol-interfaz.js?v=9"></script>
-    <script src="js/arbol-tiempo.js?v=9"></script>
-    <script src="js/arbol-figuras.js?v=9"></script>
-    <script src="js/arbol-controles.js?v=9"></script>
-    <script src="js/arbol-monitor.js?v=9"></script>
+    <!-- Scripts con anti-caché v=12 -->
+    <script src="js/arbol-datos.js?v=12"></script>
+    <script src="js/arbol-geometria.js?v=12"></script>
+    <script src="js/arbol-reglas.js?v=12"></script>
+    <script src="js/arbol-interfaz.js?v=12"></script>
+    <script src="js/arbol-tiempo.js?v=12"></script>
+    <script src="js/arbol-figuras.js?v=12"></script>
+    <script src="js/arbol-controles.js?v=12"></script>
+    <script src="js/arbol-monitor.js?v=12"></script>
 </body>
 </html>
