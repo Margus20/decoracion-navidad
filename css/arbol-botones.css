@@ -1,25 +1,31 @@
 /* ============ BOTONES DEL ÁRBOL (arbol-botones.css) ============ */
 
-/* 1. MENÚ HAMBURGUESA (Solo visible en pantallas pequeñas) */
+/* 1. MENÚ HAMBURGUESA (Siempre visible, z-index máximo) */
 .menu-hamburguesa-btn {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: calc(var(--z-ui) + 100);
+    z-index: 9999; /* Máximo para que nada lo bloquee */
     width: 3rem;
     height: 3rem;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     border: 2px solid #ffd700;
-    border-radius: 50%; /* Circular, como pediste */
+    border-radius: 50%;
     cursor: pointer;
-    display: none; /* Oculto por defecto, se activa en responsive */
+    display: flex; /* Siempre visible, no depende del responsive */
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 0.35rem;
     padding: 0;
-    box-shadow: var(--sombra-base);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     transition: var(--transicion-liquida);
+    pointer-events: auto; /* Asegura que reciba clics */
+}
+
+.menu-hamburguesa-btn:active {
+    transform: scale(0.95);
+    background: rgba(0, 0, 0, 0.95);
 }
 
 .menu-hamburguesa-btn span {
@@ -46,7 +52,7 @@
     position: fixed;
     top: 4.5rem;
     right: 1rem;
-    z-index: calc(var(--z-ui) + 90);
+    z-index: 9998; /* Justo debajo del hamburguesa */
     background: rgba(20, 20, 40, 0.95);
     border: 2px solid #ffd700;
     border-radius: var(--radio-borde);
@@ -159,54 +165,12 @@ body.mostrar-reinicio .zona-reinicio {
     transform: scale(0.95);
 }
 
-/* 6. BOTÓN VOLVER (Visible en pantallas grandes) */
+/* 6. BOTÓN VOLVER (Oculto, vive dentro del menú hamburguesa) */
 .back-button {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: var(--z-ui);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem 0.6rem 0.9rem;
-    background: linear-gradient(180deg, #d32f2f 0%, #a31515 100%);
-    color: #ffffff;
-    font-family: 'Bebas Neue', Arial, sans-serif;
-    font-size: clamp(1.2rem, 3vw, 1.5rem);
-    letter-spacing: 2px;
-    line-height: 1;
-    text-decoration: none;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
-    border: 4px solid #ffffff;
-    border-radius: 14px;
-    box-shadow:
-        0 0 0 2px #a31515 inset,
-        0 5px 0 rgba(0, 0, 0, 0.25),
-        0 8px 22px rgba(0, 0, 0, 0.5);
-    transition: var(--transicion-liquida);
+    display: none !important; /* Oculto siempre, ya está en el menú */
 }
 
-.back-button:hover {
-    transform: translateY(-2px) rotate(-2deg);
-    box-shadow:
-        0 0 0 2px #a31515 inset,
-        0 7px 0 rgba(0, 0, 0, 0.25),
-        0 12px 26px rgba(0, 0, 0, 0.55);
-}
-
-.back-button .arrow {
-    width: 1.6rem;
-    height: 1.6rem;
-    flex-shrink: 0;
-}
-
-.back-button::after {
-    content: '❄';
-    position: absolute;
-    top: -0.75rem;
-    right: -0.6rem;
-    font-size: 1.3rem;
-    color: #ffffff;
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
-    pointer-events: none;
+/* 7. BOTÓN MEJORES (Oculto, vive dentro del menú hamburguesa) */
+.btn-honor {
+    display: none !important; /* Oculto siempre, ya está en el menú */
 }
