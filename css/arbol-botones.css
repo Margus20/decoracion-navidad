@@ -174,3 +174,53 @@ body.mostrar-reinicio .zona-reinicio {
 .btn-honor {
     display: none !important; /* Oculto siempre, ya está en el menú */
 }
+
+/* ========================================================== */
+/* ============ NUEVO: BOTONES DE MÚSICA E IDIOMA EN MENÚ ==== */
+/* ========================================================== */
+.btn-musica-menu,
+.btn-idioma-menu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinea ícono y texto a la izquierda */
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: #fff;
+    text-align: left;
+    text-decoration: none;
+    border: 2px solid #ffd700;
+    border-radius: var(--radio-borde);
+    cursor: pointer;
+    transition: var(--transicion-liquida);
+    margin-top: 0.5rem; /* Separación visual de los botones superiores */
+}
+
+.btn-musica-menu {
+    background: linear-gradient(180deg, #1565c0, #0d47a1); /* Azul para diferenciar */
+}
+
+.btn-idioma-menu {
+    background: linear-gradient(180deg, #6a1b9a, #4a148c); /* Morado para diferenciar */
+}
+
+.btn-musica-menu:active,
+.btn-idioma-menu:active {
+    transform: scale(0.95);
+}
+
+.btn-musica-menu .icono-musica,
+.btn-idioma-menu .bandera {
+    font-size: 1.4rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Cuando la música está activa, el botón del menú brilla en verde */
+.btn-musica-menu.activa {
+    border-color: #44ff44;
+    box-shadow: 0 0 12px rgba(68, 255, 68, 0.6);
+}
