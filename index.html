@@ -8,7 +8,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/jpg" href="img/belen/star_avatar.jpg">
     
-    <!-- Información para redes sociales (en inglés, coherente con el idioma por defecto) -->
+    <!-- Información para redes sociales -->
     <meta property="og:title" content="Magic Christmas - Decorate the tree and set up the nativity">
     <meta property="og:description" content="Interactive app to decorate the Christmas tree and set up the nativity scene by dragging ornaments and characters.">
     <meta property="og:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
@@ -17,12 +17,13 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
     
-    <link rel="stylesheet" href="estilos.css?v=2">
+    <!-- Actualizado a v=3 para forzar la carga de los nuevos estilos -->
+    <link rel="stylesheet" href="estilos.css?v=3">
 </head>
 <body>
 
     <div class="portada">
-        <!-- Imagen que se adapta automáticamente a vertical u horizontal (por defecto inglés) -->
+        <!-- Imagen que se adapta automáticamente a vertical u horizontal -->
         <picture>
             <source media="(min-width: 768px)" srcset="img/portada_en_horizontal.jpg">
             <img src="img/portada_en_vertical.jpg" alt="Magic Christmas - choose to decorate the tree or set up the nativity">
@@ -37,13 +38,20 @@
             <a href="belen.html" class="btn-portada btn-belen" aria-label="Set up nativity"></a>
         </div>
 
-        <!-- Botón de idioma (bandera). Muestra 🇪🇸 porque el idioma actual es inglés -->
+        <!-- Botón de Música (Esquina superior izquierda) -->
+        <button class="btn-musica" aria-label="Play music" title="Play music">
+            <span class="icono-musica">🔇</span>
+        </button>
+
+        <!-- Botón de Idioma (Esquina superior derecha) -->
         <button class="btn-idioma" aria-label="Switch language to Spanish" title="Switch language to Spanish">
             <span class="bandera">🇪🇸</span>
         </button>
     </div>
 
+    <!-- Scripts al final para que la página cargue rápido -->
     <script src="script.js"></script>
     <script src="js/idioma.js?v=2"></script>
+    <script src="js/musica.js?v=1"></script>
 </body>
 </html>
