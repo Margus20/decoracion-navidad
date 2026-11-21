@@ -1,6 +1,7 @@
 // ============ SISTEMA DE IDIOMA (idioma.js) ============
-// Alterna entre español e inglés. Cambia textos, imágenes de portada
-// y etiquetas accesibles. La preferencia se guarda en localStorage.
+// Alterna entre español e inglés. Idioma POR DEFECTO: inglés.
+// Cambia textos, imágenes de portada y etiquetas accesibles.
+// La preferencia se guarda en localStorage.
 
 (function () {
     'use strict';
@@ -29,14 +30,14 @@
         }
     };
 
-    let idiomaActual = 'es';
+    let idiomaActual = 'en'; // <-- POR DEFECTO INGLÉS
 
     function leerIdiomaGuardado() {
         try {
             const guardado = localStorage.getItem('idiomaPreferido');
-            return (guardado === 'en' || guardado === 'es') ? guardado : 'es';
+            return (guardado === 'en' || guardado === 'es') ? guardado : 'en'; // <-- respaldo inglés
         } catch (e) {
-            return 'es';
+            return 'en'; // <-- respaldo inglés
         }
     }
 
@@ -111,7 +112,7 @@
                 alternarIdioma();
             });
         }
-        // Restaurar idioma elegido anteriormente
+        // Restaurar idioma elegido anteriormente (o inglés por defecto)
         aplicarIdioma(leerIdiomaGuardado());
     });
 })();
