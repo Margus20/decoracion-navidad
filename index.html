@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Navidad Mágica</title>
+    <title>Magic Christmas</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/jpg" href="img/belen/star_avatar.jpg">
     
-    <!-- Información para redes sociales -->
-    <meta property="og:title" content="Navidad Mágica - Decora tu árbol y arma tu Belén">
-    <meta property="og:description" content="Aplicación interactiva para decorar el arbolito de Navidad y armar el Belén arrastrando los adornos y personajes.">
-    <meta property="og:image" content="https://Margus20.github.io/decoracion-navidad/img/belen/portada-horizontal.jpg">
+    <!-- Información para redes sociales (en inglés, coherente con el idioma por defecto) -->
+    <meta property="og:title" content="Magic Christmas - Decorate the tree and set up the nativity">
+    <meta property="og:description" content="Interactive app to decorate the Christmas tree and set up the nativity scene by dragging ornaments and characters.">
+    <meta property="og:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
     <meta property="og:url" content="https://Margus20.github.io/decoracion-navidad/">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://Margus20.github.io/decoracion-navidad/img/belen/portada-horizontal.jpg">
+    <meta name="twitter:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
     
-    <link rel="stylesheet" href="estilos.css?v=1">
+    <link rel="stylesheet" href="estilos.css?v=2">
 </head>
 <body>
 
     <div class="portada">
-        <!-- Imagen que se adapta automáticamente a vertical u horizontal -->
+        <!-- Imagen que se adapta automáticamente a vertical u horizontal (por defecto inglés) -->
         <picture>
-            <source media="(min-width: 768px)" srcset="img/belen/portada-horizontal.jpg">
-            <img src="img/belen/portada-vertical.jpg" alt="Navidad Mágica - elige decorar el árbol o armar el Belén">
+            <source media="(min-width: 768px)" srcset="img/portada_en_horizontal.jpg">
+            <img src="img/portada_en_vertical.jpg" alt="Magic Christmas - choose to decorate the tree or set up the nativity">
         </picture>
         
         <!-- Aura de resplandor sobre el título -->
@@ -33,17 +33,17 @@
         
         <!-- Capa invisible con los botones funcionales encima de la imagen -->
         <div class="botones-portada">
-            <a href="arbol.html" class="btn-portada btn-arbol" aria-label="Decorar árbol"></a>
-            <a href="belen.html" class="btn-portada btn-belen" aria-label="Armar Belén"></a>
+            <a href="arbol.html" class="btn-portada btn-arbol" aria-label="Decorate tree"></a>
+            <a href="belen.html" class="btn-portada btn-belen" aria-label="Set up nativity"></a>
         </div>
 
-        <!-- Botón de idioma (bandera) -->
-        <button class="btn-idioma" aria-label="Cambiar idioma a inglés" title="Cambiar idioma a inglés">
-            <span class="bandera">🇬🇧</span>
+        <!-- Botón de idioma (bandera). Muestra 🇪🇸 porque el idioma actual es inglés -->
+        <button class="btn-idioma" aria-label="Switch language to Spanish" title="Switch language to Spanish">
+            <span class="bandera">🇪🇸</span>
         </button>
     </div>
 
     <script src="script.js"></script>
-    <script src="js/idioma.js?v=1"></script>
+    <script src="js/idioma.js?v=2"></script>
 </body>
 </html>
