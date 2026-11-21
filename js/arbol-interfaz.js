@@ -222,4 +222,4 @@ function generarChispas() {
             setTimeout(() => chispa.remove(), 5000);
         }, i * 50);
     }
-}
+            }
