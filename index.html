@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Magic Christmas</title>
-    
-    <!-- Favicon -->
     <link rel="icon" type="image/jpg" href="img/belen/star_avatar.jpg">
-    
-    <!-- Información para redes sociales -->
     <meta property="og:title" content="Magic Christmas - Decorate the tree and set up the nativity">
     <meta property="og:description" content="Interactive app to decorate the Christmas tree and set up the nativity scene by dragging ornaments and characters.">
     <meta property="og:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
@@ -16,42 +12,29 @@
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://Margus20.github.io/decoracion-navidad/img/portada_en_horizontal.jpg">
-    
-    <!-- Actualizado a v=3 para forzar la carga de los nuevos estilos -->
-    <link rel="stylesheet" href="estilos.css?v=3">
+    <link rel="stylesheet" href="estilos.css?v=4">
 </head>
 <body>
-
     <div class="portada">
-        <!-- Imagen que se adapta automáticamente a vertical u horizontal -->
         <picture>
             <source media="(min-width: 768px)" srcset="img/portada_en_horizontal.jpg">
             <img src="img/portada_en_vertical.jpg" alt="Magic Christmas - choose to decorate the tree or set up the nativity">
         </picture>
-        
-        <!-- Aura de resplandor sobre el título -->
         <div class="aura-titulo"></div>
-        
-        <!-- Capa invisible con los botones funcionales encima de la imagen -->
         <div class="botones-portada">
             <a href="arbol.html" class="btn-portada btn-arbol" aria-label="Decorate tree"></a>
             <a href="belen.html" class="btn-portada btn-belen" aria-label="Set up nativity"></a>
         </div>
-
-        <!-- Botón de Música (Esquina superior izquierda) -->
         <button class="btn-musica" aria-label="Play music" title="Play music">
             <span class="icono-musica">🔇</span>
         </button>
-
-        <!-- Botón de Idioma (Esquina superior derecha) -->
         <button class="btn-idioma" aria-label="Switch language to Spanish" title="Switch language to Spanish">
             <span class="bandera">🇪🇸</span>
         </button>
     </div>
 
-    <!-- Scripts al final para que la página cargue rápido -->
     <script src="script.js"></script>
     <script src="js/idioma.js?v=2"></script>
-    <script src="js/musica.js?v=1"></script>
+    <script src="js/musica.js?v=2"></script>
 </body>
 </html>
