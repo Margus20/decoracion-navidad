@@ -553,3 +553,60 @@ header h1 {
         font-size: 1.4rem;
     }
 }
+
+/* ========================================================== */
+/* ============ NUEVO: BOTÓN DE MÚSICA (parlante) =========== */
+/* ========================================================== */
+.btn-musica {
+    position: fixed;
+    top: 1rem;
+    left: 1rem; /* Esquina izquierda */
+    z-index: 1000;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 0;
+}
+
+.btn-musica:hover {
+    transform: scale(1.08);
+    background: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.6);
+}
+
+.btn-musica:active {
+    transform: scale(0.92);
+}
+
+.btn-musica .icono-musica {
+    font-size: 1.6rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Cuando la música está sonando, le damos un brillo verde para indicarlo */
+.btn-musica.activa {
+    border-color: #44ff44;
+    box-shadow: 0 0 15px rgba(68, 255, 68, 0.6);
+}
+
+/* En pantallas muy pequeñas, el botón se achica un poco */
+@media (max-width: 400px) {
+    .btn-musica {
+        width: 2.8rem;
+        height: 2.8rem;
+    }
+    .btn-musica .icono-musica {
+        font-size: 1.4rem;
+    }
+}
