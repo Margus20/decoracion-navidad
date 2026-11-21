@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Árbol Navideño</title>
+    <title data-i18n="page_title">Árbol Navideño</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Estilos fragmentados con anti-caché v=15 -->
-    <link rel="stylesheet" href="css/arbol-base.css?v=15">
-    <link rel="stylesheet" href="css/arbol-relojes.css?v=15">
-    <link rel="stylesheet" href="css/arbol-ui.css?v=15">
-    <link rel="stylesheet" href="css/arbol-botones.css?v=15">
-    <link rel="stylesheet" href="css/arbol-modales.css?v=15">
-    <link rel="stylesheet" href="css/arbol-efectos.css?v=15">
-    <link rel="stylesheet" href="css/arbol-responsive.css?v=15">
+    <!-- Estilos fragmentados con anti-caché v=16 -->
+    <link rel="stylesheet" href="css/arbol-base.css?v=16">
+    <link rel="stylesheet" href="css/arbol-relojes.css?v=16">
+    <link rel="stylesheet" href="css/arbol-ui.css?v=16">
+    <link rel="stylesheet" href="css/arbol-botones.css?v=16">
+    <link rel="stylesheet" href="css/arbol-modales.css?v=16">
+    <link rel="stylesheet" href="css/arbol-efectos.css?v=16">
+    <link rel="stylesheet" href="css/arbol-responsive.css?v=16">
 </head>
 <body>
-    <!-- MENÚ HAMBURGUESA (Siempre visible, unificado) -->
+    <!-- MENÚ HAMBURGUESA -->
     <button id="btnMenuHamburguesa" class="menu-hamburguesa-btn" aria-label="Abrir menú de opciones">
         <span></span>
         <span></span>
@@ -27,41 +27,51 @@
 
     <!-- CONTENEDOR DEL MENÚ DESPLEGABLE -->
     <nav id="menuDesplegable" class="menu-desplegable">
-        <a href="index.html" class="menu-item">🏠 VOLVER</a>
-        <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="menu-item">☕ DONAR</a>
-        <button id="btnHonorMenu" class="menu-item menu-btn">🏆 MEJORES</button>
+        <a href="index.html" class="menu-item">🏠 <span data-i18n="menu_return">VOLVER</span></a>
+        <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="menu-item">☕ <span data-i18n="menu_donate">DONAR</span></a>
+        <button id="btnHonorMenu" class="menu-item menu-btn">🏆 <span data-i18n="menu_best">MEJORES</span></button>
+        
+        <!-- NUEVO: Botón de Música en el menú -->
+        <button class="menu-item btn-musica-menu" id="btnMusicaMenu" aria-label="Activar música">
+            <span class="icono-musica">🔇</span> <span data-i18n="menu_music">Música</span>
+        </button>
+        
+        <!-- NUEVO: Botón de Idioma en el menú -->
+        <button class="menu-item btn-idioma-menu" id="btnIdiomaMenu" aria-label="Cambiar a inglés">
+            <span class="bandera">🇬🇧</span> <span data-i18n="menu_lang">Idioma</span>
+        </button>
     </nav>
 
-    <!-- Botón Volver (Oculto por CSS, vive en el menú) -->
+    <!-- Botón Volver (Oculto por CSS) -->
     <a href="index.html" class="back-button">
         <svg class="arrow" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
             <path d="M34 27 C22 27 18 13 8 13 M15 6 L6 13 L15 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        VOLVER
+        <span data-i18n="menu_return">VOLVER</span>
     </a>
 
-    <!-- Relojes y Botón de Donar -->
+    <!-- Relojes -->
     <div class="zona-relojes">
         <div class="fila-donate-reloj">
-            <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ Donar</a>
+            <a href="https://ko-fi.com/mar_gus" target="_blank" rel="noopener" class="btn-donate">☕ <span data-i18n="menu_donate">Donar</span></a>
             <div class="reloj" id="relojGlobal">
-                <span class="reloj-etiqueta">⏱ Restan</span>
+                <span class="reloj-etiqueta" data-i18n="clock_remaining">⏱ Restan</span>
                 <span class="reloj-numero" id="relojGlobalNumero">08:00</span>
             </div>
         </div>
         <div class="reloj" id="relojFinal" style="display: none;">
-            <span class="reloj-etiqueta">🔥 Final</span>
+            <span class="reloj-etiqueta" data-i18n="clock_final">🔥 Final</span>
             <span class="reloj-numero" id="relojFinalNumero">01:30</span>
         </div>
     </div>
 
-    <!-- Botón Tabla de Honor (Oculto por CSS, vive en el menú) -->
-    <button class="btn-honor" id="btnHonor">🏆 Mejores</button>
+    <!-- Botón Tabla de Honor (Oculto por CSS) -->
+    <button class="btn-honor" id="btnHonor">🏆 <span data-i18n="menu_best">Mejores</span></button>
 
-    <!-- Barra de Progreso General -->
+    <!-- Barra de Progreso -->
     <div class="panel-progreso">
         <div class="barra-contenedor">
-            <span class="label-progreso">Progreso del Árbol</span>
+            <span class="label-progreso" data-i18n="progress_label">Progreso del Árbol</span>
             <div class="barra-fondo">
                 <div id="barraGeneral" class="barra-relleno" style="width: 0%;"></div>
             </div>
@@ -79,32 +89,32 @@
     <!-- Panel de Avatares -->
     <aside class="panel-avatars" id="panelAvatars"></aside>
 
-    <!-- Panel de Controles (CON CAMPOS NUMÉRICOS) -->
+    <!-- Panel de Controles -->
     <div class="panel-controles" id="panelControles">
         <div class="fila-bloques">
             <div class="bloque-control">
-                <label for="sliderX">↔ Horizontal</label>
+                <label for="sliderX" data-i18n="ctrl_horizontal">↔ Horizontal</label>
                 <div class="fila-control-numerico">
                     <input type="range" id="sliderX" min="0" max="100" value="50" step="0.5">
                     <input type="number" id="inputX" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor horizontal">
                 </div>
             </div>
             <div class="bloque-control">
-                <label for="sliderY">↕ Vertical</label>
+                <label for="sliderY" data-i18n="ctrl_vertical">↕ Vertical</label>
                 <div class="fila-control-numerico">
                     <input type="range" id="sliderY" min="0" max="100" value="50" step="0.5">
                     <input type="number" id="inputY" min="0" max="100" step="0.1" value="50" class="input-numerico" aria-label="Valor vertical">
                 </div>
             </div>
             <div class="bloque-control">
-                <label for="sliderZoom">🔍 Tamaño</label>
+                <label for="sliderZoom" data-i18n="ctrl_size">🔍 Tamaño</label>
                 <div class="fila-control-numerico">
                     <input type="range" id="sliderZoom" min="40" max="300" value="100" step="1">
                     <input type="number" id="inputZoom" min="40" max="300" step="1" value="100" class="input-numerico" aria-label="Valor tamaño">
                 </div>
             </div>
             <div class="bloque-control">
-                <label for="sliderGiro">🔄 Girar</label>
+                <label for="sliderGiro" data-i18n="ctrl_rotate">🔄 Girar</label>
                 <div class="fila-control-numerico">
                     <input type="range" id="sliderGiro" min="-180" max="180" value="0" step="1">
                     <input type="number" id="inputGiro" min="-180" max="180" step="1" value="0" class="input-numerico" aria-label="Valor giro">
@@ -112,19 +122,19 @@
             </div>
         </div>
         <div class="fila-botones">
-            <button id="btnVoltear" class="ctrl-btn">🪞 Voltear</button>
-            <button id="btnDuplicar" class="ctrl-btn">📋 Duplicar</button>
-            <button id="btnCapas" class="ctrl-btn">📚 Capas</button>
-            <button id="btnQuitar" class="ctrl-btn ctrl-quitar">✕ Quitar</button>
+            <button id="btnVoltear" class="ctrl-btn" data-i18n="btn_flip">🪞 Voltear</button>
+            <button id="btnDuplicar" class="ctrl-btn" data-i18n="btn_duplicate">📋 Duplicar</button>
+            <button id="btnCapas" class="ctrl-btn" data-i18n="btn_layers">📚 Capas</button>
+            <button id="btnQuitar" class="ctrl-btn ctrl-quitar" data-i18n="btn_remove">✕ Quitar</button>
         </div>
     </div>
 
     <!-- Modal de Capas -->
     <div class="modal-capas" id="modalCapas">
         <div class="modal-contenido">
-            <h3>Orden de Capas</h3>
+            <h3 data-i18n="modal_layers_title">Orden de Capas</h3>
             <div id="listaCapas" class="lista-capas"></div>
-            <button id="btnCerrarCapas" class="ctrl-btn" style="margin-top: 15px; width: 100%;">Cerrar</button>
+            <button id="btnCerrarCapas" class="ctrl-btn" style="margin-top: 15px; width: 100%;" data-i18n="btn_close">Cerrar</button>
         </div>
     </div>
 
@@ -132,19 +142,19 @@
     <div class="modal-resultado" id="modalResultado">
         <div class="modal-resultado-contenido">
             <button class="modal-cerrar-x" id="btnCerrarXResultado" title="Salir sin guardar">✕</button>
-            <h2 class="modal-resultado-titulo" id="resultadoTitulo">Veredicto</h2>
+            <h2 class="modal-resultado-titulo" id="resultadoTitulo" data-i18n="modal_result_title">Veredicto</h2>
             <div class="modal-resultado-puntaje" id="resultadoPuntaje">0/100</div>
             <p class="modal-resultado-mensaje" id="resultadoMensaje"></p>
             
             <div class="modal-resultado-detalles">
-                <h4>Detalle de relaciones:</h4>
+                <h4 data-i18n="modal_result_details">Detalle de relaciones:</h4>
                 <div id="listaDetalles"></div>
             </div>
             
             <div class="campo-nombre" id="campoNombre">
-                <label for="inputNombre">✍️ Escribe tu nombre para la tabla de honor:</label>
-                <input type="text" id="inputNombre" maxlength="20" placeholder="Tu nombre aquí" autocomplete="off">
-                <button class="modal-resultado-btn" id="btnGuardarNombre">Guardar y Ver Tabla</button>
+                <label for="inputNombre" data-i18n="modal_name_label">✍️ Escribe tu nombre para la tabla de honor:</label>
+                <input type="text" id="inputNombre" maxlength="20" data-i18n-placeholder="modal_name_placeholder" placeholder="Tu nombre aquí" autocomplete="off">
+                <button class="modal-resultado-btn" id="btnGuardarNombre" data-i18n="btn_save_name">Guardar y Ver Tabla</button>
             </div>
         </div>
     </div>
@@ -152,33 +162,68 @@
     <!-- Modal de Tabla de Honor -->
     <div class="modal-honor" id="modalHonor">
         <div class="modal-honor-contenido">
-            <h3>🏆 Tabla de Honor Local</h3>
+            <h3 data-i18n="modal_honor_title">🏆 Tabla de Honor Local</h3>
             <div id="listaHonor" class="lista-honor"></div>
-            <button class="modal-resultado-btn" id="btnCerrarHonor">Cerrar</button>
+            <button class="modal-resultado-btn" id="btnCerrarHonor" data-i18n="btn_close">Cerrar</button>
         </div>
     </div>
 
     <!-- ZONA DE REINICIO -->
     <div class="zona-reinicio" id="zonaReinicio">
-        <button class="btn-reiniciar" id="btnReiniciar">🔄 REINICIAR ÁRBOL</button>
-        <button class="btn-seguir-decorando" id="btnSeguirDecorando">🎄 Seguir decorando tu Árbol</button>
+        <button class="btn-reiniciar" id="btnReiniciar" data-i18n="btn_restart">🔄 REINICIAR ÁRBOL</button>
+        <button class="btn-seguir-decorando" id="btnSeguirDecorando" data-i18n="btn_continue">🎄 Seguir decorando tu Árbol</button>
     </div>
 
-    <!-- Lupa Matemática Completa -->
+    <!-- Lupa Matemática -->
     <div id="debugPanel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; max-height: 80vh; background: rgba(20, 20, 30, 0.98); color: #fff; padding: 20px; font-family: sans-serif; font-size: 14px; z-index: 9999; border: 2px solid #ffd700; border-radius: 15px; display: none; overflow-y: auto; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
-        <h3 style="color: #ffd700; margin-top: 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px;">🔍 Lupa Matemática</h3>
-        <div id="debugContent" style="margin-bottom: 15px;">Cargando datos...</div>
-        <button onclick="document.getElementById('debugPanel').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold;">Cerrar</button>
+        <h3 style="color: #ffd700; margin-top: 0; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px;" data-i18n="debug_title">🔍 Lupa Matemática</h3>
+        <div id="debugContent" style="margin-bottom: 15px;" data-i18n="debug_loading">Cargando datos...</div>
+        <button onclick="document.getElementById('debugPanel').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold;" data-i18n="debug_close">Cerrar</button>
     </div>
 
     <!-- Botón flotante para abrir la lupa -->
-    <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;">🔍 Ver Solución</button>
+    <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;" data-i18n="debug_btn">🔍 Ver Solución</button>
 
-    <!-- ========================================================== -->
-    <!-- ============ SCRIPTS DE LÓGICA E INTERACCIÓN ============ -->
-    <!-- ========================================================== -->
     <script>
-        // 1. INTERRUPTOR DE LA LUPA
+        // ============ LÓGICA DEL MENÚ HAMBURGUESA (Limpia y profesional) ============
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnMenu = document.getElementById('btnMenuHamburguesa');
+            const menuDesplegable = document.getElementById('menuDesplegable');
+            const btnHonorMenu = document.getElementById('btnHonorMenu');
+            
+            if (btnMenu && menuDesplegable) {
+                function alternarMenu(e) {
+                    if (e) { e.preventDefault(); e.stopPropagation(); }
+                    menuDesplegable.classList.toggle('activo');
+                    btnMenu.classList.toggle('activo');
+                }
+
+                btnMenu.addEventListener('click', alternarMenu);
+                btnMenu.addEventListener('touchstart', alternarMenu, { passive: false });
+                
+                if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
+                    btnHonorMenu.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        mostrarTablaHonor();
+                        menuDesplegable.classList.remove('activo');
+                        btnMenu.classList.remove('activo');
+                    });
+                }
+
+                document.addEventListener('click', (e) => {
+                    if (menuDesplegable.classList.contains('activo')) {
+                        if (!menuDesplegable.contains(e.target) && e.target !== btnMenu) {
+                            setTimeout(() => {
+                                menuDesplegable.classList.remove('activo');
+                                btnMenu.classList.remove('activo');
+                            }, 150);
+                        }
+                    }
+                });
+            }
+        });
+
+        // ============ INTERRUPTOR DE LA LUPA ============
         const LUPA_ACTIVA = false;
         if (LUPA_ACTIVA) { 
             const btnDebug = document.getElementById('btnDebug');
@@ -191,75 +236,18 @@
                 if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
             });
         }
-
-        // 2. PRUEBA DE FUEGO DEL MENÚ HAMBURGUESA (Infalible)
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnMenu = document.getElementById('btnMenuHamburguesa');
-            const menuDesplegable = document.getElementById('menuDesplegable');
-            const btnHonorMenu = document.getElementById('btnHonorMenu');
-            
-            if (btnMenu && menuDesplegable) {
-                console.log("✅ ÉXITO: El botón y el menú fueron encontrados.");
-                
-                function probarMenu(e) {
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                    
-                    // === PRUEBA DE FUEGO VISUAL ===
-                    // Si el JavaScript está funcionando, el botón se pondrá ROJO BRILLANTE
-                    btnMenu.style.backgroundColor = '#ff0000'; 
-                    btnMenu.style.borderColor = '#ffffff';
-                    
-                    menuDesplegable.classList.toggle('activo');
-                    btnMenu.classList.toggle('activo');
-                    
-                    console.log("📌 Estado del menú:", menuDesplegable.classList.contains('activo') ? "ABIERTO" : "CERRADO");
-                }
-
-                // Escuchamos AMBOS eventos para garantizar que funcione en tablet y PC
-                btnMenu.addEventListener('click', probarMenu);
-                btnMenu.addEventListener('touchstart', probarMenu, { passive: false });
-                
-                // Conectar el botón "Mejores" del menú
-                if (btnHonorMenu && typeof mostrarTablaHonor === 'function') {
-                    btnHonorMenu.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        mostrarTablaHonor();
-                        menuDesplegable.classList.remove('activo');
-                        btnMenu.classList.remove('activo');
-                        // Restaurar color original
-                        btnMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
-                        btnMenu.style.borderColor = '#ffd700';
-                    });
-                }
-
-                // Cerrar menú al tocar fuera de él
-                document.addEventListener('click', (e) => {
-                    if (menuDesplegable.classList.contains('activo')) {
-                        if (!menuDesplegable.contains(e.target) && e.target !== btnMenu) {
-                            setTimeout(() => {
-                                menuDesplegable.classList.remove('activo');
-                                btnMenu.classList.remove('activo');
-                                btnMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
-                                btnMenu.style.borderColor = '#ffd700';
-                            }, 150);
-                        }
-                    }
-                });
-            } else {
-                console.error("❌ ERROR: No se encontró el botón o el menú. Revisa los IDs en el HTML.");
-            }
-        });
     </script>
 
-    <!-- Scripts con anti-caché v=15 -->
-    <script src="js/arbol-datos.js?v=15"></script>
-    <script src="js/arbol-geometria.js?v=15"></script>
-    <script src="js/arbol-reglas.js?v=15"></script>
-    <script src="js/arbol-interfaz.js?v=15"></script>
-    <script src="js/arbol-tiempo.js?v=15"></script>
-    <script src="js/arbol-figuras.js?v=15"></script>
-    <script src="js/arbol-controles.js?v=15"></script>
-    <script src="js/arbol-monitor.js?v=15"></script>
+    <!-- Scripts con anti-caché v=16 -->
+    <script src="js/arbol-datos.js?v=16"></script>
+    <script src="js/arbol-geometria.js?v=16"></script>
+    <script src="js/arbol-reglas.js?v=16"></script>
+    <script src="js/arbol-interfaz.js?v=16"></script>
+    <script src="js/arbol-tiempo.js?v=16"></script>
+    <script src="js/arbol-figuras.js?v=16"></script>
+    <script src="js/arbol-controles.js?v=16"></script>
+    <script src="js/arbol-monitor.js?v=16"></script>
+    <script src="js/idioma.js?v=3"></script>
+    <script src="js/musica.js?v=2"></script>
 </body>
 </html>
