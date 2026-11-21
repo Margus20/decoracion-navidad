@@ -1,6 +1,29 @@
 // ============ INTERFAZ Y CELEBRACIÓN (arbol-interfaz.js) ============
 
-// --- MODAL DE CONFIRMACIÓN PERSONALIZADO (paleta del juego) ---
+// Helper seguro para obtener traducciones dinámicas sin romper el juego
+function t(key) {
+    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
+        const lang = window.SistemaIdioma.actual();
+        return window.SistemaIdioma.traducciones[lang][key] || window.SistemaIdioma.traducciones['es'][key] || key;
+    }
+    // Fallback por defecto si el sistema de idioma aún no cargó
+    const fallback = {
+        conf_title: 'Confirmar', conf_cancel: 'Cancelar', conf_accept: 'Aceptar',
+        debug_real_score: 'Puntaje Real', debug_how_to_100_title: '📋 CÓMO LLEGAR AL 100',
+        debug_how_to_100_msg: 'Coloca las 8 piezas en sus posiciones correctas. Usa la lupa para ver las coordenadas.',
+        debug_diag_title: '🔧 DIAGNÓSTICO', debug_diag_yes: 'SÍ', debug_diag_no: 'NO',
+        debug_diag_score: 'Puntaje >= 100', debug_diag_pieces: 'Las 8 presentes',
+        result_msg_perfect: '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Árbol con maestría.',
+        result_msg_time: 'Se acabó el tiempo. ', result_msg_missing: 'Te faltan ', result_msg_points: ' puntos. ',
+        result_msg_failed: 'Hay ', result_msg_relations_fail: ' relación(es) que no se cumplen. ',
+        result_msg_partial: 'Hay ', result_msg_relations_partial: ' relación(es) casi correctas que puedes afinar. ',
+        result_msg_review: 'Revisa abajo las marcadas con ~ o ✗.',
+        result_title_perfect: '¡Árbol Perfecto!', result_title_completed: '¡Árbol Completado!', result_title_built: 'Árbol Armado'
+    };
+    return fallback[key] || key;
+}
+
+// --- MODAL DE CONFIRMACIÓN PERSONALIZADO ---
 (function inyectarEstilosConfirmacion() {
     if (document.getElementById('confStyles')) return;
     const s = document.createElement('style');
@@ -29,7 +52,8 @@ function confirmarAccion(mensaje, onAceptar) {
     const ov = document.createElement('div');
     ov.className = 'conf-overlay';
     ov.id = 'confOverlay';
-    ov.innerHTML = '<div class="conf-panel"><h3 class="conf-titulo">Confirmar</h3><p class="conf-msg">' + mensaje + '</p><div class="conf-botones"><button class="conf-btn conf-cancelar">Cancelar</button><button class="conf-btn conf-aceptar">Aceptar</button></div></div>';
+    // Usamos la función t() para los textos del modal
+    ov.innerHTML = `<div class="conf-panel"><h3 class="conf-titulo">${t('conf_title')}</h3><p class="conf-msg">${mensaje}</p><div class="conf-botones"><button class="conf-btn conf-cancelar">${t('conf_cancel')}</button><button class="conf-btn conf-aceptar">${t('conf_accept')}</button></div></div>`;
     document.body.appendChild(ov);
     ov.querySelector('.conf-aceptar').addEventListener('click', function () {
         cerrarConfirmacion();
@@ -67,13 +91,15 @@ function actualizarProgresoGeneral() {
 
     barraGeneral.style.width = score + '%';
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
-    if (etiquetaGeneral) etiquetaGeneral.textContent = `Progreso del Árbol: ${score.toFixed(2)}/100`;
+    if (etiquetaGeneral) etiquetaGeneral.textContent = `${t('progress_label')}: ${score.toFixed(2)}/100`;
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
     if (panel && content && panel.style.display === 'block') {
-        let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">Puntaje Real: ${score.toFixed(2)}</div>`;
+        let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">${t('debug_real_score')}: ${score.toFixed(2)}</div>`;
+        
+        // NOTA: c.nombre se traducirá cuando me pases arbol-reglas.js
         criterios.forEach(c => {
             const val = c.eval(m);
             const pts = (val * c.peso).toFixed(1);
@@ -87,24 +113,14 @@ function actualizarProgresoGeneral() {
         });
 
         html += `<div style="margin-top:12px; padding:10px; background:rgba(0,255,120,0.08); border:1px solid #44ff88; border-radius:8px; font-size:0.85em; color:#fff;">
-            <b style="color:#44ff88;">📍 COORDENADAS X / Y</b><br>`;
-        idsNecesarios.forEach(id => {
-            if (m[id]) {
-                const s = leerEstado(m[id]);
-                html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span style="text-transform:capitalize;">${id}</span><span style="font-family:monospace; color:#ffd700;">X ${s.x.toFixed(1)} &nbsp; Y ${s.y.toFixed(1)}</span></div>`;
-            }
-        });
-        html += `</div>`;
-
-        html += `<div style="margin-top:12px; padding:10px; background:rgba(255,140,0,0.12); border:1px solid #ff8c00; border-radius:8px; font-size:0.9em; color:#fff; line-height:1.5;">
-            <b style="color:#ff8c00;">📋 CÓMO LLEGAR AL 100</b><br>
-            <div style="color:#44ff44; margin-top:6px;">✅ Coloca las 8 piezas en sus posiciones correctas. Usa la lupa para ver las coordenadas.</div>
+            <b style="color:#44ff88;">${t('debug_how_to_100_title')}</b><br>
+            <div style="color:#44ff44; margin-top:6px;">✅ ${t('debug_how_to_100_msg')}</div>
         </div>`;
 
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
-            <b style="color:#ffd700;">🔧 DIAGNÓSTICO</b><br>
-            Puntaje >= 100: ${Math.round(score) >= 100 ? '✅ SÍ' : '❌ NO'}<br>
-            Las 8 presentes: ${todasPresentes ? '✅ SÍ' : '❌ NO'}
+            <b style="color:#ffd700;">${t('debug_diag_title')}</b><br>
+            ${t('debug_diag_score')}: ${Math.round(score) >= 100 ? `✅ ${t('debug_diag_yes')}` : `❌ ${t('debug_diag_no')}`}<br>
+            ${t('debug_diag_pieces')}: ${todasPresentes ? `✅ ${t('debug_diag_yes')}` : `❌ ${t('debug_diag_no')}`}
         </div>`;
         content.innerHTML = html;
     }
@@ -129,12 +145,22 @@ function mostrarResultadoFinal(score, motivo) {
     document.getElementById('resultadoPuntaje').className = 'modal-resultado-puntaje ' + (puntajeRedondeado >= 100 ? 'perfecto' : puntajeRedondeado >= 80 ? 'bueno' : 'regular');
     
     const faltan = 100 - puntajeRedondeado;
-    const prefijoTiempo = motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '';
-    let mensajeTexto = puntajeRedondeado >= 100 ? '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Árbol con maestría.' :
-        `${prefijoTiempo}Te faltan ${faltan} puntos. ` + (fallidas > 0 ? `Hay ${fallidas} relación(es) que no se cumplen. ` : '') +
-        (parciales > 0 ? `Hay ${parciales} relación(es) casi correctas que puedes afinar. ` : '') + 'Revisa abajo las marcadas con ~ o ✗.';
+    
+    let mensajeTexto = '';
+    if (puntajeRedondeado >= 100) {
+        mensajeTexto = t('result_msg_perfect');
+    } else {
+        const prefijo = motivo === 'tiempo' ? t('result_msg_time') : '';
+        const fallidasTxt = fallidas > 0 ? `${t('result_msg_failed')}${fallidas}${t('result_msg_relations_fail')}` : '';
+        const parcialesTxt = parciales > 0 ? `${t('result_msg_partial')}${parciales}${t('result_msg_relations_partial')}` : '';
+        mensajeTexto = `${prefijo}${t('result_msg_missing')}${faltan}${t('result_msg_points')}${fallidasTxt}${parcialesTxt}${t('result_msg_review')}`;
+    }
 
-    document.getElementById('resultadoTitulo').textContent = puntajeRedondeado >= 100 ? '¡Árbol Perfecto!' : (puntajeRedondeado >= 80 ? '¡Árbol Completado!' : 'Árbol Armado');
+    let tituloTexto = t('result_title_built');
+    if (puntajeRedondeado >= 100) tituloTexto = t('result_title_perfect');
+    else if (puntajeRedondeado >= 80) tituloTexto = t('result_title_completed');
+
+    document.getElementById('resultadoTitulo').textContent = tituloTexto;
     document.getElementById('resultadoMensaje').textContent = mensajeTexto;
 
     const listaDetalles = document.getElementById('listaDetalles');
@@ -147,6 +173,7 @@ function mostrarResultadoFinal(score, motivo) {
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
         const item = document.createElement('div');
         item.className = 'detalle-item';
+        // NOTA: c.nombre se traducirá cuando me pases arbol-reglas.js
         item.innerHTML = `<span>${c.nombre}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
         listaDetalles.appendChild(item);
     });
@@ -156,7 +183,7 @@ function mostrarResultadoFinal(score, motivo) {
 
     if (puntajeRedondeado >= 100) {
         activarCelebracion();
-        setTimeout(() => { modal.classList.add('visible'); }, 10000); // 10 segundos de gloria
+        setTimeout(() => { modal.classList.add('visible'); }, 10000);
     } else {
         modal.classList.add('visible');
     }
@@ -196,4 +223,3 @@ function generarChispas() {
         }, i * 50);
     }
 }
-// Nota: El listener del botón "btnSeguirDecorando" ya está centralizado en arbol-controles.js para evitar duplicados.
