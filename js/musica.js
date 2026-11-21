@@ -1,11 +1,12 @@
 // ============ SISTEMA DE MÚSICA NAVIDEÑA (musica.js) ============
 // Bucle infinito de 4 canciones. Solo arranca con un toque explícito del
 // usuario (así el navegador de Android no lo bloquea). Si una canción no
-// se encuentra, el ícono muestra ⚠️ para avisar de un problema de ruta.
+// se encuentra, el ícono muestra un aviso para detectar problema de ruta.
 
 (function () {
     'use strict';
 
+    // Las 4 canciones. Al terminar la última, vuelve a la primera (bucle).
     const playlist = [
         'audio/jingle_bells.mp3',
         'audio/o_christmas_tree.mp3',
@@ -23,7 +24,8 @@
         audio.preload = 'auto';
         audio.volume = 0.6;
 
-        // Cuando termina una, salta a la siguiente y vuelve a la primera al final
+        // Cuando termina una canción, salta a la siguiente.
+        // El operador % hace que al llegar al final vuelva a 0 (bucle infinito).
         audio.addEventListener('ended', function () {
             indice = (indice + 1) % playlist.length;
             audio.src = playlist[indice];
@@ -31,7 +33,7 @@
             if (p && p.catch) p.catch(function () { fijarEstado(false); });
         });
 
-        // Si un archivo no carga (ruta mal o 404), avisamos con el ícono
+        // Si un archivo no carga (ruta mal o 404), avisamos con el ícono.
         audio.addEventListener('error', function () {
             fijarEstado(false);
             const btn = document.querySelector('.btn-musica');
