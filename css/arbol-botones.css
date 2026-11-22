@@ -224,3 +224,18 @@ body.mostrar-reinicio .zona-reinicio {
     border-color: #44ff44;
     box-shadow: 0 0 12px rgba(68, 255, 68, 0.6);
 }
+
+/* ========================================================== */
+/* ============ NUEVO: BOTÓN DONAR EN EL MENÚ (Color Rojo) === */
+/* ========================================================== */
+/* Busca el enlace que tenga "ko-fi" en su dirección y lo pone rojo */
+.menu-item[href*="ko-fi"] {
+    background: linear-gradient(180deg, #c62828, #8e1a1a) !important;
+    border-color: #ff5252 !important;
+}
+
+/* Efecto al tocarlo */
+.menu-item[href*="ko-fi"]:active {
+    transform: scale(0.95);
+    background: linear-gradient(180deg, #b71c1c, #7f1212) !important;
+}
