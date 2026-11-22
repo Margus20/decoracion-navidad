@@ -6,7 +6,7 @@ const personajes = [
     
     { id: 'bambalina', nombre: 'la Bambalina', avatar: 'img/arbol/bambalina_avatar.jpg', png: 'img/arbol/bambalina.png',
         colores: [
-            { nombre: 'Original', png: 'bambalina.png' },
+            { nombre: 'Azul', png: 'bambalina.png' },
             { nombre: 'Rojo', png: 'bambalina_roja.png' },
             { nombre: 'Amarillo', png: 'bambalina_amarilla.png' },
             { nombre: 'Morado', png: 'bambalina_morada.png' },
@@ -18,7 +18,7 @@ const personajes = [
     
     { id: 'bombilla', nombre: 'la Bombilla', avatar: 'img/arbol/bombilla_avatar.jpg', png: 'img/arbol/bombilla.png',
         colores: [
-            { nombre: 'Original', png: 'bombilla.png' },
+            { nombre: 'Amarillo', png: 'bombilla.png' },
             { nombre: 'Rojo', png: 'bombilla_roja.png' },
             { nombre: 'Azul', png: 'bombilla_azul.png' },
             { nombre: 'Morado', png: 'bombilla_morado.png' },
@@ -31,7 +31,7 @@ const personajes = [
     
     { id: 'lazo', nombre: 'el Lazo', avatar: 'img/arbol/lazo_avatar.jpg', png: 'img/arbol/lazo.png',
         colores: [
-            { nombre: 'Original', png: 'lazo.png' },
+            { nombre: 'Rojo', png: 'lazo.png' },
             { nombre: 'Amarillo', png: 'lazo_amarillo.png' },
             { nombre: 'Anaranjado', png: 'lazo_anaranjado.png' },
             { nombre: 'Azul', png: 'lazo_azul.png' },
