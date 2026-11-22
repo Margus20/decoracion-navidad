@@ -1,5 +1,5 @@
 // ============ SISTEMA DE IDIOMA UNIFICADO (idioma.js) ============
-// VERSIÓN FINAL Y DEFINITIVA: Incluye Portada, Árbol y Belén.
+// VERSIÓN FINAL: Incluye Portada, Árbol, Belén y la Paleta de Colores.
 // Idioma POR DEFECTO: inglés.
 
 (function () {
@@ -16,7 +16,6 @@
             portadaV: 'img/belen/portada-vertical.jpg',
             banderaSiguiente: '🇬🇧',
             ariaBandera: 'Cambiar idioma a inglés',
-            
             // --- GENERAL ---
             page_title: 'Árbol Navideño',
             page_title_belen: 'Belén Navideño',
@@ -61,7 +60,6 @@
             msg_remove_confirm: '¿Seguro que quieres quitar {nombre} de la escena?',
             honor_anonymous: 'Anónimo',
             honor_empty: 'Aún no hay registros. ¡Sé el primero!',
-
             // --- ÁRBOL: REGLAS Y PERSONAJES ---
             rule_completitud: 'Las 8 piezas presentes',
             rule_estrella_arriba: 'Estrella en la punta del Árbol',
@@ -76,7 +74,6 @@
             char_arbol: 'el Árbol', char_bambalina: 'la Bambalina', char_baston: 'el Bastón',
             char_bombilla: 'la Bombilla', char_cascanuez: 'el Cascanueces', char_estrella: 'la Estrella',
             char_lazo: 'el Lazo', char_osito: 'el Osito',
-
             // --- ÁRBOL: INTERFAZ DINÁMICA ---
             debug_real_score: 'Puntaje Real',
             debug_how_to_100_title: '📋 CÓMO LLEGAR AL 100',
@@ -90,7 +87,6 @@
             result_msg_partial: 'Hay ', result_msg_relations_partial: ' relación(es) casi correctas que puedes afinar. ',
             result_msg_review: 'Revisa abajo las marcadas con ~ o ✗.',
             result_title_perfect: '¡Árbol Perfecto!', result_title_completed: '¡Árbol Completado!', result_title_built: 'Árbol Armado',
-
             // --- BELÉN: REGLAS ---
             rule_belen_completitud: 'Las 8 piezas presentes',
             rule_belen_jesus_cuna: 'Niño Jesús en la Cuna',
@@ -101,12 +97,10 @@
             rule_belen_oveja_suelo: 'Oveja en el suelo',
             rule_belen_burro_suelo: 'Burro en el suelo',
             rule_belen_capas: 'Orden visual correcto',
-
             // --- BELÉN: PERSONAJES ---
             char_belen_maria: 'María', char_belen_jose: 'José', char_belen_jesus: 'el Niño Jesús',
             char_belen_estrella: 'la Estrella', char_belen_oveja: 'la Oveja', char_belen_burro: 'el Burro',
             char_belen_pesebre: 'el Pesebre', char_belen_cuna: 'la Cuna',
-
             // --- BELÉN: INTERFAZ DINÁMICA ---
             debug_real_score_belen: 'Puntaje Real',
             debug_how_to_100_title_belen: '📋 CÓMO LLEGAR AL 100',
@@ -126,7 +120,14 @@
             result_msg_failed_belen: 'Hay ', result_msg_relations_fail_belen: ' relación(es) que no se cumplen. ',
             result_msg_partial_belen: 'Hay ', result_msg_relations_partial_belen: ' relación(es) casi correctas que puedes afinar. ',
             result_msg_review_belen: 'Revisa abajo las marcadas con ~ o ✗.',
-            result_title_perfect_belen: '¡Belén Perfecto!', result_title_completed_belen: '¡Belén Completado!', result_title_built_belen: 'Belén Armado'
+            result_title_perfect_belen: '¡Belén Perfecto!', result_title_completed_belen: '¡Belén Completado!', result_title_built_belen: 'Belén Armado',
+            // --- NUEVO: PALETA DE COLORES ---
+            paleta_title: 'Elige el color de {nombre}',
+            color_original: 'Original',
+            color_amarillo: 'Amarillo',
+            color_anaranjado: 'Anaranjado',
+            color_azul: 'Azul',
+            color_morado: 'Morado'
         },
         en: {
             // --- PORTADA ---
@@ -138,7 +139,6 @@
             portadaV: 'img/portada_en_vertical.jpg',
             banderaSiguiente: '🇪🇸',
             ariaBandera: 'Switch language to Spanish',
-            
             // --- GENERAL ---
             page_title: 'Christmas Tree',
             page_title_belen: 'Christmas Nativity',
@@ -183,7 +183,6 @@
             msg_remove_confirm: 'Are you sure you want to remove {nombre} from the scene?',
             honor_anonymous: 'Anonymous',
             honor_empty: 'No records yet. Be the first!',
-
             // --- ÁRBOL: REGLAS Y PERSONAJES ---
             rule_completitud: 'All 8 pieces present',
             rule_estrella_arriba: 'Star at the top of the Tree',
@@ -198,7 +197,6 @@
             char_arbol: 'the Tree', char_bambalina: 'the Valance', char_baston: 'the Candy Cane',
             char_bombilla: 'the Bulb', char_cascanuez: 'the Nutcracker', char_estrella: 'the Star',
             char_lazo: 'the Bow', char_osito: 'the Teddy Bear',
-
             // --- ÁRBOL: INTERFAZ DINÁMICA ---
             debug_real_score: 'Real Score',
             debug_how_to_100_title: '📋 HOW TO REACH 100',
@@ -212,7 +210,6 @@
             result_msg_partial: 'There are ', result_msg_relations_partial: ' relationship(s) almost correct that you can fine-tune. ',
             result_msg_review: 'Check below the ones marked with ~ or ✗.',
             result_title_perfect: 'Perfect Tree!', result_title_completed: 'Tree Completed!', result_title_built: 'Tree Built',
-
             // --- BELÉN: REGLAS ---
             rule_belen_completitud: 'All 8 pieces present',
             rule_belen_jesus_cuna: 'Baby Jesus in the Crib',
@@ -223,12 +220,10 @@
             rule_belen_oveja_suelo: 'Sheep on the ground',
             rule_belen_burro_suelo: 'Donkey on the ground',
             rule_belen_capas: 'Correct visual order',
-
             // --- BELÉN: PERSONAJES ---
             char_belen_maria: 'Mary', char_belen_jose: 'Joseph', char_belen_jesus: 'Baby Jesus',
             char_belen_estrella: 'the Star', char_belen_oveja: 'the Sheep', char_belen_burro: 'the Donkey',
             char_belen_pesebre: 'the Manger', char_belen_cuna: 'the Crib',
-
             // --- BELÉN: INTERFAZ DINÁMICA ---
             debug_real_score_belen: 'Real Score',
             debug_how_to_100_title_belen: '📋 HOW TO REACH 100',
@@ -248,7 +243,14 @@
             result_msg_failed_belen: 'There are ', result_msg_relations_fail_belen: ' relationship(s) that are not met. ',
             result_msg_partial_belen: 'There are ', result_msg_relations_partial_belen: ' relationship(s) almost correct that you can fine-tune. ',
             result_msg_review_belen: 'Check below the ones marked with ~ or ✗.',
-            result_title_perfect_belen: 'Perfect Nativity!', result_title_completed_belen: 'Nativity Completed!', result_title_built_belen: 'Nativity Built'
+            result_title_perfect_belen: 'Perfect Nativity!', result_title_completed_belen: 'Nativity Completed!', result_title_built_belen: 'Nativity Built',
+            // --- NUEVO: PALETA DE COLORES ---
+            paleta_title: 'Choose the color of {nombre}',
+            color_original: 'Original',
+            color_amarillo: 'Yellow',
+            color_anaranjado: 'Orange',
+            color_azul: 'Blue',
+            color_morado: 'Purple'
         }
     };
 
@@ -270,14 +272,12 @@
         if (!t) return;
         idiomaActual = idioma;
 
-        // 1. Título de la pestaña (fallback seguro)
         if (t.page_title_belen && document.title.includes('Belén')) document.title = t.page_title_belen;
         else if (t.page_title && document.title.includes('Árbol')) document.title = t.page_title;
         else if (t.titulo) document.title = t.titulo;
 
         document.documentElement.setAttribute('lang', idioma);
 
-        // 2. Lógica de la PORTADA
         const source = document.querySelector('.portada source');
         const img = document.querySelector('.portada img');
         if (source && t.portadaH) source.setAttribute('srcset', t.portadaH);
@@ -291,7 +291,6 @@
         if (btnArbol && t.btnArbol) btnArbol.setAttribute('aria-label', t.btnArbol);
         if (btnBelen && t.btnBelen) btnBelen.setAttribute('aria-label', t.btnBelen);
 
-        // 3. Traducir elementos con data-i18n
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (t[key]) el.textContent = t[key];
@@ -302,11 +301,9 @@
             if (t[key]) el.setAttribute('placeholder', t[key]);
         });
 
-        // 4. Actualizar botón de bandera
         const btnIdiomaPortada = document.querySelector('.btn-idioma');
         const btnIdiomaMenu = document.getElementById('btnIdiomaMenu');
         const btnIdiomaActivo = btnIdiomaMenu || btnIdiomaPortada;
-        
         if (btnIdiomaActivo && t.banderaSiguiente) {
             const icono = btnIdiomaActivo.querySelector('.bandera');
             if (icono) icono.textContent = t.banderaSiguiente;
@@ -316,7 +313,6 @@
             }
         }
 
-        // 5. Actualizar botón de música en el menú
         const btnMusicaMenu = document.getElementById('btnMusicaMenu');
         if (btnMusicaMenu && window.SistemaMusica) {
             const estaSonando = window.SistemaMusica.estaSonando ? window.SistemaMusica.estaSonando() : false;
@@ -346,21 +342,18 @@
         if (btnIdiomaPortada) {
             btnIdiomaPortada.addEventListener('click', function (e) { e.preventDefault(); alternarIdioma(); });
         }
-
         const btnIdiomaMenu = document.getElementById('btnIdiomaMenu');
         if (btnIdiomaMenu) {
             btnIdiomaMenu.addEventListener('click', function (e) {
                 e.preventDefault(); e.stopPropagation(); alternarIdioma();
             });
         }
-
         const btnMusicaMenu = document.getElementById('btnMusicaMenu');
         if (btnMusicaMenu && window.SistemaMusica) {
             btnMusicaMenu.addEventListener('click', function (e) {
                 e.preventDefault(); e.stopPropagation(); window.SistemaMusica.alternar();
             });
         }
-
         aplicarIdioma(leerIdiomaGuardado());
     });
 })();
