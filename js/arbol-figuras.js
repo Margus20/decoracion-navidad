@@ -33,7 +33,7 @@ function actualizarEstadoAvatar(idPersonaje) {
     btn.classList.toggle('activo', document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]').length > 0);
 }
 
-// --- PALETA DE COLORES ---
+// --- PALETA DE COLORES (CORREGIDO: evita que el panel se reabra al tocar) ---
 function abrirPaletaColores(personaje) {
     cerrarPaleta();
     const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
@@ -49,11 +49,26 @@ function abrirPaletaColores(personaje) {
     });
     overlay.innerHTML = `<div class="paleta-panel"><h3>Elige el color de ${personaje.nombre}</h3><div class="paleta-grid">${opcionesHtml}</div><button class="paleta-cancelar">Cancelar</button></div>`;
     document.body.appendChild(overlay);
+    
+    // CORRECCIÓN: Detenemos la propagación del evento para que no reabra el panel
     overlay.querySelectorAll('.paleta-opcion').forEach(btn => {
-        btn.addEventListener('click', () => { aplicarColor(personaje, btn.dataset.ruta); cerrarPaleta(); });
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const ruta = btn.dataset.ruta;
+            cerrarPaleta(); // Cerramos primero
+            aplicarColor(personaje, ruta); // Luego aplicamos
+        });
     });
+    
     const cancelar = overlay.querySelector('.paleta-cancelar');
-    if (cancelar) cancelar.addEventListener('click', cerrarPaleta);
+    if (cancelar) {
+        cancelar.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cerrarPaleta();
+        });
+    }
     overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrarPaleta(); });
 }
 
@@ -94,11 +109,8 @@ personajes.forEach(function (personaje) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
             
             // === AJUSTE SEGURO PARA BILINGÜISMO ===
-            // Obtiene el nombre traducido (ej: "the Star" o "la Estrella")
             const nombrePersonaje = tFiguras('char_' + personaje.id);
-            // Obtiene la frase base traducida (ej: "Are you sure you want to remove {nombre} from the scene?")
             const mensajeBase = tFiguras('msg_remove_confirm');
-            // Reemplaza {nombre} por el nombre real del personaje
             const mensajeFinal = mensajeBase.replace('{nombre}', nombrePersonaje);
 
             confirmarAccion(mensajeFinal, function () {
