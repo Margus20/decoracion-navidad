@@ -52,7 +52,7 @@ refrescarSliders = function(el) {
 };
 
 // --- BOTONES DE CONTROL ---
-if (btnVoltear) {
+if (typeof btnVoltear !== 'undefined' && btnVoltear) {
     btnVoltear.addEventListener('click', () => {
         if (piezaActiva && !juegoTerminado) {
             piezaActiva.dataset.volteada = piezaActiva.dataset.volteada === 'true' ? 'false' : 'true';
@@ -61,7 +61,7 @@ if (btnVoltear) {
     });
 }
 
-if (btnDuplicar) {
+if (typeof btnDuplicar !== 'undefined' && btnDuplicar) {
     btnDuplicar.addEventListener('click', () => {
         if (piezaActiva && !juegoTerminado) {
             const idP = piezaActiva.dataset.personaje;
@@ -97,15 +97,27 @@ if (btnDuplicar) {
     });
 }
 
-if (btnQuitar) {
+if (typeof btnQuitar !== 'undefined' && btnQuitar) {
     btnQuitar.addEventListener('click', () => {
         if (piezaActiva && !juegoTerminado) {
-            // === AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo ===
             const el = piezaActiva; // Capturamos la referencia antes de la función asíncrona
             const idP = el.dataset.personaje;
             const personaje = personajes.find(p => p.id === idP);
             
-            confirmarAccion('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?', function () {
+            // === AJUSTE SEGURO PARA BILINGÜISMO ===
+            // Usamos la función tFiguras (cargada globalmente desde arbol-figuras.js)
+            // Si por alguna razón no existe, usa el respaldo en español para no romper nada.
+            const nombrePieza = (typeof tFiguras === 'function') 
+                ? tFiguras('char_' + (personaje ? personaje.id : 'unknown')) 
+                : (personaje ? personaje.nombre : 'esta pieza');
+
+            const mensajeBase = (typeof tFiguras === 'function') 
+                ? tFiguras('msg_remove_confirm') 
+                : '¿Seguro que quieres quitar {nombre}?';
+
+            const mensajeFinal = mensajeBase.replace('{nombre}', nombrePieza);
+            
+            confirmarAccion(mensajeFinal, function () {
                 if (piezaActiva === el) piezaActiva = null;
                 el.remove();
                 panelControles.classList.remove('visible');
@@ -121,7 +133,7 @@ if (btnQuitar) {
 
 // --- CAPAS ---
 function renderizarCapas() {
-    if (!listaCapas) return;
+    if (typeof listaCapas === 'undefined' || !listaCapas) return;
     listaCapas.innerHTML = '';
     const figuras = Array.from(document.querySelectorAll('.figura-activa')).sort((a, b) => zindex(b) - zindex(a));
     figuras.forEach((fig, index) => {
@@ -142,9 +154,9 @@ window.cambiarCapa = function (id, direccion) {
     }
 };
 
-if (btnCapas) btnCapas.addEventListener('click', () => { if (!juegoTerminado) { renderizarCapas(); modalCapas.classList.add('visible'); } });
-if (btnCerrarCapas) btnCerrarCapas.addEventListener('click', () => modalCapas.classList.remove('visible'));
-if (modalCapas) modalCapas.addEventListener('click', (e) => { if (e.target === modalCapas) modalCapas.classList.remove('visible'); });
+if (typeof btnCapas !== 'undefined' && btnCapas) btnCapas.addEventListener('click', () => { if (!juegoTerminado) { renderizarCapas(); modalCapas.classList.add('visible'); } });
+if (typeof btnCerrarCapas !== 'undefined' && btnCerrarCapas) btnCerrarCapas.addEventListener('click', () => modalCapas.classList.remove('visible'));
+if (typeof modalCapas !== 'undefined' && modalCapas) modalCapas.addEventListener('click', (e) => { if (e.target === modalCapas) modalCapas.classList.remove('visible'); });
 
 // --- DESELECCIONAR Y RECALCULAR ---
 document.querySelector('.escena-overlay').addEventListener('click', function (e) {
@@ -162,7 +174,9 @@ function mostrarBotonReinicio() {
 
 function guardarEnTablaHonor(nombre, puntaje) {
     let tabla = JSON.parse(localStorage.getItem('arbolTablaHonor')) || [];
-    tabla.push({ nombre: nombre || 'Anónimo', puntaje: Math.round(puntaje), fecha: new Date().toLocaleDateString('es-VE') });
+    // Usamos el traductor para "Anónimo" si está disponible
+    const anonimo = (typeof tFiguras === 'function') ? tFiguras('honor_anonymous') : 'Anónimo';
+    tabla.push({ nombre: nombre || anonimo, puntaje: Math.round(puntaje), fecha: new Date().toLocaleDateString('es-VE') });
     tabla = tabla.sort((a, b) => b.puntaje - a.puntaje).slice(0, 10);
     localStorage.setItem('arbolTablaHonor', JSON.stringify(tabla));
 }
@@ -171,7 +185,10 @@ function mostrarTablaHonor() {
     const tabla = JSON.parse(localStorage.getItem('arbolTablaHonor')) || [];
     const lista = document.getElementById('listaHonor');
     if (!lista) return;
-    lista.innerHTML = tabla.length === 0 ? '<div class="item-honor vacio">Aún no hay registros. ¡Sé el primero!</div>' : '';
+    
+    const vacioMsg = (typeof tFiguras === 'function') ? tFiguras('honor_empty') : 'Aún no hay registros. ¡Sé el primero!';
+    lista.innerHTML = tabla.length === 0 ? `<div class="item-honor vacio">${vacioMsg}</div>` : '';
+    
     tabla.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'item-honor';
@@ -185,7 +202,8 @@ function mostrarTablaHonor() {
 const btnGuardarNombre = document.getElementById('btnGuardarNombre');
 if (btnGuardarNombre) {
     btnGuardarNombre.addEventListener('click', () => {
-        guardarEnTablaHonor(document.getElementById('inputNombre').value.trim() || 'Anónimo', calcularScoreGeneral());
+        const anonimo = (typeof tFiguras === 'function') ? tFiguras('honor_anonymous') : 'Anónimo';
+        guardarEnTablaHonor(document.getElementById('inputNombre').value.trim() || anonimo, calcularScoreGeneral());
         document.getElementById('modalResultado').classList.remove('visible');
         mostrarBotonReinicio(); 
         mostrarTablaHonor();
@@ -237,7 +255,6 @@ function arrancarJuego() {
     if (typeof updateImage === 'function') updateImage(); // Esto carga el fondo
 }
 
-// Si la página aún se está cargando, espera. Si ya está lista, ejecuta YA.
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', arrancarJuego);
 } else {
