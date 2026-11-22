@@ -1,5 +1,38 @@
 // ============ INTERFAZ Y CELEBRACIÓN (belen-interfaz.js) ============
 
+// Helper seguro para obtener traducciones dinámicas del Belén
+function tBelen(key) {
+    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
+        const lang = window.SistemaIdioma.actual();
+        return window.SistemaIdioma.traducciones[lang][key] || window.SistemaIdioma.traducciones['es'][key] || key;
+    }
+    // Fallback por defecto para que nunca se rompa si el idioma tarda en cargar
+    const fallback = {
+        progress_label_belen: 'Progreso del Belén',
+        debug_real_score_belen: 'Puntaje Real',
+        debug_how_to_100_title_belen: '📋 CÓMO LLEGAR AL 100',
+        debug_how_to_100_msg_ok: 'Todo correcto. Piezas en su lugar y mirando al centro.',
+        debug_how_to_100_msg_maria: 'María mira hacia afuera. Selecciónala y pulsa VOLTEAR.',
+        debug_how_to_100_msg_jose: 'José mira hacia afuera. Selecciónalo y pulsa VOLTEAR.',
+        debug_how_to_100_msg_oveja: 'La Oveja mira hacia afuera. Selecciónala y pulsa VOLTEAR.',
+        debug_how_to_100_msg_burro: 'El Burro mira hacia afuera. Selecciónalo y pulsa VOLTEAR.',
+        debug_how_to_100_msg_animals: 'Los dos animales están del mismo lado. Sepáralos a los extremos.',
+        debug_diag_title_belen: '🔧 DIAGNÓSTICO',
+        debug_diag_yes_belen: 'SÍ', debug_diag_no_belen: 'NO',
+        debug_diag_score_belen: 'Puntaje >= 100', debug_diag_pieces_belen: 'Las 8 presentes',
+        debug_diag_balance_belen: 'Balance animales',
+        debug_diag_balance_ok: 'Uno a cada lado', debug_diag_balance_warn: 'Mismo lado',
+        result_msg_perfect_belen: '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.',
+        result_msg_time_belen: 'Se acabó el tiempo. ', result_msg_missing_belen: 'Te faltan ', result_msg_points_belen: ' puntos. ',
+        result_msg_failed_belen: 'Hay ', result_msg_relations_fail_belen: ' relación(es) que no se cumplen. ',
+        result_msg_partial_belen: 'Hay ', result_msg_relations_partial_belen: ' relación(es) casi correctas que puedes afinar. ',
+        result_msg_review_belen: 'Revisa abajo las marcadas con ~ o ✗.',
+        result_title_perfect_belen: '¡Belén Perfecto!', result_title_completed_belen: '¡Belén Completado!', result_title_built_belen: 'Belén Armado',
+        conf_title: 'Confirmar', conf_cancel: 'Cancelar', conf_accept: 'Aceptar'
+    };
+    return fallback[key] || key;
+}
+
 // --- MODAL DE CONFIRMACIÓN PERSONALIZADO (paleta del juego) ---
 (function inyectarEstilosConfirmacion() {
     if (document.getElementById('confStyles')) return;
@@ -29,7 +62,8 @@ function confirmarAccion(mensaje, onAceptar) {
     const ov = document.createElement('div');
     ov.className = 'conf-overlay';
     ov.id = 'confOverlay';
-    ov.innerHTML = '<div class="conf-panel"><h3 class="conf-titulo">Confirmar</h3><p class="conf-msg">' + mensaje + '</p><div class="conf-botones"><button class="conf-btn conf-cancelar">Cancelar</button><button class="conf-btn conf-aceptar">Aceptar</button></div></div>';
+    // CAMBIO SEGURO: Usa traducciones para los botones del modal
+    ov.innerHTML = `<div class="conf-panel"><h3 class="conf-titulo">${tBelen('conf_title')}</h3><p class="conf-msg">${mensaje}</p><div class="conf-botones"><button class="conf-btn conf-cancelar">${tBelen('conf_cancel')}</button><button class="conf-btn conf-aceptar">${tBelen('conf_accept')}</button></div></div>`;
     document.body.appendChild(ov);
     ov.querySelector('.conf-aceptar').addEventListener('click', function () {
         cerrarConfirmacion();
@@ -68,21 +102,23 @@ function actualizarProgresoGeneral() {
 
     barraGeneral.style.width = score + '%';
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
-    if (etiquetaGeneral) etiquetaGeneral.textContent = `Progreso del Belén: ${score.toFixed(2)}/100`;
+    if (etiquetaGeneral) etiquetaGeneral.textContent = `${tBelen('progress_label_belen')}: ${score.toFixed(2)}/100`;
     barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
     if (panel && content && panel.style.display === 'block') {
-        let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">Puntaje Real: ${score.toFixed(2)}</div>`;
+        let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">${tBelen('debug_real_score_belen')}: ${score.toFixed(2)}</div>`;
+        
         criterios.forEach(c => {
             const val = c.eval(m);
             const pts = (val * c.peso).toFixed(1);
             let icon = '❌', color = '#ff4444';
             if (val >= 0.9) { icon = '✅'; color = '#44ff44'; }
             else if (val >= 0.5) { icon = '⚠️'; color = '#ffcc00'; }
+            // CAMBIO SEGURO: Usa el ID de la regla para buscar la traducción
             html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #444; padding-bottom:4px;">
-                <span style="color:#fff;">${c.nombre}</span>
+                <span style="color:#fff;">${tBelen('rule_belen_' + c.id)}</span>
                 <span style="color:${color}; font-weight:bold;">${icon} ${pts}/${c.peso}</span>
             </div>`;
         });
@@ -101,29 +137,31 @@ function actualizarProgresoGeneral() {
         html += `</div>`;
 
         const instrucciones = [];
-        if (m.maria && m.pesebre && !orientacionCorrecta(m.maria, m.pesebre, true)) instrucciones.push('María mira hacia afuera. Selecciónala y pulsa VOLTEAR.');
-        if (m.jose && m.pesebre && !orientacionCorrecta(m.jose, m.pesebre, true)) instrucciones.push('José mira hacia afuera. Selecciónalo y pulsa VOLTEAR.');
-        if (m.oveja && m.pesebre && !orientacionCorrecta(m.oveja, m.pesebre, true)) instrucciones.push('La Oveja mira hacia afuera. Selecciónala y pulsa VOLTEAR.');
-        if (m.burro && m.pesebre && !orientacionCorrecta(m.burro, m.pesebre, false)) instrucciones.push('El Burro mira hacia afuera. Selecciónalo y pulsa VOLTEAR.');
+        // CAMBIOS SEGUROS: Instrucciones traducidas
+        if (m.maria && m.pesebre && !orientacionCorrecta(m.maria, m.pesebre, true)) instrucciones.push(tBelen('debug_how_to_100_msg_maria'));
+        if (m.jose && m.pesebre && !orientacionCorrecta(m.jose, m.pesebre, true)) instrucciones.push(tBelen('debug_how_to_100_msg_jose'));
+        if (m.oveja && m.pesebre && !orientacionCorrecta(m.oveja, m.pesebre, true)) instrucciones.push(tBelen('debug_how_to_100_msg_oveja'));
+        if (m.burro && m.pesebre && !orientacionCorrecta(m.burro, m.pesebre, false)) instrucciones.push(tBelen('debug_how_to_100_msg_burro'));
         if (m.oveja && m.burro && m.pesebre && (centro(m.oveja).x > centro(m.pesebre).x) === (centro(m.burro).x > centro(m.pesebre).x)) {
-            instrucciones.push('Los dos animales están del mismo lado. Sepáralos a los extremos.');
+            instrucciones.push(tBelen('debug_how_to_100_msg_animals'));
         }
 
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,140,0,0.12); border:1px solid #ff8c00; border-radius:8px; font-size:0.9em; color:#fff; line-height:1.5;">
-            <b style="color:#ff8c00;">📋 CÓMO LLEGAR AL 100</b><br>`;
+            <b style="color:#ff8c00;">${tBelen('debug_how_to_100_title_belen')}</b><br>`;
         if (instrucciones.length === 0) {
-            html += `<div style="color:#44ff44; margin-top:6px;">✅ Todo correcto. Piezas en su lugar y mirando al centro.</div>`;
+            html += `<div style="color:#44ff44; margin-top:6px;">✅ ${tBelen('debug_how_to_100_msg_ok')}</div>`;
         } else {
             instrucciones.forEach(texto => { html += `<div style="margin-top:6px; border-bottom:1px dashed #664422; padding-bottom:6px;">👉 ${texto}</div>`; });
         }
         html += `</div>`;
 
-        const mariaADerecha = m.maria && m.pesebre && centro(m.maria).x > centro(m.pesebre).x;
+        const balanceOk = (m.oveja && m.burro && m.pesebre && (centro(m.oveja).x > centro(m.pesebre).x) !== (centro(m.burro).x > centro(m.pesebre).x));
+        
         html += `<div style="margin-top:12px; padding:10px; background:rgba(255,215,0,0.1); border:1px solid #ffd700; border-radius:8px; font-size:0.85em; color:#fff; line-height:1.6;">
-            <b style="color:#ffd700;">🔧 DIAGNÓSTICO</b><br>
-            Puntaje >= 100: ${Math.round(score) >= 100 ? '✅ SÍ' : '❌ NO'}<br>
-            Las 8 presentes: ${todasPresentes ? '✅ SÍ' : '❌ NO'}<br>
-            Balance animales: ${(m.oveja && m.burro && m.pesebre && (centro(m.oveja).x > centro(m.pesebre).x) !== (centro(m.burro).x > centro(m.pesebre).x)) ? '✅ Uno a cada lado' : '⚠️ Mismo lado'}
+            <b style="color:#ffd700;">${tBelen('debug_diag_title_belen')}</b><br>
+            ${tBelen('debug_diag_score_belen')}: ${Math.round(score) >= 100 ? `✅ ${tBelen('debug_diag_yes_belen')}` : `❌ ${tBelen('debug_diag_no_belen')}`}<br>
+            ${tBelen('debug_diag_pieces_belen')}: ${todasPresentes ? `✅ ${tBelen('debug_diag_yes_belen')}` : `❌ ${tBelen('debug_diag_no_belen')}`}<br>
+            ${tBelen('debug_diag_balance_belen')}: ${balanceOk ? `✅ ${tBelen('debug_diag_balance_ok')}` : `⚠️ ${tBelen('debug_diag_balance_warn')}`}
         </div>`;
         content.innerHTML = html;
     }
@@ -148,12 +186,23 @@ function mostrarResultadoFinal(score, motivo) {
     document.getElementById('resultadoPuntaje').className = 'modal-resultado-puntaje ' + (puntajeRedondeado >= 100 ? 'perfecto' : puntajeRedondeado >= 80 ? 'bueno' : 'regular');
     
     const faltan = 100 - puntajeRedondeado;
-    const prefijoTiempo = motivo === 'tiempo' ? 'Se acabó el tiempo. ' : '';
-    let mensajeTexto = puntajeRedondeado >= 100 ? '¡Felicitaciones! Todas las relaciones están correctas y alcanzaste los 100 puntos. Has armado el Belén con maestría.' :
-        `${prefijoTiempo}Te faltan ${faltan} puntos. ` + (fallidas > 0 ? `Hay ${fallidas} relación(es) que no se cumplen. ` : '') +
-        (parciales > 0 ? `Hay ${parciales} relación(es) casi correctas que puedes afinar. ` : '') + 'Revisa abajo las marcadas con ~ o ✗.';
+    
+    // CAMBIOS SEGUROS: Mensajes de resultado traducidos
+    let mensajeTexto = '';
+    if (puntajeRedondeado >= 100) {
+        mensajeTexto = tBelen('result_msg_perfect_belen');
+    } else {
+        const prefijo = motivo === 'tiempo' ? tBelen('result_msg_time_belen') : '';
+        const fallidasTxt = fallidas > 0 ? `${tBelen('result_msg_failed_belen')}${fallidas}${tBelen('result_msg_relations_fail_belen')}` : '';
+        const parcialesTxt = parciales > 0 ? `${tBelen('result_msg_partial_belen')}${parciales}${tBelen('result_msg_relations_partial_belen')}` : '';
+        mensajeTexto = `${prefijo}${tBelen('result_msg_missing_belen')}${faltan}${tBelen('result_msg_points_belen')}${fallidasTxt}${parcialesTxt}${tBelen('result_msg_review_belen')}`;
+    }
 
-    document.getElementById('resultadoTitulo').textContent = puntajeRedondeado >= 100 ? '¡Belén Perfecto!' : (puntajeRedondeado >= 80 ? '¡Belén Completado!' : 'Belén Armado');
+    let tituloTexto = tBelen('result_title_built_belen');
+    if (puntajeRedondeado >= 100) tituloTexto = tBelen('result_title_perfect_belen');
+    else if (puntajeRedondeado >= 80) tituloTexto = tBelen('result_title_completed_belen');
+
+    document.getElementById('resultadoTitulo').textContent = tituloTexto;
     document.getElementById('resultadoMensaje').textContent = mensajeTexto;
 
     const listaDetalles = document.getElementById('listaDetalles');
@@ -166,7 +215,8 @@ function mostrarResultadoFinal(score, motivo) {
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
         const item = document.createElement('div');
         item.className = 'detalle-item';
-        item.innerHTML = `<span>${c.nombre}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
+        // CAMBIO SEGURO: Usa el ID de la regla para buscar la traducción
+        item.innerHTML = `<span>${tBelen('rule_belen_' + c.id)}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
         listaDetalles.appendChild(item);
     });
 
@@ -175,7 +225,7 @@ function mostrarResultadoFinal(score, motivo) {
 
     if (puntajeRedondeado >= 100) {
         activarCelebracion();
-        setTimeout(() => { modal.classList.add('visible'); }, 10000); // 10 segundos de gloria
+        setTimeout(() => { modal.classList.add('visible'); }, 10000);
     } else {
         modal.classList.add('visible');
     }
