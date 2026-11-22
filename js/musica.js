@@ -1,5 +1,5 @@
 // ============ SISTEMA DE MÚSICA NAVIDEÑA (musica.js) ============
-// Usa un VIDEO OCULTO porque los archivos son .mp4 reales (video con audio).
+// Versión limpia y estable para archivos .mp3 reales.
 // Bucle infinito de 4 canciones. Solo arranca con toque explícito del usuario.
 // Si un archivo no carga, el ícono muestra ⚠️ para avisar del problema.
 
@@ -7,52 +7,39 @@
     'use strict';
 
     const playlist = [
-        'audio/jingle_bells.mp4',
-        'audio/o_christmas_tree.mp4',
-        'audio/we_wish_you.mp4',
-        'audio/twelve_days.mp4'
+        'audio/jingle_bells.mp3',
+        'audio/o_christmas_tree.mp3',
+        'audio/we_wish_you.mp3',
+        'audio/twelve_days.mp3'
     ];
 
     let indice = 0;
-    let video = null;
+    let audio = null;
     let sonando = false;
 
-    function crearVideo() {
-        if (video) return;
-        video = document.createElement('video');
-        // Ocultamos el video fuera de la vista pero sin display:none
-        // (display:none puede bloquear la reproducción en algunos navegadores)
-        video.style.position = 'fixed';
-        video.style.top = '-9999px';
-        video.style.left = '-9999px';
-        video.style.width = '1px';
-        video.style.height = '1px';
-        video.style.opacity = '0';
-        video.style.pointerEvents = 'none';
-        video.preload = 'auto';
-        video.volume = 0.6;
-        video.playsInline = true;
-        video.muted = false;
+    function crearAudio() {
+        if (audio) return;
+        audio = new Audio();
+        audio.preload = 'auto';
+        audio.volume = 0.6;
 
         // Al terminar una canción, pasar a la siguiente (bucle infinito)
-        video.addEventListener('ended', function () {
+        audio.addEventListener('ended', function () {
             indice = (indice + 1) % playlist.length;
-            video.src = playlist[indice];
-            const p = video.play();
+            audio.src = playlist[indice];
+            const p = audio.play();
             if (p && p.catch) p.catch(function () { fijarEstado(false); });
         });
 
         // Si un archivo no carga, avisar con el triángulo
-        video.addEventListener('error', function () {
+        audio.addEventListener('error', function () {
             fijarEstado(false);
             document.querySelectorAll('.btn-musica, .btn-musica-menu').forEach(function (b) {
                 const ic = b.querySelector('.icono-musica');
                 if (ic) ic.textContent = '⚠️';
             });
-            console.error('No se pudo cargar la canción:', video.src);
+            console.error('No se pudo cargar la canción:', audio.src);
         });
-
-        document.body.appendChild(video);
     }
 
     function fijarEstado(v) {
@@ -68,9 +55,9 @@
     }
 
     function reproducir() {
-        crearVideo();
-        video.src = playlist[indice];
-        const p = video.play();
+        crearAudio();
+        audio.src = playlist[indice];
+        const p = audio.play();
         if (p && p.then) {
             p.then(function () { fijarEstado(true); })
              .catch(function () { fijarEstado(false); });
@@ -80,7 +67,7 @@
     }
 
     function pausar() {
-        if (video) video.pause();
+        if (audio) audio.pause();
         fijarEstado(false);
     }
 
