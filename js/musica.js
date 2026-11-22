@@ -1,6 +1,6 @@
 // ============ SISTEMA DE MÚSICA NAVIDEÑA (musica.js) ============
-// Audios REALES de Wikimedia Commons (villancicos de dominio público),
-// porque los archivos locales eran video disfrazado de mp3 y Chrome los rechazaba.
+// Audios REALES de Wikimedia Commons (villancicos de dominio público).
+// MEMORIA ENTRE PÁGINAS: recuerda si la música estaba activa al cambiar de página.
 // Tolerante a fallos: si una canción no carga, salta a la siguiente.
 // Bucle infinito de 4 canciones. Solo arranca con toque explícito del usuario.
 
@@ -19,6 +19,27 @@
     let sonando = false;
     let intentosSeguidos = 0;
 
+    // --- MEMORIA ENTRE PÁGINAS ---
+    function leerEstadoGuardado() {
+        try {
+            const activo = localStorage.getItem('musicaActiva') === 'true';
+            const idx = parseInt(localStorage.getItem('musicaIndice'), 10);
+            return {
+                activo: activo,
+                indice: (!isNaN(idx) && idx >= 0 && idx < playlist.length) ? idx : 0
+            };
+        } catch (e) {
+            return { activo: false, indice: 0 };
+        }
+    }
+
+    function guardarEstado(activo) {
+        try {
+            localStorage.setItem('musicaActiva', activo ? 'true' : 'false');
+            localStorage.setItem('musicaIndice', String(indice));
+        } catch (e) {}
+    }
+
     function crearAudio() {
         if (audio) return;
         audio = new Audio();
@@ -28,6 +49,7 @@
         audio.addEventListener('ended', function () {
             intentosSeguidos = 0;
             indice = (indice + 1) % playlist.length;
+            guardarEstado(true);
             audio.src = playlist[indice];
             const p = audio.play();
             if (p && p.catch) p.catch(function () { fijarEstado(false); });
@@ -37,6 +59,7 @@
             intentosSeguidos++;
             if (intentosSeguidos < playlist.length) {
                 indice = (indice + 1) % playlist.length;
+                guardarEstado(true);
                 audio.src = playlist[indice];
                 const p = audio.play();
                 if (p && p.catch) p.catch(function () { fijarEstado(false); });
@@ -53,6 +76,7 @@
 
     function fijarEstado(v) {
         sonando = v;
+        guardarEstado(v);
         document.querySelectorAll('.btn-musica, .btn-musica-menu').forEach(function (b) {
             const ic = b.querySelector('.icono-musica');
             if (ic && ic.textContent !== '⚠️') ic.textContent = v ? '🔊' : '🔇';
@@ -69,7 +93,11 @@
         const p = audio.play();
         if (p && p.then) {
             p.then(function () { fijarEstado(true); })
-             .catch(function () { fijarEstado(false); });
+             .catch(function () {
+                 // Autoplay bloqueado por el navegador: no mostrar error,
+                 // solo dejar el botón en estado "apagado" hasta que el usuario toque.
+                 fijarEstado(false);
+             });
         } else {
             fijarEstado(true);
         }
@@ -101,6 +129,15 @@
         if (btnMenu) {
             btnMenu.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); alternar(); });
             btnMenu.addEventListener('touchstart', function (e) { e.preventDefault(); e.stopPropagation(); alternar(); }, { passive: false });
+        }
+
+        // --- RECUPERAR ESTADO AL CARGAR LA PÁGINA ---
+        // Si la música estaba activa en la página anterior, reanudarla automáticamente.
+        const estado = leerEstadoGuardado();
+        indice = estado.indice;
+        if (estado.activo) {
+            // Pequeño retraso para asegurar que el DOM y los botones estén listos
+            setTimeout(function () { reproducir(); }, 300);
         }
     });
 })();
