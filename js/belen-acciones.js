@@ -6,6 +6,24 @@ let intervaloFinal = null;
 let juegoTerminado = false;
 let modoLibre = false; // NUEVO: Control del modo sin presión
 
+// Helper seguro para obtener traducciones dinámicas en acciones del Belén
+function tBelenAcciones(key) {
+    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
+        const lang = window.SistemaIdioma.actual();
+        return window.SistemaIdioma.traducciones[lang][key] || window.SistemaIdioma.traducciones['es'][key] || key;
+    }
+    // Fallback local por si el sistema de idioma tarda en cargar
+    const fallback = {
+        msg_remove_confirm: '¿Seguro que quieres quitar {nombre} de la escena?',
+        char_belen_maria: 'María', char_belen_jose: 'José', char_belen_jesus: 'el Niño Jesús',
+        char_belen_estrella: 'la Estrella', char_belen_oveja: 'la Oveja', char_belen_burro: 'el Burro',
+        char_belen_pesebre: 'el Pesebre', char_belen_cuna: 'la Cuna',
+        honor_anonymous: 'Anónimo',
+        honor_empty: 'Aún no hay registros. ¡Sé el primero!'
+    };
+    return fallback[key] || key;
+}
+
 // ============ 1. RELOJES DEL JUEGO ============
 function iniciarRelojGlobal() {
     actualizarDisplayReloj('relojGlobalNumero', tiempoGlobalRestante);
@@ -115,7 +133,7 @@ function chequearVictoria() {
 function guardarEnTablaHonor(nombre, puntaje) {
     let tabla = JSON.parse(localStorage.getItem('belenTablaHonor')) || [];
     const fecha = new Date().toLocaleDateString('es-VE');
-    tabla.push({ nombre: nombre || 'Anónimo', puntaje: Math.round(puntaje), fecha });
+    tabla.push({ nombre: nombre || tBelenAcciones('honor_anonymous'), puntaje: Math.round(puntaje), fecha });
     tabla.sort((a, b) => b.puntaje - a.puntaje);
     tabla = tabla.slice(0, 10);
     localStorage.setItem('belenTablaHonor', JSON.stringify(tabla));
@@ -127,7 +145,7 @@ function mostrarTablaHonor() {
     lista.innerHTML = '';
     
     if (tabla.length === 0) {
-        lista.innerHTML = '<div class="item-honor vacio">Aún no hay registros. ¡Sé el primero!</div>';
+        lista.innerHTML = '<div class="item-honor vacio">' + tBelenAcciones('honor_empty') + '</div>';
     } else {
         tabla.forEach((item, index) => {
             const div = document.createElement('div');
@@ -195,8 +213,12 @@ personajes.forEach(function (personaje) {
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
             
-            // AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo
-            confirmarAccion('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?', function () {
+            // === AJUSTE SEGURO PARA BILINGÜISMO ===
+            const nombrePersonaje = tBelenAcciones('char_belen_' + personaje.id);
+            const mensajeBase = tBelenAcciones('msg_remove_confirm');
+            const mensajeFinal = mensajeBase.replace('{nombre}', nombrePersonaje);
+            
+            confirmarAccion(mensajeFinal, function () {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
@@ -359,8 +381,12 @@ btnQuitar.addEventListener('click', function () {
         const idP = el.dataset.personaje;
         const personaje = personajes.find(p => p.id === idP);
         
-        // AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo
-        confirmarAccion('¿Seguro que quieres quitar ' + (personaje ? personaje.nombre : 'esta pieza') + '?', function () {
+        // === AJUSTE SEGURO PARA BILINGÜISMO ===
+        const nombrePieza = personaje ? tBelenAcciones('char_belen_' + personaje.id) : 'esta pieza';
+        const mensajeBase = tBelenAcciones('msg_remove_confirm');
+        const mensajeFinal = mensajeBase.replace('{nombre}', nombrePieza);
+        
+        confirmarAccion(mensajeFinal, function () {
             if (piezaActiva === el) piezaActiva = null;
             el.remove();
             panelControles.classList.remove('visible');
@@ -416,7 +442,7 @@ const btnGuardarNombre = document.getElementById('btnGuardarNombre');
 if (btnGuardarNombre) {
     btnGuardarNombre.addEventListener('click', function() {
         const inputNombre = document.getElementById('inputNombre');
-        const nombre = inputNombre.value.trim() || 'Anónimo';
+        const nombre = inputNombre.value.trim() || tBelenAcciones('honor_anonymous');
         guardarEnTablaHonor(nombre, calcularScoreGeneral());
         
         document.getElementById('modalResultado').classList.remove('visible');
