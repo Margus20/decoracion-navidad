@@ -1,5 +1,14 @@
 // ============ FIGURAS Y ARRASTRE (arbol-figuras.js) ============
 
+// Helper seguro para obtener traducciones dinámicas de personajes y mensajes
+function tFiguras(key) {
+    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
+        const lang = window.SistemaIdioma.actual();
+        return window.SistemaIdioma.traducciones[lang][key] || window.SistemaIdioma.traducciones['es'][key] || key;
+    }
+    return key;
+}
+
 function crearFigura(personaje, pngOverride) {
     contadorCopias++;
     const img = document.createElement('img');
@@ -84,8 +93,15 @@ personajes.forEach(function (personaje) {
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
             
-            // === AJUSTE: Usamos el modal personalizado en lugar del confirm() nativo ===
-            confirmarAccion('¿Seguro que quieres quitar ' + personaje.nombre + ' de la escena?', function () {
+            // === AJUSTE SEGURO PARA BILINGÜISMO ===
+            // Obtiene el nombre traducido (ej: "the Star" o "la Estrella")
+            const nombrePersonaje = tFiguras('char_' + personaje.id);
+            // Obtiene la frase base traducida (ej: "Are you sure you want to remove {nombre} from the scene?")
+            const mensajeBase = tFiguras('msg_remove_confirm');
+            // Reemplaza {nombre} por el nombre real del personaje
+            const mensajeFinal = mensajeBase.replace('{nombre}', nombrePersonaje);
+
+            confirmarAccion(mensajeFinal, function () {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
