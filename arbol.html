@@ -184,16 +184,6 @@
     <!-- Botón flotante para abrir la lupa -->
     <button id="btnDebug" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; background: #ffd700; color: #000; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 16px; display: none;" data-i18n="debug_btn">🔍 Ver Solución</button>
 
-    <!-- BOTÓN TEMPORAL DE DIAGNÓSTICO (Solo para ver qué pasa, no daña nada) -->
-    <button id="btnDiagnostico" style="position: fixed; bottom: 80px; right: 20px; z-index: 10000; background: #ff6600; color: #fff; border: 3px solid #fff; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 14px; display: block; cursor: pointer;">🔬 DIAGNÓSTICO</button>
-    
-    <!-- Panel que mostrará la información del diagnóstico -->
-    <div id="panelDiagnostico" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 450px; max-height: 80vh; background: rgba(0,0,0,0.95); color: #fff; padding: 20px; font-family: monospace; font-size: 13px; z-index: 10001; border: 2px solid #ff6600; border-radius: 15px; overflow-y: auto; line-height: 1.6;">
-        <h3 style="color: #ff6600; margin-top: 0; text-align: center;">🔬 DIAGNÓSTICO DEL ÁRBOL</h3>
-        <div id="contenidoDiagnostico"></div>
-        <button onclick="document.getElementById('panelDiagnostico').style.display='none'" style="width:100%; padding:12px; background:#d32f2f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; margin-top: 15px; cursor: pointer;">CERRAR</button>
-    </div>
-
     <script>
         // ============ LÓGICA DEL MENÚ HAMBURGUESA (Limpia y profesional) ============
         document.addEventListener('DOMContentLoaded', function() {
@@ -246,41 +236,11 @@
                 if(typeof actualizarProgresoGeneral === 'function') actualizarProgresoGeneral();
             });
         }
-
-        // ============ LÓGICA DEL BOTÓN DE DIAGNÓSTICO ============
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnDiag = document.getElementById('btnDiagnostico');
-            if (btnDiag) {
-                btnDiag.addEventListener('click', function() {
-                    var info = '';
-                    info += '<b>1. SistemaIdioma:</b> ' + (typeof window.SistemaIdioma !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    if (window.SistemaIdioma) {
-                        info += '<b>2. Idioma actual:</b> ' + window.SistemaIdioma.actual() + '<br>';
-                    }
-                    info += '<b>3. Función tFiguras:</b> ' + (typeof tFiguras !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    if (typeof tFiguras !== 'undefined') {
-                        var nombreBaston = tFiguras('char_baston');
-                        var mensajeBase = tFiguras('msg_remove_confirm');
-                        info += '<b>4. Nombre "bastón" traducido:</b> "' + nombreBaston + '"<br>';
-                        info += '<b>5. Mensaje base:</b> "' + mensajeBase + '"<br>';
-                        var mensajeFinal = mensajeBase.replace('{nombre}', nombreBaston);
-                        info += '<b>6. Mensaje final completo:</b> "' + mensajeFinal + '"<br>';
-                    }
-                    info += '<b>7. SistemaMusica:</b> ' + (typeof window.SistemaMusica !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    if (window.SistemaMusica && typeof window.SistemaMusica.estaSonando === 'function') {
-                        info += '<b>8. Música sonando:</b> ' + (window.SistemaMusica.estaSonando() ? '✅ SÍ' : '❌ NO') + '<br>';
-                    }
-                    info += '<br><i style="color:#aaa;">Si ves esto, el diagnóstico funciona. Copia este texto y pégalo para analizarlo.</i>';
-                    document.getElementById('contenidoDiagnostico').innerHTML = info;
-                    document.getElementById('panelDiagnostico').style.display = 'block';
-                });
-            }
-        });
     </script>
 
     <!-- Scripts con anti-caché ACTUALIZADOS (CLAVE PARA QUE FUNCIONE) -->
-    <script src="js/idioma.js?v=9"></script>
-    <script src="js/musica.js?v=9"></script>
+    <script src="js/idioma.js?v=10"></script>
+    <script src="js/musica.js?v=10"></script>
     <script src="js/arbol-datos.js?v=22"></script>
     <script src="js/arbol-geometria.js?v=19"></script>
     <script src="js/arbol-reglas.js?v=19"></script>
