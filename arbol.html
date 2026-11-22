@@ -253,19 +253,11 @@
             if (btnDiag) {
                 btnDiag.addEventListener('click', function() {
                     var info = '';
-                    
-                    // 1. ¿Existe el sistema de idioma?
                     info += '<b>1. SistemaIdioma:</b> ' + (typeof window.SistemaIdioma !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    
-                    // 2. ¿Qué idioma está activo?
                     if (window.SistemaIdioma) {
                         info += '<b>2. Idioma actual:</b> ' + window.SistemaIdioma.actual() + '<br>';
                     }
-                    
-                    // 3. ¿Existe la función tFiguras?
                     info += '<b>3. Función tFiguras:</b> ' + (typeof tFiguras !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    
-                    // 4. ¿Qué devuelve tFiguras para el Bastón?
                     if (typeof tFiguras !== 'undefined') {
                         var nombreBaston = tFiguras('char_baston');
                         var mensajeBase = tFiguras('msg_remove_confirm');
@@ -274,17 +266,11 @@
                         var mensajeFinal = mensajeBase.replace('{nombre}', nombreBaston);
                         info += '<b>6. Mensaje final completo:</b> "' + mensajeFinal + '"<br>';
                     }
-                    
-                    // 7. ¿Existe SistemaMusica?
                     info += '<b>7. SistemaMusica:</b> ' + (typeof window.SistemaMusica !== 'undefined' ? '✅ EXISTE' : '❌ NO EXISTE') + '<br>';
-                    
-                    // 8. ¿Está sonando la música?
                     if (window.SistemaMusica && typeof window.SistemaMusica.estaSonando === 'function') {
                         info += '<b>8. Música sonando:</b> ' + (window.SistemaMusica.estaSonando() ? '✅ SÍ' : '❌ NO') + '<br>';
                     }
-                    
                     info += '<br><i style="color:#aaa;">Si ves esto, el diagnóstico funciona. Copia este texto y pégalo para analizarlo.</i>';
-                    
                     document.getElementById('contenidoDiagnostico').innerHTML = info;
                     document.getElementById('panelDiagnostico').style.display = 'block';
                 });
@@ -292,16 +278,15 @@
         });
     </script>
 
-    <!-- Scripts con anti-caché v=19 -->
-    <!-- IMPORTANTE: Idioma y Música cargan PRIMERO para que estén listos cuando el juego los necesite -->
+    <!-- Scripts con anti-caché ACTUALIZADOS (CLAVE PARA QUE FUNCIONE) -->
     <script src="js/idioma.js?v=9"></script>
     <script src="js/musica.js?v=9"></script>
-    <script src="js/arbol-datos.js?v=19"></script>
+    <script src="js/arbol-datos.js?v=22"></script>
     <script src="js/arbol-geometria.js?v=19"></script>
     <script src="js/arbol-reglas.js?v=19"></script>
     <script src="js/arbol-interfaz.js?v=19"></script>
     <script src="js/arbol-tiempo.js?v=19"></script>
-    <script src="js/arbol-figuras.js?v=19"></script>
+    <script src="js/arbol-figuras.js?v=21"></script>
     <script src="js/arbol-controles.js?v=19"></script>
     <script src="js/arbol-monitor.js?v=19"></script>
 </body>
