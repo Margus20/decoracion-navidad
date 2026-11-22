@@ -2,16 +2,16 @@
 // Audios REALES de Wikimedia Commons (villancicos de dominio público),
 // porque los archivos locales eran video disfrazado de mp3 y Chrome los rechazaba.
 // Tolerante a fallos: si una canción no carga, salta a la siguiente.
-// Bucle infinito. Solo arranca con toque explícito del usuario.
+// Bucle infinito de 4 canciones. Solo arranca con toque explícito del usuario.
 
 (function () {
     'use strict';
 
     const playlist = [
         'https://commons.wikimedia.org/wiki/Special:FilePath/Jingle_Bells_Or_The_One_Horse_Open_Sleigh_Complete.ogg',
-        'https://commons.wikimedia.org/wiki/Special:FilePath/Christmas_theme.ogg',
-        'https://commons.wikimedia.org/wiki/Special:FilePath/Keller_Christmas_Fantasia.ogg',
-        'https://commons.wikimedia.org/wiki/Special:FilePath/Merrychristmas-neuro.ogg'
+        'https://commons.wikimedia.org/wiki/Special:FilePath/Silent_Nights_-_Concert_Band_-_United_States_Air_Force_Band_of_the_Rockies.mp3',
+        'https://commons.wikimedia.org/wiki/Special:FilePath/It_Came_Upon_the_Midnight_Clear_-_Diplomats_-_United_States_Air_Force_Band.mp3',
+        'https://commons.wikimedia.org/wiki/Special:FilePath/Joy_to_the_World_-_Diplomats_-_United_States_Air_Force_Band.mp3'
     ];
 
     let indice = 0;
@@ -33,7 +33,6 @@
             if (p && p.catch) p.catch(function () { fijarEstado(false); });
         });
 
-        // Si una canción falla, probamos la siguiente en vez de rendirnos
         audio.addEventListener('error', function () {
             intentosSeguidos++;
             if (intentosSeguidos < playlist.length) {
