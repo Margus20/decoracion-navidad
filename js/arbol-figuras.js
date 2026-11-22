@@ -9,17 +9,32 @@ function tFiguras(key) {
     return key;
 }
 
-// Helper para traducir los nombres de los colores de la paleta.
-// Normaliza el nombre en español (quita acentos y mayúsculas) para armar la clave "color_xxx".
-// Si existe la traducción la devuelve; si no, deja el nombre original para que no se rompa nada.
-function tColor(nombreOriginal) {
-    const clave = 'color_' + nombreOriginal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
-        const lang = window.SistemaIdioma.actual();
-        const t = window.SistemaIdioma.traducciones[lang];
-        if (t && t[clave]) return t[clave];
+// === DICCIONARIO LOCAL DE LA PALETA (independiente de idioma.js) ===
+// Incluye TODOS los colores vistos hasta ahora. Si aparece otro, se agrega aquí.
+// Esto garantiza que la paleta se traduzca aunque idioma.js esté cacheado viejo.
+const PALETA_ES = {
+    titulo: 'Elige el color de {nombre}',
+    colores: {
+        original: 'Original', amarillo: 'Amarillo', anaranjado: 'Anaranjado',
+        azul: 'Azul', morado: 'Morado', rojo: 'Rojo', plateado: 'Plateado'
     }
-    return nombreOriginal;
+};
+const PALETA_EN = {
+    titulo: 'Choose the color of {nombre}',
+    colores: {
+        original: 'Original', amarillo: 'Yellow', anaranjado: 'Orange',
+        azul: 'Blue', morado: 'Purple', rojo: 'Red', plateado: 'Silver'
+    }
+};
+
+function paletaData() {
+    const lang = (window.SistemaIdioma && window.SistemaIdioma.actual) ? window.SistemaIdioma.actual() : 'en';
+    return lang === 'es' ? PALETA_ES : PALETA_EN;
+}
+
+function tColor(nombreOriginal) {
+    const clave = nombreOriginal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return paletaData().colores[clave] || nombreOriginal;
 }
 
 function crearFigura(personaje, pngOverride) {
@@ -46,7 +61,7 @@ function actualizarEstadoAvatar(idPersonaje) {
     btn.classList.toggle('activo', document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]').length > 0);
 }
 
-// --- PALETA DE COLORES (TÍTULO Y BOTÓN TRADUCIDOS + CIERRE ARREGLADO) ---
+// --- PALETA DE COLORES (TÍTULO Y COLORES INDEPENDIENTES DE idioma.js + CIERRE ARREGLADO) ---
 function abrirPaletaColores(personaje) {
     cerrarPaleta();
     const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
@@ -59,13 +74,11 @@ function abrirPaletaColores(personaje) {
     personaje.colores.forEach(c => {
         const ruta = 'img/arbol/' + c.png;
         const esActual = srcActual && srcActual.indexOf(c.png) !== -1;
-        // Usamos tColor para traducir el nombre del color
         const nombreTraducido = tColor(c.nombre);
         opcionesHtml += `<button class="paleta-opcion${esActual ? ' activo' : ''}" data-ruta="${ruta}" aria-label="Color ${nombreTraducido}"><img src="${ruta}" alt="${nombreTraducido}"><span>${nombreTraducido}</span></button>`;
     });
     
-    // Traducimos el título y el botón de cancelar
-    const titulo = tFiguras('paleta_title').replace('{nombre}', tFiguras('char_' + personaje.id));
+    const titulo = paletaData().titulo.replace('{nombre}', tFiguras('char_' + personaje.id));
     const btnCancelar = tFiguras('conf_cancel');
     
     overlay.innerHTML = `<div class="paleta-panel"><h3>${titulo}</h3><div class="paleta-grid">${opcionesHtml}</div><button class="paleta-cancelar">${btnCancelar}</button></div>`;
@@ -101,7 +114,7 @@ function cerrarPaleta() {
 function aplicarColor(personaje, rutaPng) {
     const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
     if (existente) {
-        existente.src = rutaPng; // Cambia color sin mover la pieza
+        existente.src = rutaPng;
     } else {
         crearFigura(personaje, rutaPng);
     }
@@ -122,18 +135,15 @@ personajes.forEach(function (personaje) {
     btn.addEventListener('click', function () {
         if (juegoTerminado) return;
         if (personaje.colores && personaje.colores.length) {
-            abrirPaletaColores(personaje); // Abre selector de color
+            abrirPaletaColores(personaje);
             return;
         }
         const existentes = document.querySelectorAll('.figura-activa[data-personaje="' + personaje.id + '"]');
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
-            
-            // === AJUSTE SEGURO PARA BILINGÜISMO ===
             const nombrePersonaje = tFiguras('char_' + personaje.id);
             const mensajeBase = tFiguras('msg_remove_confirm');
             const mensajeFinal = mensajeBase.replace('{nombre}', nombrePersonaje);
-
             confirmarAccion(mensajeFinal, function () {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
