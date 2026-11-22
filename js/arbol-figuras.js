@@ -9,6 +9,19 @@ function tFiguras(key) {
     return key;
 }
 
+// Helper para traducir los nombres de los colores de la paleta.
+// Normaliza el nombre en español (quita acentos y mayúsculas) para armar la clave "color_xxx".
+// Si existe la traducción la devuelve; si no, deja el nombre original para que no se rompa nada.
+function tColor(nombreOriginal) {
+    const clave = 'color_' + nombreOriginal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (window.SistemaIdioma && window.SistemaIdioma.traducciones) {
+        const lang = window.SistemaIdioma.actual();
+        const t = window.SistemaIdioma.traducciones[lang];
+        if (t && t[clave]) return t[clave];
+    }
+    return nombreOriginal;
+}
+
 function crearFigura(personaje, pngOverride) {
     contadorCopias++;
     const img = document.createElement('img');
@@ -33,7 +46,7 @@ function actualizarEstadoAvatar(idPersonaje) {
     btn.classList.toggle('activo', document.querySelectorAll('.figura-activa[data-personaje="' + idPersonaje + '"]').length > 0);
 }
 
-// --- PALETA DE COLORES (CORREGIDO: evita que el panel se reabra al tocar) ---
+// --- PALETA DE COLORES (TÍTULO Y BOTÓN TRADUCIDOS + CIERRE ARREGLADO) ---
 function abrirPaletaColores(personaje) {
     cerrarPaleta();
     const existente = document.querySelector('.figura-activa[data-personaje="' + personaje.id + '"]');
@@ -42,12 +55,20 @@ function abrirPaletaColores(personaje) {
     overlay.className = 'paleta-overlay';
     overlay.id = 'paletaOverlay';
     let opcionesHtml = '';
+    
     personaje.colores.forEach(c => {
         const ruta = 'img/arbol/' + c.png;
         const esActual = srcActual && srcActual.indexOf(c.png) !== -1;
-        opcionesHtml += `<button class="paleta-opcion${esActual ? ' activo' : ''}" data-ruta="${ruta}" aria-label="Color ${c.nombre}"><img src="${ruta}" alt="${c.nombre}"><span>${c.nombre}</span></button>`;
+        // Usamos tColor para traducir el nombre del color
+        const nombreTraducido = tColor(c.nombre);
+        opcionesHtml += `<button class="paleta-opcion${esActual ? ' activo' : ''}" data-ruta="${ruta}" aria-label="Color ${nombreTraducido}"><img src="${ruta}" alt="${nombreTraducido}"><span>${nombreTraducido}</span></button>`;
     });
-    overlay.innerHTML = `<div class="paleta-panel"><h3>Elige el color de ${personaje.nombre}</h3><div class="paleta-grid">${opcionesHtml}</div><button class="paleta-cancelar">Cancelar</button></div>`;
+    
+    // Traducimos el título y el botón de cancelar
+    const titulo = tFiguras('paleta_title').replace('{nombre}', tFiguras('char_' + personaje.id));
+    const btnCancelar = tFiguras('conf_cancel');
+    
+    overlay.innerHTML = `<div class="paleta-panel"><h3>${titulo}</h3><div class="paleta-grid">${opcionesHtml}</div><button class="paleta-cancelar">${btnCancelar}</button></div>`;
     document.body.appendChild(overlay);
     
     // CORRECCIÓN: Detenemos la propagación del evento para que no reabra el panel
