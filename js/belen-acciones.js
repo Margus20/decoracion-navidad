@@ -4,7 +4,7 @@ let tiempoFinalRestante = 45;
 let intervaloGlobal = null;
 let intervaloFinal = null;
 let juegoTerminado = false;
-let modoLibre = false; // NUEVO: Control del modo sin presión
+let modoLibre = false;
 
 // Helper seguro para obtener traducciones dinámicas en acciones del Belén
 function tBelenAcciones(key) {
@@ -12,7 +12,6 @@ function tBelenAcciones(key) {
         const lang = window.SistemaIdioma.actual();
         return window.SistemaIdioma.traducciones[lang][key] || window.SistemaIdioma.traducciones['es'][key] || key;
     }
-    // Fallback local por si el sistema de idioma tarda en cargar
     const fallback = {
         msg_remove_confirm: '¿Seguro que quieres quitar {nombre} de la escena?',
         char_belen_maria: 'María', char_belen_jose: 'José', char_belen_jesus: 'el Niño Jesús',
@@ -84,13 +83,14 @@ function finalizarJuego(motivo) {
     
     deseleccionar();
     actualizarProgresoGeneral();
+    if (typeof liberarEstadoPanelHistory === 'function') liberarEstadoPanelHistory();
     
     if (typeof mostrarResultadoFinal === 'function') {
         mostrarResultadoFinal(calcularScoreGeneral(), motivo);
     }
 }
 
-// ============ NUEVO: MODO LIBRE (Decorar sin presión) ============
+// ============ MODO LIBRE ============
 function activarModoLibre() {
     modoLibre = true;
     juegoTerminado = false;
@@ -99,24 +99,22 @@ function activarModoLibre() {
     document.body.classList.remove('juego-congelado');
     document.body.classList.remove('mostrar-reinicio');
     
-    // FORZAMOS que la zona de relojes y el botón DONAR queden visibles
     const zonaRelojes = document.querySelector('.zona-relojes'); if (zonaRelojes) zonaRelojes.style.display = 'flex';
     const btnDonate = document.querySelector('.btn-donate'); if (btnDonate) btnDonate.style.display = 'inline-flex';
     
-    // Ocultamos SOLO los relojes individuales
     const rg = document.getElementById('relojGlobal'); if (rg) rg.style.display = 'none';
     const rf2 = document.getElementById('relojFinal'); if (rf2) rf2.style.display = 'none';
     
-    // El resto de elementos de competencia sí se ocultan
     const pp = document.querySelector('.panel-progreso'); if (pp) pp.style.display = 'none';
     const bh = document.getElementById('btnHonor'); if (bh) bh.style.display = 'none';
     const mr = document.getElementById('modalResultado'); if (mr) mr.classList.remove('visible');
     const mh = document.getElementById('modalHonor'); if (mh) mh.classList.remove('visible');
     
     deseleccionar();
+    if (typeof liberarEstadoPanelHistory === 'function') liberarEstadoPanelHistory();
 }
 
-// ============ RED DE SEGURIDAD: Chequeo instantáneo ============
+// ============ RED DE SEGURIDAD ============
 function chequearVictoria() {
     if (juegoTerminado || modoLibre) return;
     const figuras = document.querySelectorAll('.figura-activa');
@@ -213,7 +211,6 @@ personajes.forEach(function (personaje) {
         if (existentes.length > 0) {
             const aQuitar = (piezaActiva && piezaActiva.dataset.personaje === personaje.id) ? piezaActiva : existentes[existentes.length - 1];
             
-            // === AJUSTE SEGURO PARA BILINGÜISMO ===
             const nombrePersonaje = tBelenAcciones('char_belen_' + personaje.id);
             const mensajeBase = tBelenAcciones('msg_remove_confirm');
             const mensajeFinal = mensajeBase.replace('{nombre}', nombrePersonaje);
@@ -222,6 +219,7 @@ personajes.forEach(function (personaje) {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
+                if (typeof liberarEstadoPanelHistory === 'function') liberarEstadoPanelHistory(); // <-- NUEVO
                 if (!modoLibre) actualizarProgresoGeneral();
             });
         } else {
@@ -231,13 +229,28 @@ personajes.forEach(function (personaje) {
     });
 });
 
-// ============ 5. ARRASTRAR CON DEDO O MOUSE ============
+// ============ 5. ARRASTRAR + PELLIZCO (NUEVO) ============
 function hacerArrastrable(elemento) {
     let arrastrando = false;
     let startX = 0, startY = 0, initX = 0, initY = 0;
+    let pinchActivo = false, distPinchInicial = 0, zoomPinchInicial = 0;
+
+    function distanciaDosDedos(e) {
+        const t = e.touches;
+        return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    }
 
     function inicio(e) {
         if (juegoTerminado) return;
+        if (e.touches && e.touches.length === 2) {
+            pinchActivo = true;
+            arrastrando = false;
+            e.preventDefault();
+            seleccionarPieza(elemento);
+            distPinchInicial = distanciaDosDedos(e);
+            zoomPinchInicial = parseFloat(elemento.dataset.zoom) || 100;
+            return;
+        }
         seleccionarPieza(elemento);
         arrastrando = true;
         e.preventDefault();
@@ -250,7 +263,22 @@ function hacerArrastrable(elemento) {
     }
 
     function mover(e) {
-        if (!arrastrando || juegoTerminado) return;
+        if (juegoTerminado) return;
+        if (pinchActivo) {
+            if (!e.touches || e.touches.length < 2) return;
+            e.preventDefault();
+            const nueva = distanciaDosDedos(e);
+            if (distPinchInicial > 0) {
+                let nuevoZoom = zoomPinchInicial * (nueva / distPinchInicial);
+                nuevoZoom = Math.max(40, Math.min(300, nuevoZoom));
+                elemento.dataset.zoom = nuevoZoom;
+                aplicarTransform(elemento);
+                refrescarSliders(elemento);
+                if (!modoLibre) actualizarProgresoGeneral();
+            }
+            return;
+        }
+        if (!arrastrando) return;
         e.preventDefault();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -263,7 +291,15 @@ function hacerArrastrable(elemento) {
         if (!modoLibre) actualizarProgresoGeneral();
     }
 
-    function fin() {
+    function fin(e) {
+        if (pinchActivo && (!e || !e.touches || e.touches.length < 2)) {
+            pinchActivo = false;
+            if (!modoLibre) {
+                actualizarProgresoGeneral();
+                verificarInicioRelojFinal();
+                chequearVictoria();
+            }
+        }
         if (arrastrando) {
             arrastrando = false;
             if (!modoLibre) {
@@ -283,7 +319,7 @@ function hacerArrastrable(elemento) {
     document.addEventListener('touchcancel', fin);
 }
 
-// ============ 6. SLIDERS, CAMPOS NUMÉRICOS Y BOTONES DE CONTROL ============
+// ============ 6. SLIDERS Y CONTROLES ============
 function sincronizarSliderInput(sliderId, inputId, min, max) {
     const slider = document.getElementById(sliderId);
     const input = document.getElementById(inputId);
@@ -381,7 +417,6 @@ btnQuitar.addEventListener('click', function () {
         const idP = el.dataset.personaje;
         const personaje = personajes.find(p => p.id === idP);
         
-        // === AJUSTE SEGURO PARA BILINGÜISMO ===
         const nombrePieza = personaje ? tBelenAcciones('char_belen_' + personaje.id) : 'esta pieza';
         const mensajeBase = tBelenAcciones('msg_remove_confirm');
         const mensajeFinal = mensajeBase.replace('{nombre}', nombrePieza);
@@ -391,6 +426,7 @@ btnQuitar.addEventListener('click', function () {
             el.remove();
             panelControles.classList.remove('visible');
             actualizarEstadoAvatar(idP);
+            if (typeof liberarEstadoPanelHistory === 'function') liberarEstadoPanelHistory(); // <-- NUEVO
             if (!modoLibre) {
                 actualizarProgresoGeneral();
                 verificarInicioRelojFinal();
@@ -433,7 +469,7 @@ function recalcularTodasLasFiguras() {
     document.querySelectorAll('.figura-activa').forEach(f => aplicarTransform(f));
 }
 
-// ============ 9. GESTIÓN DEL MODAL DE RESULTADO Y REINICIO ============
+// ============ 9. RESULTADO Y REINICIO ============
 function mostrarBotonReinicio() {
     document.body.classList.add('mostrar-reinicio');
 }
@@ -459,7 +495,6 @@ if (btnCerrarXResultado) {
     });
 }
 
-// NUEVO: Event listener para el botón Seguir Decorando
 const btnSeguirDecorando = document.getElementById('btnSeguirDecorando');
 if (btnSeguirDecorando) {
     btnSeguirDecorando.addEventListener('click', function() {
@@ -471,35 +506,4 @@ if (btnSeguirDecorando) {
 
 const btnHonor = document.getElementById('btnHonor');
 if (btnHonor) {
-    btnHonor.addEventListener('click', function() {
-        mostrarTablaHonor();
-    });
-}
-
-const btnCerrarHonor = document.getElementById('btnCerrarHonor');
-if (btnCerrarHonor) {
-    btnCerrarHonor.addEventListener('click', function() {
-        document.getElementById('modalHonor').classList.remove('visible');
-    });
-}
-
-document.getElementById('modalHonor').addEventListener('click', (e) => { 
-    if (e.target.id === 'modalHonor') document.getElementById('modalHonor').classList.remove('visible'); 
-});
-
-const btnReiniciar = document.getElementById('btnReiniciar');
-if (btnReiniciar) {
-    btnReiniciar.addEventListener('click', function() {
-        location.reload();
-    });
-}
-
-// ============ 10. INICIALIZACIÓN ============
-iniciarRelojGlobal();
-if (typeof iniciarRelojLimpieza === 'function') iniciarRelojLimpieza();
-updateImage();
-window.addEventListener('resize', () => { updateImage(); recalcularTodasLasFiguras(); });
-window.addEventListener('orientationchange', updateImage);
-document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && typeof verificarTiempoTranscurrido === 'function') verificarTiempoTranscurrido();
-});
+    btnHonor.addEventListener('click', function(
