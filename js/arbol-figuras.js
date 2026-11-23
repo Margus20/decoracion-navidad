@@ -148,6 +148,7 @@ personajes.forEach(function (personaje) {
                 if (piezaActiva === aQuitar) deseleccionar();
                 aQuitar.remove();
                 actualizarEstadoAvatar(personaje.id);
+                if (typeof liberarEstadoPanelHistory === 'function') liberarEstadoPanelHistory(); // <-- NUEVO: Limpia el historial al quitar
                 if (!modoLibre) actualizarProgresoGeneral();
             });
         } else {
@@ -157,11 +158,27 @@ personajes.forEach(function (personaje) {
     });
 });
 
-// --- ARRASTRE ---
+// --- ARRASTRE + PELLIZCO (NUEVO: escala con dos dedos sin quitar el arrastre) ---
 function hacerArrastrable(elemento) {
     let arrastrando = false, startX = 0, startY = 0, initX = 0, initY = 0;
+    let pinchActivo = false, distPinchInicial = 0, zoomPinchInicial = 0;
+
+    function distanciaDosDedos(e) {
+        const t = e.touches;
+        return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    }
+
     function inicio(e) {
         if (juegoTerminado) return;
+        if (e.touches && e.touches.length === 2) {
+            pinchActivo = true;
+            arrastrando = false;
+            e.preventDefault();
+            seleccionarPieza(elemento);
+            distPinchInicial = distanciaDosDedos(e);
+            zoomPinchInicial = parseFloat(elemento.dataset.zoom) || 100;
+            return;
+        }
         seleccionarPieza(elemento);
         arrastrando = true;
         e.preventDefault();
@@ -171,8 +188,24 @@ function hacerArrastrable(elemento) {
         initX = parseFloat(elemento.dataset.x) || 50;
         initY = parseFloat(elemento.dataset.y) || 50;
     }
+
     function mover(e) {
-        if (!arrastrando || juegoTerminado) return;
+        if (juegoTerminado) return;
+        if (pinchActivo) {
+            if (!e.touches || e.touches.length < 2) return;
+            e.preventDefault();
+            const nueva = distanciaDosDedos(e);
+            if (distPinchInicial > 0) {
+                let nuevoZoom = zoomPinchInicial * (nueva / distPinchInicial);
+                nuevoZoom = Math.max(40, Math.min(300, nuevoZoom));
+                elemento.dataset.zoom = nuevoZoom;
+                aplicarTransform(elemento);
+                refrescarSliders(elemento);
+                if (!modoLibre) actualizarProgresoGeneral();
+            }
+            return;
+        }
+        if (!arrastrando) return;
         e.preventDefault();
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -182,12 +215,18 @@ function hacerArrastrable(elemento) {
         refrescarSliders(elemento);
         if (!modoLibre) actualizarProgresoGeneral();
     }
-    function fin() {
+
+    function fin(e) {
+        if (pinchActivo && (!e || !e.touches || e.touches.length < 2)) {
+            pinchActivo = false;
+            if (!modoLibre) { actualizarProgresoGeneral(); verificarInicioRelojFinal(); chequearVictoria(); }
+        }
         if (arrastrando) {
             arrastrando = false;
             if (!modoLibre) { actualizarProgresoGeneral(); verificarInicioRelojFinal(); chequearVictoria(); }
         }
     }
+
     elemento.addEventListener('mousedown', inicio);
     document.addEventListener('mousemove', mover);
     document.addEventListener('mouseup', fin);
