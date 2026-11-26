@@ -93,10 +93,16 @@ function limpiarEscenaAutomaticamente() {
     piezaActiva = null;
     celebracionActivada = false;
     contadorCopias = 1;
-    panelControles.classList.remove('visible');
+    if (panelControles) panelControles.classList.remove('visible');
     document.body.classList.remove('celebracion-activa');
-    barraGeneral.style.width = '0%';
-    barraGeneral.className = 'barra-relleno nivel-bajo';
+    
+    // AJUSTE SEGURO: la barra se busca fresco por su ID, no depende de la variable global
+    const barraEl = document.getElementById('barraGeneral');
+    if (barraEl) {
+        barraEl.style.height = '0%';
+        barraEl.className = 'barra-relleno nivel-bajo';
+    }
+    
     document.querySelectorAll('.avatar-btn').forEach(btn => btn.classList.remove('activo'));
     
     tiempoInicio = Date.now();
