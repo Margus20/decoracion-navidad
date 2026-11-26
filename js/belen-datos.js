@@ -12,7 +12,7 @@ const personajes = [
 
 const idsNecesarios = ['maria', 'jose', 'jesus', 'estrella', 'pesebre', 'cuna', 'oveja', 'burro'];
 
-// ============ REFERENCIAS AL DOM ============
+// ============ REFERENCIAS AL DOM (con protección contra elementos que no existan) ============
 const panelAvatars = document.getElementById('panelAvatars');
 const zonaFiguras = document.getElementById('zonaFiguras');
 const panelControles = document.getElementById('panelControles');
@@ -64,11 +64,17 @@ function limpiarEscenaAutomaticamente() {
     piezaActiva = null;
     celebracionActivada = false;
     contadorCopias = 1;
-    panelControles.classList.remove('visible');
-    contenedorBarraInd.style.display = 'none';
+    if (panelControles) panelControles.classList.remove('visible');
+    if (contenedorBarraInd) contenedorBarraInd.style.display = 'none';
     document.body.classList.remove('celebracion-activa');
-    barraGeneral.style.width = '0%';
-    barraGeneral.className = 'barra-relleno nivel-bajo';
+    
+    // AJUSTE SEGURO: la barra se busca fresco por su ID, no depende de la variable global
+    const barraEl = document.getElementById('barraGeneral');
+    if (barraEl) {
+        barraEl.style.width = '0%';
+        barraEl.className = 'barra-relleno nivel-bajo';
+    }
+    
     document.querySelectorAll('.avatar-btn').forEach(btn => btn.classList.remove('activo'));
     
     tiempoInicio = Date.now();
