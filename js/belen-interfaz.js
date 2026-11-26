@@ -100,11 +100,10 @@ function actualizarProgresoGeneral() {
     const juegoTerminadoActivo = (typeof juegoTerminado !== 'undefined' && juegoTerminado);
     const disparoCargado = (typeof finalizarJuego === 'function');
 
-    // AJUSTE SEGURO: la barra se busca fresco por su ID en cada actualización,
-    // en lugar de depender de una variable global que puede no apuntar al elemento.
+    // AJUSTE SEGURO: la barra se busca fresco por su ID y se pinta por ALTURA (barra vertical).
     const barraEl = document.getElementById('barraGeneral');
     if (barraEl) {
-        barraEl.style.width = score + '%';
+        barraEl.style.height = score + '%';
         barraEl.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
     }
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
