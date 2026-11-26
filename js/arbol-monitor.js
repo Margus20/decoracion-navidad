@@ -17,7 +17,13 @@
         // Verificamos que las 8 piezas requeridas estén presentes en el mapa
         const todasPresentes = idsNecesarios.every(id => m[id]);
 
-        // 3. Si el puntaje es 100 y las 8 están, ¡VICTORIA! 
+        // 3. ACTUALIZAR LA BARRA Y EL NÚMERO en cada revisión.
+        //    Antes solo se revisaba victoria, pero nadie pintaba la UI.
+        if (typeof actualizarProgresoGeneral === 'function') {
+            actualizarProgresoGeneral();
+        }
+
+        // 4. Si el puntaje es 100 y las 8 están, ¡VICTORIA! 
         if (Math.round(score) >= 100 && todasPresentes) {
             detenerMonitor();
             if (typeof finalizarJuego === 'function') {
