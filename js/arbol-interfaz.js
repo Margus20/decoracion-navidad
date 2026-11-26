@@ -9,6 +9,7 @@ function t(key) {
     // Fallback por defecto si el sistema de idioma aún no cargó
     const fallback = {
         conf_title: 'Confirmar', conf_cancel: 'Cancelar', conf_accept: 'Aceptar',
+        progress_label: 'Progreso del Árbol',
         debug_real_score: 'Puntaje Real', debug_how_to_100_title: '📋 CÓMO LLEGAR AL 100',
         debug_how_to_100_msg: 'Coloca las 8 piezas en sus posiciones correctas. Usa la lupa para ver las coordenadas.',
         debug_diag_title: '🔧 DIAGNÓSTICO', debug_diag_yes: 'SÍ', debug_diag_no: 'NO',
@@ -52,7 +53,6 @@ function confirmarAccion(mensaje, onAceptar) {
     const ov = document.createElement('div');
     ov.className = 'conf-overlay';
     ov.id = 'confOverlay';
-    // Usamos la función t() para los textos del modal
     ov.innerHTML = `<div class="conf-panel"><h3 class="conf-titulo">${t('conf_title')}</h3><p class="conf-msg">${mensaje}</p><div class="conf-botones"><button class="conf-btn conf-cancelar">${t('conf_cancel')}</button><button class="conf-btn conf-aceptar">${t('conf_accept')}</button></div></div>`;
     document.body.appendChild(ov);
     ov.querySelector('.conf-aceptar').addEventListener('click', function () {
@@ -89,21 +89,22 @@ function actualizarProgresoGeneral() {
     const juegoTerminadoActivo = (typeof juegoTerminado !== 'undefined' && juegoTerminado);
     const disparoCargado = (typeof finalizarJuego === 'function');
 
-    // AJUSTE SEGURO: la barra se busca fresco por su ID y se pinta por ALTURA (barra vertical).
+    // 1) PRIMERO pintamos la etiqueta con el número. Así, aunque la barra fallara,
+    //    el usuario siempre ve sus puntos. Cada parte va protegida por separado.
+    const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
+    if (etiquetaGeneral) etiquetaGeneral.textContent = `${t('progress_label')}: ${score.toFixed(2)}/100`;
+
+    // 2) DESPUÉS la barra vertical, buscada fresca por su ID y con guarda.
     const barraEl = document.getElementById('barraGeneral');
     if (barraEl) {
         barraEl.style.height = score + '%';
         barraEl.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
     }
-    const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
-    if (etiquetaGeneral) etiquetaGeneral.textContent = `${t('progress_label')}: ${score.toFixed(2)}/100`;
 
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
     if (panel && content && panel.style.display === 'block') {
         let html = `<div style="text-align:center; font-size:1.5em; margin-bottom:15px; color:${score>=100?'#44ff44':'#ff4444'}; font-weight:bold;">${t('debug_real_score')}: ${score.toFixed(2)}</div>`;
-        
-        // NOTA: c.nombre se traducirá cuando me pases arbol-reglas.js
         criterios.forEach(c => {
             const val = c.eval(m);
             const pts = (val * c.peso).toFixed(1);
@@ -177,7 +178,6 @@ function mostrarResultadoFinal(score, motivo) {
         else if (valor >= 0.5) { estado = 'parcial'; texto = '~'; }
         const item = document.createElement('div');
         item.className = 'detalle-item';
-        // NOTA: c.nombre se traducirá cuando me pases arbol-reglas.js
         item.innerHTML = `<span>${c.nombre}</span><span style="color:#ffd700;font-weight:bold;margin:0 10px;">${puntosObtenidos}/${c.peso}</span><span class="detalle-estado ${estado}">${texto}</span>`;
         listaDetalles.appendChild(item);
     });
