@@ -89,10 +89,14 @@ function actualizarProgresoGeneral() {
     const juegoTerminadoActivo = (typeof juegoTerminado !== 'undefined' && juegoTerminado);
     const disparoCargado = (typeof finalizarJuego === 'function');
 
-    barraGeneral.style.width = score + '%';
+    // AJUSTE SEGURO: la barra se busca fresco por su ID y se pinta por ALTURA (barra vertical).
+    const barraEl = document.getElementById('barraGeneral');
+    if (barraEl) {
+        barraEl.style.height = score + '%';
+        barraEl.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
+    }
     const etiquetaGeneral = document.querySelector('.panel-progreso .label-progreso');
     if (etiquetaGeneral) etiquetaGeneral.textContent = `${t('progress_label')}: ${score.toFixed(2)}/100`;
-    barraGeneral.className = 'barra-relleno ' + (score < 25 ? 'nivel-bajo' : score < 75 ? 'nivel-medio' : 'nivel-alto');
 
     const panel = document.getElementById('debugPanel');
     const content = document.getElementById('debugContent');
